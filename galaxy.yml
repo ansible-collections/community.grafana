@@ -1,0 +1,16 @@
+namespace: ansible_community
+name: grafana
+version: 1.0.0
+readme: README.md
+authors: null
+description: null
+license: null
+license_file: null
+tags:
+  - monitoring
+  - grafana
+dependencies: {}
+repository: git@github.com:gundalow-collection-migration/grafana.git
+documentation: null
+homepage: null
+issues: null
