@@ -30,16 +30,17 @@ jobs:
         pycodestyle --max-line-length=160 --ignore=E305,E402,W503,W504,E722,E741 ./
     - name: Run yamlint
       run: |
+        cd ansible_collections/gundalow-collections/
         ansible-test sanity --docker=default --test yamllint plugins/modules/*
     - name: Run validate modules
       run: |
+        cd ansible_collections/gundalow-collections/
         ansible-test sanity --docker=default --test validate-modules plugins/modules/*
     - name: Run Pylint
       run: |
+        cd ansible_collections/gundalow-collections/
         ansible-test sanity --docker=default --test pylint plugins/modules/*
     - name: Run unit tests
-      # Need to fix unit test for thing other than ontap later.
-      
-      #  ansible-test units --docker=default --python ${{ matrix.python-version }}
       run: |
+        cd ansible_collections/gundalow-collections/
         ansible-test units --docker=default --python ${{ matrix.python-version }}
