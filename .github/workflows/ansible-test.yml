@@ -20,7 +20,7 @@ jobs:
         run: ansible-test sanity --docker -v --color
 #     - name: Run unit tests
 #       run: ansible-test units --docker -v --color
-      - name: Run integration tests on Python 2.7
-        run: ansible-test integration --docker -v --color --retry-on-error --python 2.7
+#     - name: Run integration tests on Python 2.7
+#       run: ansible-test integration --docker -v --color --retry-on-error --python 2.7
       - name: Run integration tests on Python 3.7
         run: ansible-test integration --docker -v --color --retry-on-error --python 3.7
