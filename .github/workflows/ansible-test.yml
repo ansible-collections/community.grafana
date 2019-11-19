@@ -45,6 +45,8 @@ jobs:
 #        cd ansible_collections/gundalow_collections/grafana
 #        ansible-test sanity --docker=default --test pylint plugins/modules/*
     - name: Run unit tests
+      env:
+        ACTIONS_RUNNER_DEBUG: true
       run: |
         cd ansible_collections/gundalow_collections/grafana
         bash -c "test -d tests/units && ansible-test units --docker=default --python ${{ matrix.python-version }}"
