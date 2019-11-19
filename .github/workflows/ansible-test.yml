@@ -7,10 +7,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Python 3.7
+      - name: Set up Python 3.6
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.6
       - name: Check out code
         uses: actions/checkout@v1
         with:
@@ -23,5 +23,5 @@ jobs:
 #       run: ansible-test units --docker -v --color
 #     - name: Run integration tests on Python 2.7
 #       run: ansible-test integration --docker -v --color --retry-on-error --python 2.7
-      - name: Run integration tests on Python 3.7
-        run: ansible-test integration --docker ubuntu1804 -v --color --retry-on-error --python 3.7
+      - name: Run integration tests on Python 3.6
+        run: ansible-test integration --docker ubuntu1804 -v --color --retry-on-error --python 3.6
