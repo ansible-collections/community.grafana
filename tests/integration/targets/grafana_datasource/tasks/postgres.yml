@@ -1,6 +1,6 @@
 - name: Create postgres datasource
   register: result
-  ansible_community.grafana.grafana_datasource:
+  gundalow_collections.grafana.grafana_datasource:
     name: datasource-postgres
     grafana_url: http://127.0.0.1:3000
     grafana_user: admin
@@ -21,7 +21,7 @@
     - 'result.msg == ''Datasource datasource-postgres created : Datasource added'''
 - name: Check postgres datasource creation idempotency
   register: result
-  ansible_community.grafana.grafana_datasource:
+  gundalow_collections.grafana.grafana_datasource:
     name: datasource-postgres
     grafana_url: http://127.0.0.1:3000
     grafana_user: admin

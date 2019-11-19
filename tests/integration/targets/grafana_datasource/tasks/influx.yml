@@ -1,6 +1,6 @@
 - name: Create influxdb datasource
   register: result
-  ansible_community.grafana.grafana_datasource:
+  gundalow_collections.grafana.grafana_datasource:
     name: datasource-influxdb
     grafana_url: http://127.0.0.1:3000
     grafana_user: admin
@@ -20,7 +20,7 @@
     - 'result.msg == ''Datasource datasource-influxdb created : Datasource added'''
 - name: Check influxdb datasource creation idempotency
   register: result
-  ansible_community.grafana.grafana_datasource:
+  gundalow_collections.grafana.grafana_datasource:
     name: datasource-influxdb
     grafana_url: http://127.0.0.1:3000
     grafana_user: admin
