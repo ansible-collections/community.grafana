@@ -32,19 +32,19 @@ jobs:
       run: |
         cd ansible_collections/gundalow_collections/grafana
         ansible-test sanity --docker=default
-    - name: Run yamlint
-      run: |
-        cd ansible_collections/gundalow_collections/grafana
-        ansible-test sanity --docker=default --test yamllint plugins/modules/*
-    - name: Run validate modules
-      run: |
-        cd ansible_collections/gundalow_collections/grafana
-        ansible-test sanity --docker=default --test validate-modules plugins/modules/*
-    - name: Run Pylint
-      run: |
-        cd ansible_collections/gundalow_collections/grafana
-        ansible-test sanity --docker=default --test pylint plugins/modules/*
+#    - name: Run yamlint
+#      run: |
+#        cd ansible_collections/gundalow_collections/grafana
+#        ansible-test sanity --docker=default --test yamllint plugins/modules/*
+#    - name: Run validate modules
+#      run: |
+#        cd ansible_collections/gundalow_collections/grafana
+#        ansible-test sanity --docker=default --test validate-modules plugins/modules/*
+#    - name: Run Pylint
+#      run: |
+#        cd ansible_collections/gundalow_collections/grafana
+#        ansible-test sanity --docker=default --test pylint plugins/modules/*
     - name: Run unit tests
       run: |
         cd ansible_collections/gundalow_collections/grafana
-        test -d tests/units && ansible-test units --docker=default --python ${{ matrix.python-version }}
+        bash -c "test -d tests/units && ansible-test units --docker=default --python ${{ matrix.python-version }}"
