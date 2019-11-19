@@ -1,0 +1,45 @@
+name: ansible-test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      # Python version 2.6 does not exist in github
+      # Python Version 3.8 does not exist in github
+      matrix:
+        #python-version: [2.7, 3.5, 3.6, 3.7]
+        python-version: [3.7]
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install netapp-lib pycodestyle
+        pip install ansible==2.9
+    - name: Run pycodestyle
+      run: |
+        pycodestyle --max-line-length=160 --ignore=E305,E402,W503,W504,E722,E741 ./
+    - name: Run yamlint
+      run: |
+        ansible-test sanity --docker=default --test yamllint plugins/modules/*
+    - name: Run validate modules
+      run: |
+        ansible-test sanity --docker=default --test validate-modules plugins/modules/*
+    - name: Run Pylint
+      run: |
+        ansible-test sanity --docker=default --test pylint plugins/modules/*
+    - name: Run unit tests
+      # Need to fix unit test for thing other than ontap later.
+      
+      #  ansible-test units --docker=default --python ${{ matrix.python-version }}
+      run: |
+        ansible-test units --docker=default --python ${{ matrix.python-version }}
