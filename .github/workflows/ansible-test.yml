@@ -26,4 +26,3 @@ jobs:
         run: ansible-test integration --docker ubuntu1804 -v --color --retry-on-error --python 3.6
 
 # FIXME FUTURE: If Look if we want to split integration tests into it's own job if they are long running
-
