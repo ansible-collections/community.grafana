@@ -1,6 +1,6 @@
 - name: Create cloudwatch datasource
   register: result
-  ansible_community.grafana.grafana_datasource:
+  grafana_datasource:
     name: datasource-cloudwatch
     grafana_url: http://127.0.0.1:3000
     grafana_user: admin
@@ -22,7 +22,7 @@
     - 'result.msg == ''Datasource datasource-cloudwatch created : Datasource added'''
 - name: Check cloudwatch datasource creation idempotency
   register: result
-  ansible_community.grafana.grafana_datasource:
+  grafana_datasource:
     name: datasource-cloudwatch
     grafana_url: http://127.0.0.1:3000
     grafana_user: admin
