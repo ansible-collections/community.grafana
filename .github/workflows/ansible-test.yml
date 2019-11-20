@@ -18,11 +18,9 @@ jobs:
         run: pip install ansible==2.9.1 --disable-pip-version-check
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color
-#     - name: Run unit tests
-#       run: ansible-test units --docker -v --color
-#     - name: Run integration tests on Python 2.7
-#       run: ansible-test integration --docker -v --color --retry-on-error --python 2.7
       - name: Run integration tests on Python 3.6
         run: ansible-test integration --docker ubuntu1804 -v --color --retry-on-error --python 3.6
 
 # FIXME FUTURE: If Look if we want to split integration tests into it's own job if they are long running
+# FIXME FUTURE: Other Python Versions
+# FIXME FUTURE: Other Operating Systems
