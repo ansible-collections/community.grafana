@@ -1,6 +1,13 @@
 ###
 # https://probot.github.io/apps/settings/
 #
+
+# DO NOT MODIFY
+# this is a copy of https://github.com/gundalow-collection/.github/blob/master/.github/settings.yml
+# Work around till https://github.com/probot/settings/pull/179 is merged
+
+
+
 repository:
   # See https://developer.github.com/v3/repos/#edit for all available settings.
   has_issues: true
