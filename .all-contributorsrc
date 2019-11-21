@@ -1,0 +1,25 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "gundalow",
+      "name": "John R Barker",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/940557?v=4",
+      "profile": "https://github.com/gundalow",
+      "contributions": [
+        "infra",
+        "test",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "grafana",
+  "projectOwner": "gundalow-collections",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
