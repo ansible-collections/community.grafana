@@ -1,5 +1,5 @@
 # Grafana Role
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
 
 This is an example single Collection called `community.collection`
 
@@ -34,6 +34,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/gundalow"><img src="https://avatars1.githubusercontent.com/u/940557?v=4" width="100px;" alt="John R Barker"/><br /><sub><b>John R Barker</b></sub></a><br /><a href="#infra-gundalow" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/gundalow-collections/grafana/commits?author=gundalow" title="Tests">⚠️</a> <a href="https://github.com/gundalow-collections/grafana/commits?author=gundalow" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/rrey"><img src="https://avatars1.githubusercontent.com/u/2752379?v=4" width="100px;" alt="Rémi REY"/><br /><sub><b>Rémi REY</b></sub></a><br /><a href="https://github.com/gundalow-collections/grafana/commits?author=rrey" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
