@@ -1,0 +1,7 @@
+---
+
+grafana_url: "http://127.0.0.1:3000"
+grafana_username: "admin"
+grafana_password: "admin"
+
+...
