@@ -1,3 +1,5 @@
+---
+
 - block:
   - include: elastic.yml
   - include: influx.yml

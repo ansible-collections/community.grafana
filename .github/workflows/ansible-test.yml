@@ -3,23 +3,110 @@ name: CI
 on: push
 
 jobs:
-  build:
+    #  sanity:
+    #    runs-on: ubuntu-latest
+    #    #services:
+    #    #  grafana:
+    #    #    image: grafana/grafana:latest
+    #    #    ports:
+    #    #    - 3000/tcp
+    #    steps:
+    #
+    #      - name: Check out code
+    #        uses: actions/checkout@v1
+    #        with:
+    #          path: ansible_collections/gundalow_collections/grafana
+    #
+    #      - name: Set up Python 3.6
+    #        uses: actions/setup-python@v1
+    #        with:
+    #          python-version: 3.6
+    #
+    #      - name: Install Ansible 2.9.1
+    #        run: pip install ansible==2.9.1 --disable-pip-version-check
+    #
+    #      - name: Run sanity tests
+    #        run: ansible-test sanity --docker -v --color --python 3.6
+    #
+    #  units:
+    #    runs-on: ubuntu-latest
+    #    #services:
+    #    #  grafana:
+    #    #    image: grafana/grafana:latest
+    #    #    ports:
+    #    #    - 3000/tcp
+    #    steps:
+    #      - name: Check out code
+    #        uses: actions/checkout@v1
+    #        with:
+    #          path: ansible_collections/gundalow_collections/grafana
+    #
+    #      - name: Set up Python 3.6
+    #        uses: actions/setup-python@v1
+    #        with:
+    #          python-version: 3.6
+    #
+    #      - name: Install Ansible 2.9.1
+    #        run: pip install ansible==2.9.1 --disable-pip-version-check
+    #
+    #      - name: Run unit tests
+    #        run: ansible-test units --docker -v --color --python 3.6
+
+  integration:
     runs-on: ubuntu-latest
+    services:
+      grafana:
+        image: grafana/grafana:latest
+        ports:
+            - 3000/tcp
+    strategy:
+      matrix:
+        #python_version: ["3.5", "3.6"]
+        python_version: ["3.6"]
     steps:
-      - name: Set up Python 3.6
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.6
       - name: Check out code
         uses: actions/checkout@v1
         with:
           path: ansible_collections/gundalow_collections/grafana
+
+      - name: Set up Python ${{ matrix.python_version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python_version }}
+
       - name: Install Ansible 2.9.1
         run: pip install ansible==2.9.1 --disable-pip-version-check
-      - name: Run sanity tests
-        run: ansible-test sanity --docker -v --color
-      - name: Run integration tests on Python 3.6
-        run: ansible-test integration --docker ubuntu1804 -v --color --retry-on-error --python 3.6
+
+      - name: Write host info to grafana_team/defaults/main.yml
+        #run: "echo \"grafana_url: 'http://${GRAFANA_HOST}:${GRAFANA_PORT}'\" >> tests/integration/targets/grafana_team/defaults/main.yml"
+        run: "echo \"grafana_url: 'http://${GRAFANA_HOST}:${GRAFANA_PORT}'\" >> tests/integration/targets/setup_grafana/defaults/main.yml"
+        env:
+          GRAFANA_HOST: 127.0.0.1
+          GRAFANA_PORT: ${{ job.services.grafana.ports[3000] }}
+      - name: debug
+        run: cat tests/integration/targets/setup_grafana/defaults/main.yml
+#      - name: Wait for Docker container
+#        uses: "maddox/actions/wait-for-200@master"
+#        env:
+#          URL: "http://"
+#          SECONDS_BETWEEN_CHECKS: "2"
+#          MAX_TRIES: "20"
+      # By now Grafana docker instance should nearly be ready
+      - name: Wait for Grafana Docker Container
+        run: curl ${GRAFANA_HOST}:${GRAFANA_PORT}
+        env:
+          GRAFANA_HOST: 127.0.0.1
+          GRAFANA_PORT: ${{ job.services.grafana.ports[3000] }}
+
+#      - name: Wait for Grafana Docker Container
+#        run: bash -c "while [[ \"$(curl -s -o /dev/null -w ''%{http_code}'' ${GRAFANA_HOST}:${GRAFANA_PORT})\" != '200' ]]; do sleep 5; done"
+#        shell: bash 
+#        env:
+#          GRAFANA_HOST: 127.0.0.1
+#          GRAFANA_PORT: ${{ job.services.grafana.ports[3000] }}
+
+      - name: Run integration tests on Python ${{ matrix.python_version }}
+        run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }}
 
 # FIXME FUTURE: If Look if we want to split integration tests into it's own job if they are long running
 # FIXME FUTURE: Other Python Versions
