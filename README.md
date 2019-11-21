@@ -1,4 +1,5 @@
 # Grafana Role
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
 
 This is an example single Collection called `community.collection`
 
@@ -23,3 +24,19 @@ For more information see `#ansible-community` on Freenode IRC.
 GNU General Public License v3.0 or later
 
 See LICENCING to see the full text.
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/gundalow"><img src="https://avatars1.githubusercontent.com/u/940557?v=4" width="100px;" alt="John R Barker"/><br /><sub><b>John R Barker</b></sub></a><br /><a href="#infra-gundalow" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/gundalow-collections/grafana/commits?author=gundalow" title="Tests">⚠️</a> <a href="https://github.com/gundalow-collections/grafana/commits?author=gundalow" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
