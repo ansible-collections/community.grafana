@@ -15,6 +15,15 @@
         "test",
         "code"
       ]
+    },
+    {
+      "login": "rrey",
+      "name": "Rémi REY",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2752379?v=4",
+      "profile": "https://github.com/rrey",
+      "contributions": [
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
