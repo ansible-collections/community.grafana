@@ -12,99 +12,110 @@ ANSIBLE_METADATA = {
     'metadata_version': '1.1'
 }
 
-DOCUMENTATION = '''module: grafana_dashboard
+DOCUMENTATION = '''
+---
+module: grafana_dashboard
 author:
-- Thierry Sallé (@seuf)
+  - Thierry Sallé (@seuf)
+version_added: "2.5"
 short_description: Manage Grafana dashboards
 description:
-- Create, update, delete, export Grafana dashboards via API.
+  - Create, update, delete, export Grafana dashboards via API.
 options:
   url:
     description:
-    - The Grafana URL.
+      - The Grafana URL.
     required: true
-    aliases:
-    - grafana_url
+    aliases: [ grafana_url ]
+    version_added: 2.7
   url_username:
     description:
-    - The Grafana API user.
+      - The Grafana API user.
     default: admin
-    aliases:
-    - grafana_user
+    aliases: [ grafana_user ]
+    version_added: 2.7
   url_password:
     description:
-    - The Grafana API password.
+      - The Grafana API password.
     default: admin
-    aliases:
-    - grafana_password
+    aliases: [ grafana_password ]
+    version_added: 2.7
   grafana_api_key:
     description:
-    - The Grafana API key.
-    - If set, I(grafana_user) and I(grafana_password) will be ignored.
+      - The Grafana API key.
+      - If set, I(grafana_user) and I(grafana_password) will be ignored.
   org_id:
     description:
-    - The Grafana Organisation ID where the dashboard will be imported / exported.
-    - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs
-      to one organisation..
+      - The Grafana Organisation ID where the dashboard will be imported / exported.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation..
     default: 1
   folder:
     description:
-    - The Grafana folder where this dashboard will be imported to.
+      - The Grafana folder where this dashboard will be imported to.
     default: General
+    version_added: '2.10'
   state:
     description:
-    - State of the dashboard.
+      - State of the dashboard.
     required: true
-    choices:
-    - absent
-    - export
-    - present
+    choices: [ absent, export, present ]
     default: present
   slug:
     description:
-    - Deprecated since Grafana 5. Use grafana dashboard uid instead.
-    - slug of the dashboard. It's the friendly url name of the dashboard.
-    - When C(state) is C(present), this parameter can override the slug in the meta
-      section of the json file.
-    - If you want to import a json dashboard exported directly from the interface
-      (not from the api), you have to specify the slug parameter because there is
-      no meta section in the exported json.
+      - Deprecated since Grafana 5. Use grafana dashboard uid instead.
+      - slug of the dashboard. It's the friendly url name of the dashboard.
+      - When C(state) is C(present), this parameter can override the slug in the meta section of the json file.
+      - If you want to import a json dashboard exported directly from the interface (not from the api),
+        you have to specify the slug parameter because there is no meta section in the exported json.
   uid:
+    version_added: 2.7
     description:
-    - uid of the dashboard to export when C(state) is C(export) or C(absent).
+      - uid of the dashboard to export when C(state) is C(export) or C(absent).
   path:
     description:
-    - The path to the json file containing the Grafana dashboard to import or export.
+      - The path to the json file containing the Grafana dashboard to import or export.
+      - A http URL is also accepted (since 2.10).
+    aliases: [ dashboard_url ]
   overwrite:
     description:
-    - Override existing dashboard when state is present.
+      - Override existing dashboard when state is present.
     type: bool
     default: 'no'
+  dashboard_id:
+    description:
+      - Public Grafana.com dashboard id to import
+    version_added: '2.10'
+  dashboard_revision:
+    description:
+      - Revision of the public grafana dashboard to import
+    default: 1
+    version_added: '2.10'
   message:
     description:
-    - Set a commit message for the version history.
-    - Only used when C(state) is C(present).
+      - Set a commit message for the version history.
+      - Only used when C(state) is C(present).
   validate_certs:
     description:
-    - If C(no), SSL certificates will not be validated.
-    - This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated.
+      - This should only be used on personally controlled sites using self-signed certificates.
     type: bool
     default: 'yes'
   client_cert:
     description:
-    - PEM formatted certificate chain file to be used for SSL client authentication.
-    - This file can also include the key as well, and if the key is included, client_key
-      is not required
+      - PEM formatted certificate chain file to be used for SSL client authentication.
+      - This file can also include the key as well, and if the key is included, client_key is not required
+    version_added: 2.7
   client_key:
     description:
-    - PEM formatted file that contains your private key to be used for SSL client
-    - authentication. If client_cert contains both the certificate and key, this option
-      is not required
+      - PEM formatted file that contains your private key to be used for SSL client
+      - authentication. If client_cert contains both the certificate and key, this option is not required
+    version_added: 2.7
   use_proxy:
     description:
-    - Boolean of whether or not to use proxy.
+      - Boolean of whether or not to use proxy.
     default: 'yes'
     type: bool
+    version_added: 2.7
 '''
 
 EXAMPLES = '''
@@ -119,6 +130,21 @@ EXAMPLES = '''
         message: Updated by ansible
         overwrite: yes
         path: /path/to/dashboards/foo.json
+
+    - name: Import Grafana dashboard Zabbix
+      grafana_dashboard:
+        grafana_url: http://grafana.company.com
+        grafana_api_key: "{{ grafana_api_key }}"
+        folder: zabbix
+        dashboard_id: 6098
+        dashbord_revision: 1
+
+    - name: Import Grafana dashboard zabbix
+      grafana_dashboard:
+        grafana_url: http://grafana.company.com
+        grafana_api_key: "{{ grafana_api_key }}"
+        folder: public
+        dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
 
     - name: Export dashboard
       grafana_dashboard:
@@ -141,7 +167,6 @@ uid:
 '''
 
 import json
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -285,7 +310,7 @@ def grafana_dashboard_changed(payload, dashboard):
         del(dashboard['meta'])
 
     # new dashboards don't require an id attribute (or, it can be 'null'), Grafana's API will generate it
-    if payload['dashboard']['id'] is None:
+    if payload['dashboard'].get('id'):
         del(dashboard['dashboard']['id'])
         del(payload['dashboard']['id'])
 
@@ -298,11 +323,20 @@ def grafana_dashboard_changed(payload, dashboard):
 def grafana_create_dashboard(module, data):
 
     # define data payload for grafana API
-    try:
-        with open(data['path'], 'r') as json_file:
-            payload = json.load(json_file)
-    except Exception as e:
-        raise GrafanaAPIException("Can't load json file %s" % to_native(e))
+    payload = {}
+    if data.get('dashboard_id'):
+        data['path'] = "https://grafana.com/api/dashboards/%s/revisions/%s/download" % (data['dashboard_id'], data['dashboard_revision'])
+    if data['path'].startswith('http'):
+        r, info = fetch_url(module, data['path'])
+        if info['status'] != 200:
+            raise GrafanaAPIException('Unable to download grafana dashboard from url %s : %s' % (data['path'], info))
+        payload = json.loads(r.read())
+    else:
+        try:
+            with open(data['path'], 'r') as json_file:
+                payload = json.load(json_file)
+        except Exception as e:
+            raise GrafanaAPIException("Can't load json file %s" % to_native(e))
 
     # Check that the dashboard JSON is nested under the 'dashboard' key
     if 'dashboard' not in payload:
@@ -382,6 +416,10 @@ def grafana_create_dashboard(module, data):
         if folder_exists is True:
             payload['folderId'] = folder_id
 
+        # Ensure there is no id in payload
+        if 'id' in payload['dashboard']:
+            del payload['dashboard']['id']
+
         r, info = fetch_url(module, '%s/api/dashboards/db' % data['grafana_url'],
                             data=json.dumps(payload), headers=headers, method='POST')
         if info['status'] == 200:
@@ -395,8 +433,8 @@ def grafana_create_dashboard(module, data):
                     raise GrafanaAPIException(e)
             result['uid'] = uid
         else:
-            raise GrafanaAPIException('Unable to create the new dashboard %s : %s - %s.' %
-                                      (payload['dashboard']['title'], info['status'], info))
+            raise GrafanaAPIException('Unable to create the new dashboard %s : %s - %s. (headers : %s)' %
+                                      (payload['dashboard']['title'], info['status'], info, headers))
 
     return result
 
@@ -497,7 +535,9 @@ def main():
         folder=dict(type='str', default='General'),
         uid=dict(type='str'),
         slug=dict(type='str'),
-        path=dict(type='str'),
+        path=dict(aliases=['dashboard_url'], type='str'),
+        dashboard_id=dict(type='str'),
+        dashboard_revision=dict(type='str', default='1'),
         overwrite=dict(type='bool', default=False),
         message=dict(type='str'),
     )
@@ -505,7 +545,7 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=False,
         required_together=[['url_username', 'url_password', 'org_id']],
-        mutually_exclusive=[['grafana_user', 'grafana_api_key'], ['uid', 'slug']],
+        mutually_exclusive=[['grafana_user', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
     )
 
     try:
