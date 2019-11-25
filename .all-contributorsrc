@@ -24,6 +24,16 @@
       "contributions": [
         "test"
       ]
+    },
+    {
+      "login": "seuf",
+      "name": "Thierry Sallé",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1336359?v=4",
+      "profile": "https://aperogeek.fr",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
