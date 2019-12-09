@@ -16,8 +16,14 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: Install Ansible 2.9.1
-        run: pip install ansible==2.9.1 --disable-pip-version-check
+      - name: HACK download ansible
+        run: git clone https://github.com/ansible-collection-migration/ansible-minimal.git
+
+      - name: HACK remove broken symlinks
+        run: find ansible-minimal -type l ! -exec test -e {} \; -print | xargs rm -f
+
+      - name: HACK Install ansible-minimal@devel
+        run: pip install -e ./ansible-minimal/
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
@@ -35,8 +41,14 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: Install Ansible 2.9.1
-        run: pip install ansible==2.9.1 --disable-pip-version-check
+      - name: HACK download ansible
+        run: git clone https://github.com/ansible-collection-migration/ansible-minimal.git
+
+      - name: HACK remove broken symlinks
+        run: find ansible-minimal -type l ! -exec test -e {} \; -print | xargs rm -f
+
+      - name: HACK Install ansible-minimal@devel
+        run: pip install -e ./ansible-minimal/
 
       - name: Run unit tests
         run: ansible-test units --docker -v --color --python 3.6
@@ -57,8 +69,14 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
 
-      - name: Install Ansible 2.9.1
-        run: pip install ansible==2.9.1 --disable-pip-version-check
+      - name: HACK download ansible
+        run: git clone https://github.com/ansible-collection-migration/ansible-minimal.git
+
+      - name: HACK remove broken symlinks
+        run: find ansible-minimal -type l ! -exec test -e {} \; -print | xargs rm -f
+
+      - name: HACK Install ansible-minimal@devel
+        run: pip install -e ./ansible-minimal/
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }}
