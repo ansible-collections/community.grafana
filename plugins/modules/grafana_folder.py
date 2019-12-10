@@ -34,7 +34,6 @@ version_added: "2.10"
 short_description: Manage Grafana Folders
 description:
   - Create/update/delete Grafana Folders through the Folders API.
-  - Also allows to add members in the team (if members exists).
   - The Folders API is only available starting Grafana 5 and the module will fail if the server version is lower than version 5.
 options:
   url:
@@ -121,7 +120,84 @@ folder:
     returned: On success
     type: complex
     contains:
-      TODO
+        id:
+            description: The Folder identifier
+            returned: always
+            type: int
+            sample:
+              - 42
+        uid:
+            description: The Folder uid
+            returned: always
+            type: str
+            sample:
+              - "nErXDvCkzz"
+        title:
+            description: The Folder title
+            returned: always
+            type: str
+            sample:
+              - "Department ABC"
+        url:
+            description: The Folder url
+            returned: always
+            type: str
+            sample:
+              - "/dashboards/f/nErXDvCkzz/department-abc"
+        hasAcl:
+            description: Boolean specifying if folder has acl
+            returned: always
+            type: bool
+            sample:
+              - false
+        canSave:
+            description: Boolean specifying if current user can save in folder
+            returned: always
+            type: bool
+            sample:
+              - false
+        canEdit:
+            description: Boolean specifying if current user can edit in folder
+            returned: always
+            type: bool
+            sample:
+              - false
+        canAdmin:
+            description: Boolean specifying if current user can admin in folder
+            returned: always
+            type: bool
+            sample:
+              - false
+        createdBy:
+            description: The name of the user who created the folder
+            returned: always
+            type: str
+            sample:
+              - "admin"
+        created:
+            description: The folder creation date
+            returned: always
+            type: str
+            sample:
+              - "2018-01-31T17:43:12+01:00"
+        updatedBy:
+            description: The name of the user who last updated the folder
+            returned: always
+            type: str
+            sample:
+              - "admin"
+        updated:
+            description: The date the folder was last updated
+            returned: always
+            type: str
+            sample:
+              - "2018-01-31T17:43:12+01:00"
+        version:
+            description: The folder version
+            returned: always
+            type: int
+            sample:
+              - 1
 '''
 
 import json
