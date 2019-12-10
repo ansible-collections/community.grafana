@@ -208,7 +208,8 @@ team:
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
+from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible_collections.gundalow_collections.grafana.plugins.module_utils.base import grafana_argument_spec
 
 __metaclass__ = type
 
@@ -318,22 +319,12 @@ def setup_module_object():
     return module
 
 
-argument_spec = url_argument_spec()
-# remove unnecessary arguments
-del argument_spec['force']
-del argument_spec['force_basic_auth']
-del argument_spec['http_agent']
-
+argument_spec = grafana_argument_spec()
 argument_spec.update(
-    state=dict(choices=['present', 'absent'], default='present'),
     name=dict(type='str', required=True),
     email=dict(type='str', required=True),
     members=dict(type='list', required=False),
-    url=dict(aliases=["grafana_url"], type='str', required=True),
-    grafana_api_key=dict(type='str', no_log=True),
     enforce_members=dict(type='bool', default=False),
-    url_username=dict(aliases=['grafana_user'], default='admin'),
-    url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
 )
 
 

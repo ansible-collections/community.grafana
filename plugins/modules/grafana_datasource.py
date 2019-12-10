@@ -20,10 +20,11 @@ short_description: Manage Grafana datasources
 description:
 - Create/update/delete Grafana datasources via API.
 options:
-  grafana_url:
+  url:
     description:
     - The Grafana URL.
     required: true
+    aliases: [ grafana_url ]
   name:
     description:
     - The name of the datasource.
@@ -47,8 +48,6 @@ options:
     description:
     - The URL of the datasource.
     required: true
-    aliases:
-    - ds_url
   access:
     description:
     - The access mode for this datasource.
@@ -331,7 +330,7 @@ EXAMPLES = '''
     grafana_password: "xxxxxx"
     org_id: "1"
     ds_type: "cloudwatch"
-    url: "http://monitoring.us-west-1.amazonaws.com"
+    ds_url: "http://monitoring.us-west-1.amazonaws.com"
     aws_auth_type: "keys"
     aws_default_region: "us-west-1"
     aws_access_key: "speakFriendAndEnter"
@@ -412,8 +411,9 @@ import base64
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
-from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
+from ansible_collections.gundalow_collections.grafana.plugins.module_utils.base import grafana_argument_spec
 
 __metaclass__ = type
 
@@ -635,19 +635,10 @@ def grafana_delete_datasource(module, data):
 
 def main():
     # use the predefined argument spec for url
-    argument_spec = url_argument_spec()
-    # remove unnecessary arguments
-    del argument_spec['force']
-    del argument_spec['force_basic_auth']
-    del argument_spec['http_agent']
+    argument_spec = grafana_argument_spec()
 
     argument_spec.update(
         name=dict(required=True, type='str'),
-        state=dict(choices=['present', 'absent'],
-                   default='present'),
-        grafana_url=dict(type='str', required=True),
-        url_username=dict(aliases=['grafana_user'], default='admin'),
-        url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
         ds_type=dict(choices=['graphite',
                               'prometheus',
                               'elasticsearch',
@@ -660,7 +651,6 @@ def main():
                               'sni-thruk-datasource'], required=True),
         url=dict(required=True, type='str', aliases=['ds_url']),
         access=dict(default='proxy', choices=['proxy', 'direct']),
-        grafana_api_key=dict(type='str', no_log=True),
         database=dict(type='str'),
         user=dict(default='', type='str'),
         password=dict(default='', no_log=True, type='str'),

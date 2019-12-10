@@ -7,7 +7,7 @@
     grafana_password: "{{ grafana_password}}"
     org_id: '1'
     ds_type: cloudwatch
-    url: http://monitoring.us-west-1.amazonaws.com
+    ds_url: http://monitoring.us-west-1.amazonaws.com
     aws_auth_type: keys
     aws_default_region: us-west-1
     aws_access_key: speakFriendAndEnter
@@ -29,7 +29,7 @@
     grafana_password: "{{ grafana_password }}"
     org_id: '1'
     ds_type: cloudwatch
-    url: http://monitoring.us-west-1.amazonaws.com
+    ds_url: http://monitoring.us-west-1.amazonaws.com
     aws_auth_type: keys
     aws_default_region: us-west-1
     aws_access_key: speakFriendAndEnter

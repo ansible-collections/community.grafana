@@ -167,10 +167,11 @@ uid:
 
 import json
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils._text import to_native
 from ansible.module_utils._text import to_text
+from ansible_collections.gundalow_collections.grafana.plugins.module_utils.base import grafana_argument_spec
 
 __metaclass__ = type
 
@@ -519,17 +520,9 @@ def grafana_export_dashboard(module, data):
 
 def main():
     # use the predefined argument spec for url
-    argument_spec = url_argument_spec()
-    # remove unnecessary arguments
-    del argument_spec['force']
-    del argument_spec['force_basic_auth']
-    del argument_spec['http_agent']
+    argument_spec = grafana_argument_spec()
     argument_spec.update(
         state=dict(choices=['present', 'absent', 'export'], default='present'),
-        url=dict(aliases=['grafana_url'], required=True),
-        url_username=dict(aliases=['grafana_user'], default='admin'),
-        url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
-        grafana_api_key=dict(type='str', no_log=True),
         org_id=dict(default=1, type='int'),
         folder=dict(type='str', default='General'),
         uid=dict(type='str'),
