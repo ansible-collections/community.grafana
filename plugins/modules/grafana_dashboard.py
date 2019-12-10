@@ -57,7 +57,6 @@ options:
   state:
     description:
       - State of the dashboard.
-    required: true
     choices: [ absent, export, present ]
     default: present
   slug:
