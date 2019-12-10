@@ -42,6 +42,7 @@ options:
       - The Grafana URL.
     required: true
     type: str
+    aliases: [ grafana_url ]
   name:
     description:
       - The name of the Grafana Team.
@@ -240,7 +241,7 @@ class GrafanaTeamInterface(object):
         if status_code == 404:
             return None
         elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s' header: %s" % (method, full_url, self.headers))
+            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
         elif status_code == 403:
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 409:
@@ -328,7 +329,7 @@ argument_spec.update(
     name=dict(type='str', required=True),
     email=dict(type='str', required=True),
     members=dict(type='list', required=False),
-    url=dict(type='str', required=True),
+    url=dict(aliases=["grafana_url"], type='str', required=True),
     grafana_api_key=dict(type='str', no_log=True),
     enforce_members=dict(type='bool', default=False),
     url_username=dict(aliases=['grafana_user'], default='admin'),
