@@ -643,7 +643,7 @@ def main():
                               'mysql',
                               'postgres',
                               'cloudwatch',
-                              'alexanderzobnin-zabbix-datasource']),
+                              'alexanderzobnin-zabbix-datasource'], required=True),
         url=dict(required=True, type='str', aliases=['ds_url']),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         grafana_api_key=dict(type='str', no_log=True),
