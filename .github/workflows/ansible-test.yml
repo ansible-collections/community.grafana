@@ -16,14 +16,8 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: HACK download ansible
-        run: git clone https://github.com/ansible-collection-migration/ansible-minimal.git
-
-      - name: HACK remove broken symlinks
-        run: find ansible-minimal -type l ! -exec test -e {} \; -print | xargs rm -f
-
-      - name: HACK Install ansible-minimal@devel
-        run: pip install -e ./ansible-minimal/
+      - name: Install ansible-minimal
+        run: pip install git+https://github.com/ansible-collection-migration/ansible-minimal.git --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
@@ -41,15 +35,9 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: HACK download ansible
-        run: git clone https://github.com/ansible-collection-migration/ansible-minimal.git
-
-      - name: HACK remove broken symlinks
-        run: find ansible-minimal -type l ! -exec test -e {} \; -print | xargs rm -f
-
-      - name: HACK Install ansible-minimal@devel
-        run: pip install -e ./ansible-minimal/
-
+      - name: Install ansible-minimal
+        run: pip install git+https://github.com/ansible-collection-migration/ansible-minimal.git --disable-pip-version-check
+        
       - name: Run unit tests
         run: ansible-test units --docker -v --color --python 3.6
 
@@ -69,14 +57,8 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
 
-      - name: HACK download ansible
-        run: git clone https://github.com/ansible-collection-migration/ansible-minimal.git
-
-      - name: HACK remove broken symlinks
-        run: find ansible-minimal -type l ! -exec test -e {} \; -print | xargs rm -f
-
-      - name: HACK Install ansible-minimal@devel
-        run: pip install -e ./ansible-minimal/
+      - name: Install ansible-minimal
+        run: pip install git+https://github.com/ansible-collection-migration/ansible-minimal.git --disable-pip-version-check
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }}
