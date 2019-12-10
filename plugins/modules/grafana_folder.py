@@ -42,12 +42,13 @@ options:
       - The Grafana URL.
     required: true
     type: str
+    aliases: [ grafana_url ]
   name:
     description:
       - The title of the Grafana Folder.
     required: true
     type: str
-    aliases: ["title"]
+    aliases: [ title ]
   url_username:
     description:
       - The Grafana user for API authentication.
@@ -159,7 +160,7 @@ class GrafanaFolderInterface(object):
         if status_code == 404:
             return None
         elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s' header: %s" % (method, full_url, self.headers))
+            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
         elif status_code == 403:
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 412:
@@ -215,7 +216,7 @@ del argument_spec['http_agent']
 argument_spec.update(
     state=dict(choices=['present', 'absent'], default='present'),
     name=dict(type='str', aliases=['title'], required=True),
-    url=dict(type='str', required=True),
+    url=dict(aliases=['grafana_url'], type='str', required=True),
     grafana_api_key=dict(type='str', no_log=True),
     url_username=dict(aliases=['grafana_user'], default='admin'),
     url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
