@@ -22,28 +22,6 @@ short_description: Manage Grafana dashboards
 description:
   - Create, update, delete, export Grafana dashboards via API.
 options:
-  url:
-    description:
-      - The Grafana URL.
-    required: true
-    aliases: [ grafana_url ]
-    version_added: 2.7
-  url_username:
-    description:
-      - The Grafana API user.
-    default: admin
-    aliases: [ grafana_user ]
-    version_added: 2.7
-  url_password:
-    description:
-      - The Grafana API password.
-    default: admin
-    aliases: [ grafana_password ]
-    version_added: 2.7
-  grafana_api_key:
-    description:
-      - The Grafana API key.
-      - If set, I(grafana_user) and I(grafana_password) will be ignored.
   org_id:
     description:
       - The Grafana Organisation ID where the dashboard will be imported / exported.
@@ -93,28 +71,8 @@ options:
     description:
       - Set a commit message for the version history.
       - Only used when C(state) is C(present).
-  validate_certs:
-    description:
-      - If C(no), SSL certificates will not be validated.
-      - This should only be used on personally controlled sites using self-signed certificates.
-    type: bool
-    default: 'yes'
-  client_cert:
-    description:
-      - PEM formatted certificate chain file to be used for SSL client authentication.
-      - This file can also include the key as well, and if the key is included, client_key is not required
-    version_added: 2.7
-  client_key:
-    description:
-      - PEM formatted file that contains your private key to be used for SSL client
-      - authentication. If client_cert contains both the certificate and key, this option is not required
-    version_added: 2.7
-  use_proxy:
-    description:
-      - Boolean of whether or not to use proxy.
-    default: 'yes'
-    type: bool
-    version_added: 2.7
+extends_documentation_fragment:
+- ansible_collections.grafana.grafana
 '''
 
 EXAMPLES = '''

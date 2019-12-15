@@ -20,11 +20,6 @@ short_description: Manage Grafana datasources
 description:
 - Create/update/delete Grafana datasources via API.
 options:
-  url:
-    description:
-    - The Grafana URL.
-    required: true
-    aliases: [ grafana_url ]
   name:
     description:
     - The name of the datasource.
@@ -55,22 +50,6 @@ options:
     - direct
     - proxy
     default: proxy
-  url_username:
-    description:
-    - The Grafana API user.
-    default: admin
-    aliases:
-    - grafana_user
-  url_password:
-    description:
-    - The Grafana API password.
-    default: admin
-    aliases:
-    - grafana_password
-  grafana_api_key:
-    description:
-    - The Grafana API key.
-    - If set, C(grafana_user) and C(grafana_password) will be ignored.
   database:
     description:
     - Name of the database for the datasource.
@@ -195,24 +174,6 @@ options:
     description:
     - Use trends or not for zabbix datasource type
     type: bool
-  client_cert:
-    required: false
-    description:
-    - TLS certificate path used by ansible to query grafana api
-  client_key:
-    required: false
-    description:
-    - TLS private key path used by ansible to query grafana api
-  validate_certs:
-    description:
-    - Whether to validate the Grafana certificate.
-    type: bool
-    default: 'yes'
-  use_proxy:
-    description:
-    - Boolean of whether or not to use proxy.
-    default: 'yes'
-    type: bool
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
@@ -272,6 +233,8 @@ options:
     - Namespaces of Custom Metrics for CloudWatch datasource type
     default: ''
     required: false
+extends_documentation_fragment:
+- ansible_collections.grafana.grafana
 '''
 
 EXAMPLES = '''
