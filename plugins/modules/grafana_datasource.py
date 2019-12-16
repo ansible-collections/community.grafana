@@ -20,6 +20,10 @@ short_description: Manage Grafana datasources
 description:
 - Create/update/delete Grafana datasources via API.
 options:
+  grafana_url:
+    description:
+    - The Grafana URL.
+    required: true
   name:
     description:
     - The name of the datasource.
@@ -43,6 +47,8 @@ options:
     description:
     - The URL of the datasource.
     required: true
+    aliases:
+    - ds_url
   access:
     description:
     - The access mode for this datasource.
@@ -50,6 +56,22 @@ options:
     - direct
     - proxy
     default: proxy
+  url_username:		
+    description:		
+    - The Grafana API user.		
+    default: admin		
+    aliases:		
+    - grafana_user		
+  url_password:		
+    description:		
+    - The Grafana API password.		
+    default: admin		
+    aliases:		
+    - grafana_password		
+  grafana_api_key:		
+    description:		
+    - The Grafana API key.		
+    - If set, C(grafana_user) and C(grafana_password) will be ignored.
   database:
     description:
     - Name of the database for the datasource.
@@ -174,6 +196,42 @@ options:
     description:
     - Use trends or not for zabbix datasource type
     type: bool
+  client_cert:		
+    required: false		
+    description:		
+    - TLS certificate path used by ansible to query grafana api		
+  client_key:		
+    required: false		
+    description:		
+    - TLS private key path used by ansible to query grafana api		
+  validate_certs:		
+    description:		
+    - Whether to validate the Grafana certificate.		
+    type: bool		
+    default: 'yes'		
+  use_proxy:		
+    description:		
+    - Boolean of whether or not to use proxy.		
+    default: 'yes'		
+    type: bool
+  client_cert:
+    required: false
+    description:
+    - TLS certificate path used by ansible to query grafana api
+  client_key:
+    required: false
+    description:
+    - TLS private key path used by ansible to query grafana api
+  validate_certs:
+    description:
+    - Whether to validate the Grafana certificate.
+    type: bool
+    default: 'yes'
+  use_proxy:
+    description:
+    - Boolean of whether or not to use proxy.
+    default: 'yes'
+    type: bool
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
@@ -233,8 +291,6 @@ options:
     - Namespaces of Custom Metrics for CloudWatch datasource type
     default: ''
     required: false
-extends_documentation_fragment:
-- ansible_collections.grafana.grafana
 '''
 
 EXAMPLES = '''
@@ -374,9 +430,8 @@ import base64
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
-from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible.module_utils._text import to_text
-from ansible_collections.gundalow_collections.grafana.plugins.module_utils.base import grafana_argument_spec
 
 __metaclass__ = type
 
@@ -598,10 +653,18 @@ def grafana_delete_datasource(module, data):
 
 def main():
     # use the predefined argument spec for url
-    argument_spec = grafana_argument_spec()
+    argument_spec = url_argument_spec()
+    # remove unnecessary arguments
+    del argument_spec['force']
+    del argument_spec['force_basic_auth']
+    del argument_spec['http_agent']
 
     argument_spec.update(
         name=dict(required=True, type='str'),
+        state=dict(choices=['present', 'absent'], default='present'),
+        grafana_url=dict(type='str', required=True),
+        url_username=dict(aliases=['grafana_user'], default='admin'),
+        url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
         ds_type=dict(choices=['graphite',
                               'prometheus',
                               'elasticsearch',
