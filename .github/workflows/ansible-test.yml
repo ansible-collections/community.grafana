@@ -61,7 +61,11 @@ jobs:
         run: pip install git+https://github.com/ansible-collection-migration/ansible-minimal.git --disable-pip-version-check
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
-        run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }}
+        run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }} -continue-on-error --diff --coverage
+
+      - name: Download Coverage Script
+        run: wget https://raw.githubusercontent.com/ansible/ansible/devel/test/utils/dci/dci-coverage.sh
+
 
 # FIXME FUTURE: If Look if we want to split integration tests into it's own job if they are long running
 # FIXME FUTURE: Other Python Versions
