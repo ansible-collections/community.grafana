@@ -72,7 +72,7 @@ options:
       - Set a commit message for the version history.
       - Only used when C(state) is C(present).
 extends_documentation_fragment:
-- ansible_collections.grafana.grafana
+- community.grafana.grafana
 '''
 
 EXAMPLES = '''
