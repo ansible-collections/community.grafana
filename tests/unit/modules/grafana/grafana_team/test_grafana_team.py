@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from ansible_collections.gundalow_collections.grafana.plugins.modules import grafana_team
+from ansible_collections.community.grafana.plugins.modules import grafana_team
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils import basic
 from ansible.module_utils.urls import basic_auth_header
@@ -187,7 +187,7 @@ class GrafanaTeamsTest(TestCase):
             grafana_team.main()
         self.assertEqual(result.exception.args[0]['msg'], 'parameters are mutually exclusive: url_username|grafana_api_key')
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
     def test_module_fails_with_low_grafana_version(self, mock_get_version):
         set_module_args({
             'name': 'MyTestTeam',
@@ -204,8 +204,8 @@ class GrafanaTeamsTest(TestCase):
             grafana_team.main()
         self.assertEqual(result.exception.args[0]['msg'], 'Teams API is available starting Grafana v5')
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_module_failure_with_unauthorized_resp(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'name': 'MyTestTeam',
@@ -220,8 +220,8 @@ class GrafanaTeamsTest(TestCase):
             grafana_team.main()
         self.assertTrue(result.exception.args[0]['msg'].startswith('Unauthorized to perform action'))
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_module_failure_with_permission_denied_resp(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'name': 'MyTestTeam',
@@ -236,8 +236,8 @@ class GrafanaTeamsTest(TestCase):
             grafana_team.main()
         self.assertTrue(result.exception.args[0]['msg'].startswith('Permission Denied'))
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_get_team_method_with_existing_team(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',
@@ -258,8 +258,8 @@ class GrafanaTeamsTest(TestCase):
             method='GET')
         self.assertEquals(res, {"email": "email@test.com", "name": "MyTestTeam"})
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_get_team_method_with_non_existing_team(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',
@@ -280,8 +280,8 @@ class GrafanaTeamsTest(TestCase):
             method='GET')
         self.assertEquals(res, None)
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_create_team_method(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',
@@ -303,8 +303,8 @@ class GrafanaTeamsTest(TestCase):
             method='POST')
         self.assertEquals(res, {"message": "Team created", "teamId": 2})
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_update_team_method(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',
@@ -325,8 +325,8 @@ class GrafanaTeamsTest(TestCase):
             method='PUT')
         self.assertEquals(res, {"message": "Team updated"})
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_delete_team_method(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'absent',
@@ -347,8 +347,8 @@ class GrafanaTeamsTest(TestCase):
             method='DELETE')
         self.assertEquals(res, {"message": "Team deleted"})
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_get_team_members_method(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',
@@ -369,8 +369,8 @@ class GrafanaTeamsTest(TestCase):
             method='GET')
         self.assertEquals(res, ["user1@email.com", "user2@email.com"])
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_get_team_members_method_no_members_returned(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',
@@ -391,8 +391,8 @@ class GrafanaTeamsTest(TestCase):
             method='GET')
         self.assertEquals(res, [])
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_add_team_member_method(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',
@@ -415,8 +415,8 @@ class GrafanaTeamsTest(TestCase):
                 method='POST')
             self.assertEquals(res, None)
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_team.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
     def test_delete_team_member_method(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'state': 'present',

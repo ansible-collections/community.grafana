@@ -166,7 +166,7 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
-from ansible_collections.gundalow_collections.grafana.plugins.module_utils.base import grafana_argument_spec
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec
 
 __metaclass__ = type
 

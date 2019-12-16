@@ -129,7 +129,7 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils._text import to_native
 from ansible.module_utils._text import to_text
-from ansible_collections.gundalow_collections.grafana.plugins.module_utils.base import grafana_argument_spec
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec
 
 __metaclass__ = type
 

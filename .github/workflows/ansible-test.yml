@@ -10,7 +10,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
         with:
-          path: ansible_collections/gundalow_collections/grafana
+          path: ansible_collections/community/grafana
 
       - name: Set up Python 3.6
         uses: actions/setup-python@v1
@@ -29,7 +29,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
         with:
-          path: ansible_collections/gundalow_collections/grafana
+          path: ansible_collections/community/grafana
 
       - name: Set up Python 3.6
         uses: actions/setup-python@v1
@@ -38,7 +38,7 @@ jobs:
 
       - name: Install ansible-minimal
         run: pip install git+https://github.com/ansible-collection-migration/ansible-minimal.git --disable-pip-version-check
-        
+
       - name: Run unit tests
         run: ansible-test units --docker -v --color --python 3.6 --coverage
 
@@ -54,7 +54,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
         with:
-          path: ansible_collections/gundalow_collections/grafana
+          path: ansible_collections/community/grafana
 
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v1
