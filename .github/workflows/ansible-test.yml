@@ -39,7 +39,10 @@ jobs:
         run: pip install git+https://github.com/ansible-collection-migration/ansible-minimal.git --disable-pip-version-check
         
       - name: Run unit tests
-        run: ansible-test units --docker -v --color --python 3.6
+        run: ansible-test units --docker -v --color --python 3.6 --coverage
+
+      - name: Upload Coverage data
+        run: tests/coverage.sh
 
   integration:
     runs-on: ubuntu-latest
