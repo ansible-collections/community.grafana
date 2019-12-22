@@ -1,5 +1,5 @@
 # Grafana Role
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
+![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
 
 This is an example single Collection called `community.collection`
 
