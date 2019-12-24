@@ -10,13 +10,12 @@
     url: "https://thruk.company.com/sitename/thruk"
     tls_skip_verify : yes
     validate_certs: no
-- debug:
-    var: result
 - assert:
     that:
     - result.changed == true
     - result.name == 'datasource-thruk'
     - 'result.msg == ''Datasource datasource-thruk created : Datasource added'''
+
 - name: Check thruk datasource creation idempotency
   register: result
   grafana_datasource:
@@ -29,8 +28,6 @@
     url: "https://thruk.company.com/sitename/thruk"
     tls_skip_verify : yes
     validate_certs: no
-- debug:
-    var: result
 - assert:
     that:
     - result.name == 'datasource-thruk'
