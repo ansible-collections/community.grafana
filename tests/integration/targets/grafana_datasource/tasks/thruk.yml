@@ -8,8 +8,9 @@
     org_id: "1"
     ds_type: sni-thruk-datasource
     url: "https://thruk.company.com/sitename/thruk"
-    tls_skip_verify : yes
+    tls_skip_verify: yes
     validate_certs: no
+
 - assert:
     that:
     - result.changed == true
@@ -26,8 +27,9 @@
     org_id: '1'
     ds_type: sni-thruk-datasource
     url: "https://thruk.company.com/sitename/thruk"
-    tls_skip_verify : yes
+    tls_skip_verify: yes
     validate_certs: no
+
 - assert:
     that:
     - result.name == 'datasource-thruk'
@@ -43,4 +45,3 @@
     - result.after.url == 'https://thruk.company.com/sitename/thruk'
     - result.after.user == ''
     - result.after.withCredentials == false
-
