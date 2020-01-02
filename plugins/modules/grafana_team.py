@@ -166,7 +166,7 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
 
 __metaclass__ = type
 
@@ -270,8 +270,8 @@ def setup_module_object():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=[['url_username', 'url_password']],
-        mutually_exclusive=[['url_username', 'grafana_api_key']],
+        required_together=grafana_required_together(),
+        mutually_exclusive=grafana_mutually_exclusive(),
     )
     return module
 

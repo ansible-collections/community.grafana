@@ -37,3 +37,11 @@ def grafana_argument_spec():
         url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
     )
     return argument_spec
+
+
+def grafana_required_together():
+    return [['url_username', 'url_password']]
+
+
+def grafana_mutually_exclusive():
+    return [['url_username', 'grafana_api_key']]
