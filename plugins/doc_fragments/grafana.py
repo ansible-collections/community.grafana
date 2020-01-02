@@ -52,7 +52,6 @@ class ModuleDocFragment(object):
     description:
       - If C(no), SSL certificates will not be validated.
       - This should only set to C(no) used on personally controlled sites using self-signed certificates.
-      - Prior to 1.9.2 the code defaulted to C(no).
     type: bool
     default: yes
     '''
