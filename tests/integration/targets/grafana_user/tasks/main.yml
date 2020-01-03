@@ -1,0 +1,97 @@
+---
+- name: Create a Grafana user without password (expect failure)
+  grafana_user:
+    url: "http://127.0.0.1:3000"
+    url_username: admin
+    url_password: admin
+    name: "Bruce Wayne"
+    email: batman@gotham.city
+    login: batman
+    state: present
+  register: result
+  ignore_errors: yes
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.failed == true"
+      - "result.msg == 'Password must be provided'"
+
+- name: Create a Grafana user
+  grafana_user:
+    url: "http://127.0.0.1:3000"
+    url_username: admin
+    url_password: admin
+    name: "Bruce Wayne"
+    email: batman@gotham.city
+    login: batman
+    password: robin
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.user.name == 'Bruce Wayne'"
+      - "result.user.email == 'batman@gotham.city'"
+      - "result.user.isGrafanaAdmin == false"
+
+- name: Check idempotency on user creation (password not requiered)
+  grafana_user:
+    url: "http://127.0.0.1:3000"
+    url_username: admin
+    url_password: admin
+    name: "Bruce Wayne"
+    email: batman@gotham.city
+    login: batman
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.user.name == 'Bruce Wayne'"
+      - "result.user.email == 'batman@gotham.city'"
+      - "result.user.isGrafanaAdmin == false"
+
+- name: Update Grafana user
+  grafana_user:
+    url: "http://127.0.0.1:3000"
+    url_username: admin
+    url_password: admin
+    name: "The Dark Knight"
+    email: thedarkknight@gotham.city
+    login: batman
+    password: robin
+    is_admin: true
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.user.name == 'The Dark Knight'"
+      - "result.user.email == 'thedarkknight@gotham.city'"
+      - "result.user.isGrafanaAdmin == true"
+
+- name: Delete a Grafana user
+  grafana_user:
+    url: "http://127.0.0.1:3000"
+    url_username: admin
+    url_password: admin
+    login: batman
+    state: absent
+  register: result
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.message == 'User deleted'"
+
+- name: Check idempotency on user deletion
+  grafana_user:
+    url: "http://127.0.0.1:3000"
+    url_username: admin
+    url_password: admin
+    login: batman
+    state: absent
+  register: result
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.message == 'No user found, nothing to do'"
