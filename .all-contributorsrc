@@ -34,11 +34,22 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "Tailzip",
+      "name": "Antoine",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1068018?v=4",
+      "profile": "http://antoine.tanzil.li",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "projectName": "grafana",
-  "projectOwner": "gundalow-collections",
+  "projectOwner": "ansible-collections",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "skipCi": true
 }
