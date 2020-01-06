@@ -64,6 +64,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "MCyprien",
+      "name": "MCyprien",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/11160859?v=4",
+      "profile": "https://github.com/MCyprien",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
