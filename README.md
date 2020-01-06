@@ -30,15 +30,19 @@ See LICENCING to see the full text.
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/gundalow"><img src="https://avatars1.githubusercontent.com/u/940557?v=4" width="100px;" alt="John R Barker"/><br /><sub><b>John R Barker</b></sub></a><br /><a href="#infra-gundalow" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/gundalow-collections/grafana/commits?author=gundalow" title="Tests">⚠️</a> <a href="https://github.com/gundalow-collections/grafana/commits?author=gundalow" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/rrey"><img src="https://avatars1.githubusercontent.com/u/2752379?v=4" width="100px;" alt="Rémi REY"/><br /><sub><b>Rémi REY</b></sub></a><br /><a href="https://github.com/gundalow-collections/grafana/commits?author=rrey" title="Tests">⚠️</a></td>
-    <td align="center"><a href="https://aperogeek.fr"><img src="https://avatars1.githubusercontent.com/u/1336359?v=4" width="100px;" alt="Thierry Sallé"/><br /><sub><b>Thierry Sallé</b></sub></a><br /><a href="https://github.com/gundalow-collections/grafana/commits?author=seuf" title="Code">💻</a> <a href="https://github.com/gundalow-collections/grafana/commits?author=seuf" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/gundalow"><img src="https://avatars1.githubusercontent.com/u/940557?v=4" width="100px;" alt=""/><br /><sub><b>John R Barker</b></sub></a><br /><a href="#infra-gundalow" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/ansible-collections/grafana/commits?author=gundalow" title="Tests">⚠️</a> <a href="https://github.com/ansible-collections/grafana/commits?author=gundalow" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/rrey"><img src="https://avatars1.githubusercontent.com/u/2752379?v=4" width="100px;" alt=""/><br /><sub><b>Rémi REY</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=rrey" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://aperogeek.fr"><img src="https://avatars1.githubusercontent.com/u/1336359?v=4" width="100px;" alt=""/><br /><sub><b>Thierry Sallé</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=seuf" title="Code">💻</a> <a href="https://github.com/ansible-collections/grafana/commits?author=seuf" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/jual"><img src="https://avatars2.githubusercontent.com/u/4416541?v=4" width="100px;" alt=""/><br /><sub><b>jual</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=jual" title="Code">💻</a> <a href="https://github.com/ansible-collections/grafana/commits?author=jual" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
