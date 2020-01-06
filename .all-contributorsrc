@@ -34,11 +34,22 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "jual",
+      "name": "jual",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/4416541?v=4",
+      "profile": "https://github.com/jual",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "projectName": "grafana",
-  "projectOwner": "gundalow-collections",
+  "projectOwner": "ansible-collections",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "skipCi": true
 }
