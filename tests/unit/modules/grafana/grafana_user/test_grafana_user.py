@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
-from ansible_collections.gundalow_collections.grafana.plugins.modules import grafana_user
+from ansible_collections.community.grafana.plugins.modules import grafana_user
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils import basic
 from ansible.module_utils.urls import basic_auth_header
@@ -87,7 +87,7 @@ class GrafanaUserTest(TestCase):
         self.addCleanup(self.mock_module_helper.stop)
 
     # create an already existing user
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_user.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_user.fetch_url')
     def test_create_user_existing_user(self, mock_fetch_url):
         set_module_args({
             'url': 'https://grafana.example.com',
@@ -116,7 +116,7 @@ class GrafanaUserTest(TestCase):
                 method='POST')
 
     # create a new user
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_user.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_user.fetch_url')
     def test_create_user_new_user(self, mock_fetch_url):
         set_module_args({
             'url': 'https://grafana.example.com',
@@ -175,7 +175,7 @@ class GrafanaUserTest(TestCase):
             "createdAt": "2019-09-25T14:44:37+01:00"
         })
 
-    @patch('ansible_collections.gundalow_collections.grafana.plugins.modules.grafana_user.fetch_url')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_user.fetch_url')
     def test_delete_user(self, mock_fetch_url):
         set_module_args({
             'url': 'https://grafana.example.com',
