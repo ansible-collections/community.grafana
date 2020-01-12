@@ -260,7 +260,7 @@ class GrafanaFolderInterface(object):
         return response
 
     def get_folder(self, title):
-        url = "/api/folders?limit=1000"
+        url = "/api/search?type=dash-folder&query={title}".format(title=title)
         response = self._send_request(url, headers=self.headers, method="GET")
         for item in response:
             if item.get("title") == title:
