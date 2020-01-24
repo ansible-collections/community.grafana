@@ -70,14 +70,6 @@ jobs:
       - name: Install collection
         run: /bin/bash -c "ansible-galaxy collection install $(ls build_artifact/community-grafana-*) --force"
 
-      - name: DEBUG CWD
-        run: pwd
-
-      - name: DEBUG check working-directory
-        run: ls -la
-        # chdir to where the newly build collection has been installed
-        working-directory: /home/runner/.ansible/collections/ansible_collections/community/grafana
-
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
         # chdir to where the newly build collection has been installed
@@ -85,6 +77,7 @@ jobs:
 
       - name: Upload Coverage data
         run: tests/coverage.sh
+        working-directory: /home/runner/.ansible/collections/ansible_collections/community/grafana
 
 
 # FIXME FUTURE: If Look if we want to split integration tests into it's own job if they are long running
