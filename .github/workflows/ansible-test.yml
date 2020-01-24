@@ -76,7 +76,8 @@ jobs:
         working-directory: /home/runner/.ansible/collections/ansible_collections/community/grafana
 
       - name: Upload Coverage data
-        run: tests/coverage.sh
+        # FIXME Possible `ansible-collection build` bug, executable flag not kept
+        run: bash -eux tests/coverage.sh
         working-directory: /home/runner/.ansible/collections/ansible_collections/community/grafana
 
 
