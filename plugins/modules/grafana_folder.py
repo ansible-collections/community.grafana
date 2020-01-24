@@ -36,35 +36,12 @@ description:
   - Create/update/delete Grafana Folders through the Folders API.
   - The Folders API is only available starting Grafana 5 and the module will fail if the server version is lower than version 5.
 options:
-  url:
-    description:
-      - The Grafana URL.
-    required: true
-    type: str
-    aliases: [ grafana_url ]
   name:
     description:
       - The title of the Grafana Folder.
     required: true
     type: str
     aliases: [ title ]
-  url_username:
-    description:
-      - The Grafana user for API authentication.
-    default: admin
-    type: str
-    aliases: [ grafana_user ]
-  url_password:
-    description:
-      - The Grafana password for API authentication.
-    default: admin
-    type: str
-    aliases: [ grafana_password ]
-  grafana_api_key:
-    description:
-      - The Grafana API key.
-      - If set, C(url_username) and C(url_password) will be ignored.
-    type: str
   state:
     description:
       - Delete the members not found in the C(members) parameters from the
@@ -72,28 +49,8 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
-  use_proxy:
-    description:
-      - If C(no), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
-    type: bool
-    default: yes
-  client_cert:
-    description:
-      - PEM formatted certificate chain file to be used for SSL client authentication.
-      - This file can also include the key as well, and if the key is included, I(client_key) is not required
-    type: path
-  client_key:
-    description:
-      - PEM formatted file that contains your private key to be used for SSL client authentication.
-      - If I(client_cert) contains both the certificate and key, this option is not required.
-    type: path
-  validate_certs:
-    description:
-      - If C(no), SSL certificates will not be validated.
-      - This should only set to C(no) used on personally controlled sites using self-signed certificates.
-      - Prior to 1.9.2 the code defaulted to C(no).
-    type: bool
-    default: yes
+extends_documentation_fragment:
+- community.grafana.grafana
 '''
 
 EXAMPLES = '''
@@ -203,7 +160,8 @@ folder:
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
+from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
 
 __metaclass__ = type
 
@@ -277,25 +235,16 @@ def setup_module_object():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=[['url_username', 'url_password']],
-        mutually_exclusive=[['url_username', 'grafana_api_key']],
+        required_together=grafana_required_together(),
+        mutually_exclusive=grafana_mutually_exclusive(),
     )
     return module
 
 
-argument_spec = url_argument_spec()
-# remove unnecessary arguments
-del argument_spec['force']
-del argument_spec['force_basic_auth']
-del argument_spec['http_agent']
-
+argument_spec = grafana_argument_spec()
 argument_spec.update(
-    state=dict(choices=['present', 'absent'], default='present'),
     name=dict(type='str', aliases=['title'], required=True),
-    url=dict(aliases=['grafana_url'], type='str', required=True),
-    grafana_api_key=dict(type='str', no_log=True),
-    url_username=dict(aliases=['grafana_user'], default='admin'),
-    url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
+    state=dict(type='str', default='present', choices=['present', 'absent']),
 )
 
 

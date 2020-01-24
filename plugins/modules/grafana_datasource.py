@@ -331,7 +331,7 @@ EXAMPLES = '''
     grafana_password: "xxxxxx"
     org_id: "1"
     ds_type: "cloudwatch"
-    url: "http://monitoring.us-west-1.amazonaws.com"
+    ds_url: "http://monitoring.us-west-1.amazonaws.com"
     aws_auth_type: "keys"
     aws_default_region: "us-west-1"
     aws_access_key: "speakFriendAndEnter"
@@ -643,11 +643,11 @@ def main():
 
     argument_spec.update(
         name=dict(required=True, type='str'),
-        state=dict(choices=['present', 'absent'],
-                   default='present'),
+        state=dict(choices=['present', 'absent'], default='present'),
         grafana_url=dict(type='str', required=True),
         url_username=dict(aliases=['grafana_user'], default='admin'),
         url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
+        grafana_api_key=dict(type='str', no_log=True),
         ds_type=dict(choices=['graphite',
                               'prometheus',
                               'elasticsearch',
@@ -660,7 +660,6 @@ def main():
                               'sni-thruk-datasource'], required=True),
         url=dict(required=True, type='str', aliases=['ds_url']),
         access=dict(default='proxy', choices=['proxy', 'direct']),
-        grafana_api_key=dict(type='str', no_log=True),
         database=dict(type='str'),
         user=dict(default='', type='str'),
         password=dict(default='', no_log=True, type='str'),
