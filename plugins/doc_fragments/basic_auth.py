@@ -28,11 +28,6 @@ class ModuleDocFragment(object):
     default: admin
     type: str
     aliases: [ grafana_password ]
-  grafana_api_key:
-    description:
-      - The Grafana API key.
-      - If set, C(url_username) and C(url_password) will be ignored.
-    type: str
   use_proxy:
     description:
       - If C(no), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
