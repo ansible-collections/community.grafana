@@ -70,6 +70,12 @@ jobs:
       - name: Install collection
         run: /bin/bash -c "ansible-galaxy collection install $(ls build_artifact/community-grafana-*) --force"
 
+      - name: find files
+        run: find ~/.ansible/collections/
+
+      - name: ansible-test version
+        run: ansible-test --version
+
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
         # chdir to where the newly build collection has been installed
