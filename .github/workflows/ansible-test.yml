@@ -71,7 +71,7 @@ jobs:
         run: /bin/bash -c "ansible-galaxy collection install $(ls build_artifact/community-grafana-*) --force"
 
       - name: DEBUG CWD
-        run: ls -lha
+        run: pwd
 
       - name: DEBUG check working-directory
         run: ls -la
