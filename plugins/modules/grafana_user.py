@@ -40,23 +40,6 @@ description:
   - Tested with Grafana v6.4.3
   - Password update is not supported at the time
 options:
-  url:
-    description:
-      - The Grafana URL.
-    required: true
-    type: str
-  url_username:
-    description:
-      - The Grafana user for API authentication.
-    default: admin
-    type: str
-    aliases: [ grafana_user ]
-  url_password:
-    description:
-      - The Grafana password for API authentication.
-    required: true
-    type: str
-    aliases: [ grafana_password ]
   name:
     description:
       - The name of the Grafana User.
@@ -90,28 +73,8 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
-  use_proxy:
-    description:
-      - If C(no), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
-    type: bool
-    default: yes
-  client_cert:
-    description:
-      - PEM formatted certificate chain file to be used for SSL client authentication.
-      - This file can also include the key as well, and if the key is included, I(client_key) is not required
-    type: path
-  client_key:
-    description:
-      - PEM formatted file that contains your private key to be used for SSL client authentication.
-      - If I(client_cert) contains both the certificate and key, this option is not required.
-    type: path
-  validate_certs:
-    description:
-      - If C(no), SSL certificates will not be validated.
-      - This should only set to C(no) used on personally controlled sites using self-signed certificates.
-      - Prior to 1.9.2 the code defaulted to C(no).
-    type: bool
-    default: yes
+extends_documentation_fragment:
+- community.grafana.basic_auth
 '''
 
 EXAMPLES = '''
@@ -197,7 +160,8 @@ user:
 import json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
+from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
 
 __metaclass__ = type
 
@@ -282,22 +246,15 @@ def setup_module_object():
         supports_check_mode=False,
         required_if=[
             ['state', 'present', ['name', 'email']],
-        ]
+        ],
+        required_together=grafana_required_together(),
+        mutually_exclusive=grafana_mutually_exclusive(),
     )
     return module
 
 
-argument_spec = url_argument_spec()
-# remove unnecessary arguments
-del argument_spec['force']
-del argument_spec['force_basic_auth']
-del argument_spec['http_agent']
-
-
+argument_spec = grafana_argument_spec()
 argument_spec.update(
-    url=dict(type='str', required=True),
-    url_username=dict(aliases=['grafana_user'], default='admin'),
-    url_password=dict(aliases=['grafana_password'], type='str', required=True, no_log=True),
     state=dict(choices=['present', 'absent'], default='present'),
     name=dict(type='str', required=False),
     email=dict(type='str', required=False),
@@ -305,6 +262,7 @@ argument_spec.update(
     password=dict(type='str', required=False, no_log=True),
     is_admin=dict(type='bool', default=False),
 )
+argument_spec.pop('grafana_api_key')
 
 
 def main():

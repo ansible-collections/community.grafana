@@ -50,7 +50,8 @@ options:
     type: str
     choices: ["present", "absent"]
 extends_documentation_fragment:
-- community.grafana.grafana
+- community.grafana.basic_auth
+- community.grafana.api_key
 '''
 
 EXAMPLES = '''

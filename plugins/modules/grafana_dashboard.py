@@ -72,7 +72,8 @@ options:
       - Set a commit message for the version history.
       - Only used when C(state) is C(present).
 extends_documentation_fragment:
-- community.grafana.grafana
+- community.grafana.basic_auth
+- community.grafana.api_key
 '''
 
 EXAMPLES = '''
