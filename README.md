@@ -1,23 +1,21 @@
-# Grafana Role
+# Grafana Collection
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
 
-This is an example single Collection called `community.collection`
+This collection called `community.grafana` aims at providing all Ansible modules allowing to interact with Grafana.
+The modules present in Ansible 2.9 are included in this collection and will benefit from the evolutions and quality requirements from this collection.
 
 As this is an independent Collection, it can be release on it's own release cadance.
-
-It will also be listed as a dependency of the `ansible.kitchen_sink` Meta collection
 
 ## GitHub workflow
 
 * Maintainers would be members of this GitHub Repo
 * Branch protections could be used to enforce 1 (or 2) reviews from relevant maintainers [CODEOWNERS](.github/CODEOWNERS)
 
+## Contributing
 
-## Notes
-
-*WARNING* This is a proof of concept for Ansible Community Collection development workflow.
-
-For more information see `#ansible-community` on Freenode IRC.
+Any contribution is welcome and we only ask contributors to:
+* Provide *at least* integration tests for any contribution.
+* Create an issues for any significant contribution that would change a large portion of the code base.
 
 ## License
 
