@@ -52,6 +52,7 @@ options:
       - List of team members (emails).
       - The list can be enforced with C(enforce_members) parameter.
     type: list
+    elements: str
   state:
     description:
       - Delete the members not found in the C(members) parameters from the
@@ -281,7 +282,7 @@ argument_spec = grafana_argument_spec()
 argument_spec.update(
     name=dict(type='str', required=True),
     email=dict(type='str', required=True),
-    members=dict(type='list', required=False),
+    members=dict(type='list', elements='str', required=False),
     enforce_members=dict(type='bool', default=False),
 )
 
