@@ -83,6 +83,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "rverchere",
+      "name": "Remi Verchere",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/232433?v=4",
+      "profile": "https://github.com/rverchere",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
