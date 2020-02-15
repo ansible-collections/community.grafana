@@ -40,6 +40,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/jual"><img src="https://avatars2.githubusercontent.com/u/4416541?v=4" width="100px;" alt=""/><br /><sub><b>jual</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=jual" title="Code">💻</a> <a href="https://github.com/ansible-collections/grafana/commits?author=jual" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/MCyprien"><img src="https://avatars2.githubusercontent.com/u/11160859?v=4" width="100px;" alt=""/><br /><sub><b>MCyprien</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=MCyprien" title="Code">💻</a> <a href="https://github.com/ansible-collections/grafana/commits?author=MCyprien" title="Tests">⚠️</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://twitter.com/RealRockaut"><img src="https://avatars0.githubusercontent.com/u/453368?v=4" width="100px;" alt=""/><br /><sub><b>Markus Fischbacher</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=rockaut" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-enable -->
