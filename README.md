@@ -1,7 +1,9 @@
 # Grafana Collection
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)](https://codecov.io/gh/ansible-collections/grafana)
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
+<!-- ALL-CONTRIBUTORS-BADGE:END --> 
 
 This collection called `community.grafana` aims at providing all Ansible modules allowing to interact with Grafana.
 The modules present in Ansible 2.9 are included in this collection and will benefit from the evolutions and quality requirements from this collection.
