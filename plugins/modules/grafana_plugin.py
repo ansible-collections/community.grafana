@@ -84,6 +84,11 @@ class GrafanaCliException(Exception):
     pass
 
 
+def parse_version(string):
+    name, version = string.split('@')
+    return name.strip(), version.strip()
+
+
 def grafana_cli_bin(params):
     '''
     Get the grafana-cli binary path with global options.
@@ -137,7 +142,7 @@ def get_grafana_plugin_version(module, params):
     for line in stdout_lines:
         if line.find(' @ ') != -1:
             line = line.rstrip()
-            plugin_name, plugin_version = line.split(' @ ')
+            plugin_name, plugin_version = parse_version(line)
             if plugin_name == params['name']:
                 return plugin_version
     return None
@@ -209,7 +214,7 @@ def grafana_plugin(module, params):
             if line.find(params['name']):
                 if line.find(' @ ') != -1:
                     line = line.rstrip()
-                    plugin_name, plugin_version = line.split('@')
+                    plugin_name, plugin_version = parse_version(line)
                 else:
                     plugin_version = None
                 return {'msg': 'Grafana plugin {0} installed : {1}'.format(params['name'], cmd),
