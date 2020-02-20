@@ -499,7 +499,7 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=False,
         required_together=[['url_username', 'url_password', 'org_id']],
-        mutually_exclusive=[['grafana_user', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
+        mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
     )
 
     if 'message' in module.params:
