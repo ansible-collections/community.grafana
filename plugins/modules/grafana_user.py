@@ -247,8 +247,7 @@ def setup_module_object():
         required_if=[
             ['state', 'present', ['name', 'email']],
         ],
-        required_together=grafana_required_together(),
-        mutually_exclusive=grafana_mutually_exclusive(),
+        required_together=grafana_required_together()
     )
     return module
 

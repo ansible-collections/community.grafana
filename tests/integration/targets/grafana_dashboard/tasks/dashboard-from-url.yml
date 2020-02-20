@@ -6,7 +6,7 @@
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
-    message: Updated by ansible
+    commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
     overwrite: true
   register: result
@@ -25,7 +25,7 @@
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
-    message: Updated by ansible
+    commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
     overwrite: true
   register: result

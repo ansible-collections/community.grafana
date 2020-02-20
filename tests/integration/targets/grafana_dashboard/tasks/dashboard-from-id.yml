@@ -5,7 +5,7 @@
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
-    message: Updated by ansible
+    commit_message: Updated by ansible
     dashboard_id: "6098"
     dashboard_revision: "1"
     overwrite: true
@@ -25,7 +25,7 @@
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
-    message: Updated by ansible
+    commit_message: Updated by ansible
     dashboard_id: "6098"
     dashboard_revision: "1"
     overwrite: true
