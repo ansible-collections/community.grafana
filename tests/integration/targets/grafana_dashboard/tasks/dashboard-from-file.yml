@@ -11,7 +11,7 @@
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
-    message: Updated by ansible
+    commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
   register: result
@@ -30,7 +30,7 @@
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
-    message: Updated by ansible
+    commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
   register: result
