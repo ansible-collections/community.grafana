@@ -193,11 +193,7 @@ class GrafanaUserInterface(object):
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 200:
             return self._module.from_json(resp.read())
-
-        body = None
-        if resp:
-            body = resp.read()
-        self._module.fail_json(failed=True, msg="Grafana Users API answered with HTTP %d" % status_code, body=body)
+        self._module.fail_json(failed=True, msg="Grafana Users API answered with HTTP %d" % status_code, body=self._module.from_json(resp.read()))
 
     def create_user(self, name, email, login, password):
         # https://grafana.com/docs/http_api/admin/#global-users
