@@ -49,28 +49,36 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        grafana_version: ["6.6.2"]
         python_version: ["3.6"]
+    container:
+      image: python:${{ matrix.python_version }}-alpine
+    services:
+      grafana:
+        image: grafana/grafana:${{ matrix.grafana_version }}
     steps:
+
+      - name: Install bash
+        run: apk add bash git gcc python3-dev libc-dev libffi-dev openssl-dev
+
       - name: Check out code
         uses: actions/checkout@v1
         with:
           path: ansible_collections/community/grafana
 
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python_version }}
+      - name: Install deps
+        run: pip install coverage #jinja2 pyyaml
+
+          #      - name: Set up Python ${{ matrix.python_version }}
+          #        uses: actions/setup-python@v1
+          #        with:
+          #          python-version: ${{ matrix.python_version }}
 
       - name: Install ansible-base
         run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
-        run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
+        run: ansible-test integration -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
 
       - name: Upload Coverage data
         run: tests/coverage.sh
-
-
-# FIXME FUTURE: If Look if we want to split integration tests into it's own job if they are long running
-# FIXME FUTURE: Other Python Versions
-# FIXME FUTURE: Other Operating Systems

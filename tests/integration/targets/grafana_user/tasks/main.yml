@@ -1,7 +1,7 @@
 ---
 - name: Create a Grafana user without password (expect failure)
   grafana_user:
-    url: "http://127.0.0.1:3000"
+    url: "{{ grafana_url }}"
     url_username: admin
     url_password: admin
     name: "Bruce Wayne"
@@ -14,11 +14,11 @@
     that:
       - "result.changed == false"
       - "result.failed == true"
-      - "result.msg == 'Password must be provided'"
+      - "result.msg == 'missing required arguments: password'"
 
 - name: Create a Grafana user
   grafana_user:
-    url: "http://127.0.0.1:3000"
+    url: "{{ grafana_url }}"
     url_username: admin
     url_password: admin
     name: "Bruce Wayne"
@@ -36,7 +36,7 @@
 
 - name: Check idempotency on user creation (password not requiered)
   grafana_user:
-    url: "http://127.0.0.1:3000"
+    url: "{{ grafana_url }}"
     url_username: admin
     url_password: admin
     name: "Bruce Wayne"
@@ -53,7 +53,7 @@
 
 - name: Update Grafana user
   grafana_user:
-    url: "http://127.0.0.1:3000"
+    url: "{{ grafana_url }}"
     url_username: admin
     url_password: admin
     name: "The Dark Knight"
@@ -72,7 +72,7 @@
 
 - name: Delete a Grafana user
   grafana_user:
-    url: "http://127.0.0.1:3000"
+    url: "{{ grafana_url }}"
     url_username: admin
     url_password: admin
     login: batman
@@ -85,7 +85,7 @@
 
 - name: Check idempotency on user deletion
   grafana_user:
-    url: "http://127.0.0.1:3000"
+    url: "{{ grafana_url }}"
     url_username: admin
     url_password: admin
     login: batman

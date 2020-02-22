@@ -7,7 +7,7 @@
 
 - name: Check import grafana dashboard from file
   grafana_dashboard:
-    grafana_url: "http://127.0.0.1:3000"
+    grafana_url: "{{ grafana_url }}"
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
@@ -26,7 +26,7 @@
 
 - name: Check import grafana dashboard from file idempotency
   grafana_dashboard:
-    grafana_url: "http://127.0.0.1:3000"
+    grafana_url: "{{ grafana_url }}"
     grafana_user: "admin"
     grafana_password: "admin"
     state: present
