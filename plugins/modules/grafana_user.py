@@ -198,7 +198,7 @@ class GrafanaUserInterface(object):
     def create_user(self, name, email, login, password):
         # https://grafana.com/docs/http_api/admin/#global-users
         if not password:
-            self._module.fail_json(failed=True, msg="Password must be provided")
+            self._module.fail_json(failed=True, msg="missing required arguments: password")
         url = "/api/admin/users"
         user = dict(name=name, email=email, login=login, password=password)
         self._send_request(url, data=user, headers=self.headers, method="POST")

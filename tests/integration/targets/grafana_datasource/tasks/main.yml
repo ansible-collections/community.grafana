@@ -6,6 +6,3 @@
   - include: postgres.yml
   - include: cloudwatch.yml
   - include: thruk.yml
-  when:
-  - ansible_distribution == 'Ubuntu'
-  - ansible_distribution_release != 'trusty'
