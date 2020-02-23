@@ -29,6 +29,11 @@ Click on the name of a plugin or module to view that content's documentation:
     - [grafana_team](#)
     - [grafana_user](#)
 
+## Supported Grafana versions
+
+This collection is currently testing the modules against Grafana versions `6.4.5`, `6.5.3`, `6.6.2`.
+We aim at keeping the last 3 minor versions of Grafana tested.
+
 ## Installation and Usage
 
 ### Installing the Collection from Ansible Galaxy
