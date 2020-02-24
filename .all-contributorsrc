@@ -92,6 +92,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Akasurde",
+      "name": "Abhijeet Kasurde",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/633765?v=4",
+      "profile": "http://akasurde.github.io",
+      "contributions": [
+        "doc",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
