@@ -24,22 +24,27 @@ options:
     description:
     - Name of the plugin.
     required: true
+    type: str
   version:
     description:
     - Version of the plugin to install.
     - Defaults to C(latest).
+    type: str
   grafana_plugins_dir:
     description:
     - Directory where the Grafana plugin will be installed.
     - If omitted, defaults to C(/var/lib/grafana/plugins).
+    type: str
   grafana_repo:
     description:
     - URL to the Grafana plugin repository.
     - 'If omitted, grafana-cli will use the default value: U(https://grafana.com/api/plugins).'
+    type: str
   grafana_plugin_url:
     description:
     - Full URL to the plugin zip file instead of downloading the file from U(https://grafana.com/api/plugins).
     - Requires grafana 4.6.x or later.
+    type: str
   state:
     description:
     - Whether the plugin should be installed.
@@ -47,6 +52,7 @@ options:
     - present
     - absent
     default: present
+    type: str
 '''
 
 EXAMPLES = '''

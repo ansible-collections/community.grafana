@@ -27,16 +27,19 @@ options:
       - The Grafana Organisation ID where the dashboard will be imported / exported.
       - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation..
     default: 1
+    type: int
   folder:
     description:
       - The Grafana folder where this dashboard will be imported to.
     default: General
     version_added: '2.10'
+    type: str
   state:
     description:
       - State of the dashboard.
     choices: [ absent, export, present ]
     default: present
+    type: str
   slug:
     description:
       - Deprecated since Grafana 5. Use grafana dashboard uid instead.
@@ -44,15 +47,18 @@ options:
       - When C(state) is C(present), this parameter can override the slug in the meta section of the json file.
       - If you want to import a json dashboard exported directly from the interface (not from the api),
         you have to specify the slug parameter because there is no meta section in the exported json.
+    type: str
   uid:
     version_added: 2.7
     description:
       - uid of the dashboard to export when C(state) is C(export) or C(absent).
+    type: str
   path:
     description:
       - The path to the json file containing the Grafana dashboard to import or export.
       - A http URL is also accepted (since 2.10).
     aliases: [ dashboard_url ]
+    type: str
   overwrite:
     description:
       - Override existing dashboard when state is present.
@@ -62,17 +68,20 @@ options:
     description:
       - Public Grafana.com dashboard id to import
     version_added: '2.10'
+    type: str
   dashboard_revision:
     description:
       - Revision of the public grafana dashboard to import
     default: 1
     version_added: '2.10'
+    type: str
   commit_message:
     description:
       - Set a commit message for the version history.
       - Only used when C(state) is C(present).
       - C(message) alias is deprecated in Ansible 2.10, since it is used internally by Ansible Core Engine.
     aliases: [ 'message' ]
+    type: str
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
