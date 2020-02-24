@@ -24,10 +24,12 @@ options:
     description:
     - The Grafana URL.
     required: true
+    type: str
   name:
     description:
     - The name of the datasource.
     required: true
+    type: str
   ds_type:
     description:
     - The type of the datasource.
@@ -43,12 +45,14 @@ options:
     - cloudwatch
     - alexanderzobnin-zabbix-datasource
     - sni-thruk-datasource
+    type: str
   url:
     description:
     - The URL of the datasource.
     required: true
     aliases:
     - ds_url
+    type: str
   access:
     description:
     - The access mode for this datasource.
@@ -56,41 +60,50 @@ options:
     - direct
     - proxy
     default: proxy
+    type: str
   url_username:
     description:
     - The Grafana API user.
     default: admin
     aliases:
     - grafana_user
+    type: str
   url_password:
     description:
     - The Grafana API password.
     default: admin
     aliases:
     - grafana_password
+    type: str
   grafana_api_key:
     description:
     - The Grafana API key.
     - If set, C(grafana_user) and C(grafana_password) will be ignored.
+    type: str
   database:
     description:
     - Name of the database for the datasource.
     - This options is required when the C(ds_type) is C(influxdb), C(elasticsearch)
       (index name), C(mysql) or C(postgres).
     required: false
+    type: str
   user:
     description:
     - The datasource login user for influxdb datasources.
+    type: str
   password:
     description:
-    - The datasource password
+    - The datasource password.
+    type: str
   basic_auth_user:
     description:
     - The datasource basic auth user.
     - Setting this option with basic_auth_password will enable basic auth.
+    type: str
   basic_auth_password:
     description:
     - The datasource basic auth password, when C(basic auth) is C(yes).
+    type: str
   with_credentials:
     description:
     - Whether credentials such as cookies or auth headers should be sent with cross-site
@@ -102,14 +115,17 @@ options:
     - The client TLS certificate.
     - If C(tls_client_cert) and C(tls_client_key) are set, this will enable TLS authentication.
     - Starts with ----- BEGIN CERTIFICATE -----
+    type: str
   tls_client_key:
     description:
     - The client TLS private key
     - Starts with ----- BEGIN RSA PRIVATE KEY -----
+    type: str
   tls_ca_cert:
     description:
     - The TLS CA certificate for self signed certificates.
     - Only used when C(tls_client_cert) and C(tls_client_key) are set.
+    type: str
   tls_skip_verify:
     description:
     - Skip the TLS datasource certificate verification.
@@ -126,6 +142,7 @@ options:
     - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
       belong to one organisation.
     default: 1
+    type: int
   state:
     description:
     - Status of the datasource
@@ -133,6 +150,7 @@ options:
     - absent
     - present
     default: present
+    type: str
   es_version:
     description:
     - Elasticsearch version (for C(ds_type = elasticsearch) only)
@@ -143,20 +161,24 @@ options:
     - 5
     - 56
     default: 5
+    type: int
   max_concurrent_shard_requests:
     description:
     - Starting with elasticsearch 5.6, you can specify the max concurrent shard per
       requests.
     default: 256
+    type: int
   time_field:
     description:
     - Name of the time field in elasticsearch ds.
-    - For example C(@timestamp)
-    default: timestamp
+    - For example C(@timestamp).
+    type: str
+    default: '@timestamp'
   time_interval:
     description:
     - Minimum group by interval for C(influxdb) or C(elasticsearch) datasources.
-    - for example C(>10s)
+    - for example C(>10s).
+    type: str
   interval:
     description:
     - For elasticsearch C(ds_type), this is the index pattern used.
@@ -167,6 +189,7 @@ options:
     - Weekly
     - Monthly
     - Yearly
+    type: str
   tsdb_version:
     description:
     - The opentsdb version.
@@ -176,6 +199,7 @@ options:
     - 2
     - 3
     default: 1
+    type: int
   tsdb_resolution:
     description:
     - The opentsdb time resolution.
@@ -183,6 +207,7 @@ options:
     - millisecond
     - second
     default: second
+    type: str
   sslmode:
     description:
     - SSL mode for C(postgres) datasource type.
@@ -191,19 +216,23 @@ options:
     - require
     - verify-ca
     - verify-full
+    type: str
+    default: disable
   trends:
     required: false
     description:
-    - Use trends or not for zabbix datasource type
+    - Use trends or not for zabbix datasource type.
     type: bool
   client_cert:
     required: false
     description:
-    - TLS certificate path used by ansible to query grafana api
+    - TLS certificate path used by ansible to query grafana api.
+    type: path
   client_key:
     required: false
     description:
-    - TLS private key path used by ansible to query grafana api
+    - TLS private key path used by ansible to query grafana api.
+    type: path
   validate_certs:
     description:
     - Whether to validate the Grafana certificate.
@@ -223,10 +252,12 @@ options:
     - keys
     - credentials
     - arn
+    type: str
   aws_default_region:
     description:
     - AWS default region for CloudWatch datasource type
     default: us-east-1
+    type: str
     choices:
     - ap-northeast-1
     - ap-northeast-2
@@ -252,27 +283,32 @@ options:
       is C(credentials)
     default: ''
     required: false
+    type: str
   aws_access_key:
     description:
     - AWS access key for CloudWatch datasource type when C(aws_auth_type) is C(keys)
     default: ''
     required: false
+    type: str
   aws_secret_key:
     description:
     - AWS secret key for CloudWatch datasource type when C(aws_auth_type) is C(keys)
     default: ''
     required: false
+    type: str
   aws_assume_role_arn:
     description:
     - AWS IAM role arn to assume for CloudWatch datasource type when C(aws_auth_type)
       is C(arn)
     default: ''
     required: false
+    type: str
   aws_custom_metrics_namespaces:
     description:
     - Namespaces of Custom Metrics for CloudWatch datasource type
     default: ''
     required: false
+    type: str
 '''
 
 EXAMPLES = '''
