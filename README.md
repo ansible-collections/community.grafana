@@ -3,7 +3,7 @@
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)](https://codecov.io/gh/ansible-collections/grafana)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END --> 
 
 This repo hosts the `community.grafana` Ansible Collection.
@@ -141,6 +141,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://twitter.com/RealRockaut"><img src="https://avatars0.githubusercontent.com/u/453368?v=4" width="100px;" alt=""/><br /><sub><b>Markus Fischbacher</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=rockaut" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/rverchere"><img src="https://avatars3.githubusercontent.com/u/232433?v=4" width="100px;" alt=""/><br /><sub><b>Remi Verchere</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=rverchere" title="Code">💻</a></td>
+    <td align="center"><a href="http://akasurde.github.io"><img src="https://avatars1.githubusercontent.com/u/633765?v=4" width="100px;" alt=""/><br /><sub><b>Abhijeet Kasurde</b></sub></a><br /><a href="https://github.com/ansible-collections/grafana/commits?author=Akasurde" title="Documentation">📖</a> <a href="https://github.com/ansible-collections/grafana/commits?author=Akasurde" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
