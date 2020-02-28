@@ -17,11 +17,9 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import os
 import json
 import socket
 import getpass
-from base64 import b64encode
 from datetime import datetime
 
 from ansible.module_utils._text import to_text
@@ -266,10 +264,10 @@ class CallbackModule(CallbackBase):
 
     def _send_annotation(self, annotation):
         try:
-            response = open_url(self.grafana_url, data=json.dumps(annotation), headers=self.headers,
-                                method="POST",
-                                validate_certs=self.validate_grafana_certs,
-                                url_username=self.grafana_user, url_password=self.grafana_password,
-                                http_agent=self.http_agent, force_basic_auth=self.force_basic_auth)
+            open_url(self.grafana_url, data=json.dumps(annotation), headers=self.headers,
+                     method="POST",
+                     validate_certs=self.validate_grafana_certs,
+                     url_username=self.grafana_user, url_password=self.grafana_password,
+                     http_agent=self.http_agent, force_basic_auth=self.force_basic_auth)
         except Exception as e:
             self._display.error(u'Could not submit message to Grafana: %s' % to_text(e))

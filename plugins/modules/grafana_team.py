@@ -302,7 +302,7 @@ def main():
     if state == 'present':
         team = grafana_iface.get_team(name)
         if team is None:
-            new_team = grafana_iface.create_team(name, email)
+            grafana_iface.create_team(name, email)
             team = grafana_iface.get_team(name)
             changed = True
         if members is not None:

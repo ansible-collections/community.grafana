@@ -261,7 +261,7 @@ def main():
     if state == 'present':
         folder = grafana_iface.get_folder(title)
         if folder is None:
-            new_folder = grafana_iface.create_folder(title)
+            grafana_iface.create_folder(title)
             folder = grafana_iface.get_folder(title)
             changed = True
         folder = grafana_iface.get_folder(title)
