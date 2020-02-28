@@ -18,16 +18,16 @@ Click on the name of a plugin or module to view that content's documentation:
   - **Filter Plugins**:
   - **Inventory Source**:
   - **Callback Plugins**:
-    - [grafana_annotations](#)
+    - [grafana_annotations](https://docs.ansible.com/ansible/latest/plugins/callback/grafana_annotations.html)
   - **Lookup Plugins**:
-    - [grafana_dashboard](#)
+    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/plugins/lookup/grafana_dashboard.html)
   - **Modules**:
-    - [grafana_dashboard](#)
-    - [grafana_datasource](#)
-    - [grafana_folder](#)
-    - [grafana_plugin](#)
-    - [grafana_team](#)
-    - [grafana_user](#)
+    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/modules/grafana_dashboard_module.html)
+    - [grafana_datasource](https://docs.ansible.com/ansible/latest/modules/grafana_datasource_module.html)
+    - grafana_folder
+    - [grafana_plugin](https://docs.ansible.com/ansible/latest/modules/grafana_plugin_module.html)
+    - grafana_team
+    - grafana_user
 
 ## Supported Grafana versions
 
@@ -38,7 +38,7 @@ We aim at keeping the last 3 minor versions of Grafana tested.
 
 ### Installing the Collection from Ansible Galaxy
 
-Before using the Kuberentes collection, you need to install it with the Ansible Galaxy CLI:
+Before using the Grafana collection, you need to install it with the Ansible Galaxy CLI:
 
     ansible-galaxy collection install community.grafana
 
