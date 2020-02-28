@@ -72,8 +72,6 @@ version:
   returned: always
 '''
 
-import base64
-import json
 import os
 from ansible.module_utils.basic import AnsibleModule
 

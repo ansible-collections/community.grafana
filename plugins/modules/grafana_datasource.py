@@ -444,7 +444,6 @@ after:
 '''
 
 import json
-import base64
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
