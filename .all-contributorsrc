@@ -103,15 +103,6 @@
         "doc",
         "test"
       ]
-    },
-    {
-      "login": "jpmens",
-      "name": "JP Mens",
-      "avatar_url": "https://avatars2.githubusercontent.com/u/60706?v=4",
-      "profile": "https://jpmens.net",
-      "contributions": [
-        "bug"
-      ]
     }
   ],
   "contributorsPerLine": 7,
