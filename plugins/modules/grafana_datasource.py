@@ -22,11 +22,6 @@ short_description: Manage Grafana datasources
 description:
 - Create/update/delete Grafana datasources via API.
 options:
-  grafana_url:
-    description:
-    - The Grafana URL.
-    required: true
-    type: str
   name:
     description:
     - The name of the datasource.
@@ -48,12 +43,10 @@ options:
     - alexanderzobnin-zabbix-datasource
     - sni-thruk-datasource
     type: str
-  url:
+  ds_url:
     description:
     - The URL of the datasource.
     required: true
-    aliases:
-    - ds_url
     type: str
   access:
     description:
@@ -62,25 +55,6 @@ options:
     - direct
     - proxy
     default: proxy
-    type: str
-  url_username:
-    description:
-    - The Grafana API user.
-    default: admin
-    aliases:
-    - grafana_user
-    type: str
-  url_password:
-    description:
-    - The Grafana API password.
-    default: admin
-    aliases:
-    - grafana_password
-    type: str
-  grafana_api_key:
-    description:
-    - The Grafana API key.
-    - If set, C(grafana_user) and C(grafana_password) will be ignored.
     type: str
   database:
     description:
@@ -225,26 +199,6 @@ options:
     description:
     - Use trends or not for zabbix datasource type.
     type: bool
-  client_cert:
-    required: false
-    description:
-    - TLS certificate path used by ansible to query grafana api.
-    type: path
-  client_key:
-    required: false
-    description:
-    - TLS private key path used by ansible to query grafana api.
-    type: path
-  validate_certs:
-    description:
-    - Whether to validate the Grafana certificate.
-    type: bool
-    default: 'yes'
-  use_proxy:
-    description:
-    - Boolean of whether or not to use proxy.
-    default: 'yes'
-    type: bool
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
@@ -311,6 +265,9 @@ options:
     default: ''
     required: false
     type: str
+extends_documentation_fragment:
+- community.grafana.basic_auth
+- community.grafana.api_key
 '''
 
 EXAMPLES = '''
@@ -384,7 +341,7 @@ EXAMPLES = '''
     grafana_password: "xxxxxx"
     org_id: "1"
     ds_type: "sni-thruk-datasource"
-    url: "https://thruk.company.com/sitename/thruk"
+    ds_url: "https://thruk.company.com/sitename/thruk"
     basic_auth_user: "thruk-user"
     basic_auth_password: "******"
 '''
@@ -450,6 +407,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
 
 __metaclass__ = type
 
@@ -460,7 +418,7 @@ def get_datasource_payload(data):
         'name': data['name'],
         'type': data['ds_type'],
         'access': data['access'],
-        'url': data['url'],
+        'url': data['ds_url'],
         'database': data['database'],
         'withCredentials': data['with_credentials'],
         'isDefault': data['is_default'],
@@ -552,7 +510,7 @@ class GrafanaInterface(object):
 
     def __init__(self, module):
         self._module = module
-        self.grafana_url = module.params.get("grafana_url")
+        self.grafana_url = module.params.get("url")
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
         if module.params.get('grafana_api_key', None):
@@ -612,19 +570,10 @@ class GrafanaInterface(object):
 
 def main():
     # use the predefined argument spec for url
-    argument_spec = url_argument_spec()
-    # remove unnecessary arguments
-    del argument_spec['force']
-    del argument_spec['force_basic_auth']
-    del argument_spec['http_agent']
+    argument_spec = grafana_argument_spec()
 
     argument_spec.update(
         name=dict(required=True, type='str'),
-        state=dict(choices=['present', 'absent'], default='present'),
-        grafana_url=dict(type='str', required=True),
-        url_username=dict(aliases=['grafana_user'], default='admin'),
-        url_password=dict(aliases=['grafana_password'], default='admin', no_log=True),
-        grafana_api_key=dict(type='str', no_log=True),
         ds_type=dict(choices=['graphite',
                               'prometheus',
                               'elasticsearch',
@@ -635,7 +584,7 @@ def main():
                               'cloudwatch',
                               'alexanderzobnin-zabbix-datasource',
                               'sni-thruk-datasource'], required=True),
-        url=dict(required=True, type='str', aliases=['ds_url']),
+        ds_url=dict(required=True, type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         database=dict(type='str', default=""),
         user=dict(default='', type='str'),
