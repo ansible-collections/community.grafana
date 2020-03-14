@@ -449,6 +449,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
 from ansible.module_utils._text import to_text
+from ansible.module_utils.common.dict_transformations import recursive_diff
 
 __metaclass__ = type
 
@@ -459,73 +460,19 @@ class GrafanaAPIException(Exception):
     pass
 
 
-class GrafanaInterface(object):
-
-    def __init__(self, module):
-        self._module = module
-        self.grafana_url = module.params.get("url")
-        # {{{ Authentication header
-        self.headers = {"Content-Type": "application/json"}
-        if module.params.get('grafana_api_key', None):
-            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
-        else:
-            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
-            self.grafana_switch_organisation(module.params['org_id'])
-        # }}}
-
-    def _send_request(self, url, data=None, headers=None, method="GET"):
-        if data is not None:
-            data = json.dumps(data, sort_keys=True)
-        if not headers:
-            headers = []
-
-        full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
-        status_code = info["status"]
-        if status_code == 404:
-            return None
-        elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
-        elif status_code == 403:
-            self._module.fail_json(failed=True, msg="Permission Denied")
-        elif status_code == 200:
-            return self._module.from_json(resp.read())
-        self._module.fail_json(failed=True, msg="Grafana API answered with HTTP %d" % status_code)
-
-
-    def grafana_switch_organisation(self, org_id):
-        url = "/api/user/using/%d" %  org_id
-        response = self._send_request(url, headers=self.headers, method='POST')
-
-
-def grafana_datasource_exists(module, grafana_url, name, headers):
-    datasource_exists = False
-    ds = {}
-    r, info = fetch_url(module, '%s/api/datasources/name/%s' % (grafana_url, quote(name)), headers=headers, method='GET')
-    if info['status'] == 200:
-        datasource_exists = True
-        ds = json.loads(to_text(r.read(), errors='surrogate_or_strict'))
-    elif info['status'] == 404:
-        datasource_exists = False
-    else:
-        raise GrafanaAPIException('Unable to get datasource %s : %s' % (name, info))
-
-    return datasource_exists, ds
-
-
-def grafana_create_datasource(module, data):
-
-    # define data payload for grafana API
-    payload = {'orgId': data['org_id'],
-               'name': data['name'],
-               'type': data['ds_type'],
-               'access': data['access'],
-               'url': data['url'],
-               'database': data['database'],
-               'withCredentials': data['with_credentials'],
-               'isDefault': data['is_default'],
-               'user': data['user'],
-               'password': data['password']}
+def get_datasource_payload(data):
+    payload = {
+        'orgId': data['org_id'],
+        'name': data['name'],
+        'type': data['ds_type'],
+        'access': data['access'],
+        'url': data['url'],
+        'database': data['database'],
+        'withCredentials': data['with_credentials'],
+        'isDefault': data['is_default'],
+        'user': data['user'],
+        'password': data['password']
+    }
 
     # define basic auth
     if 'basic_auth_user' in data and data['basic_auth_user'] and 'basic_auth_password' in data and data['basic_auth_password']:
@@ -604,99 +551,69 @@ def grafana_create_datasource(module, data):
             json_data['assumeRoleArn'] = data.get('aws_assume_role_arn')
         if data.get('aws_access_key') and data.get('aws_secret_key'):
             payload['secureJsonData'] = {'accessKey': data.get('aws_access_key'), 'secretKey': data.get('aws_secret_key')}
-
     payload['jsonData'] = json_data
+    return payload
 
-    # test if datasource already exists
-    datasource_exists, ds = grafana_datasource_exists(module,
-                                                      data['grafana_url'],
-                                                      data['name'],
-                                                      headers=HEADERS)
+class GrafanaInterface(object):
 
-    result = {}
-    if datasource_exists is True:
-        del ds['typeLogoUrl']
-        if 'version' in ds:
-            del ds['version']
-        if 'readOnly' in ds:
-            del ds['readOnly']
-        if ds['basicAuth'] is False:
-            del ds['basicAuthUser']
-            del ds['basicAuthPassword']
-        if 'jsonData' in ds:
-            if 'tlsAuth' in ds['jsonData'] and ds['jsonData']['tlsAuth'] is False:
-                del ds['secureJsonFields']
-            if 'tlsAuth' not in ds['jsonData']:
-                del ds['secureJsonFields']
-        payload['id'] = ds['id']
-        if ds == payload:
-            # unchanged
-            result['name'] = data['name']
-            result['id'] = ds['id']
-            result['msg'] = "Datasource %s unchanged." % data['name']
-            result['changed'] = False
+    def __init__(self, module):
+        self._module = module
+        self.grafana_url = module.params.get("grafana_url")
+        # {{{ Authentication header
+        self.headers = {"Content-Type": "application/json"}
+        if module.params.get('grafana_api_key', None):
+            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
         else:
-            # update
-            r, info = fetch_url(module, '%s/api/datasources/%d' %
-                                (data['grafana_url'], ds['id']),
-                                data=json.dumps(payload), headers=HEADERS, method='PUT')
-            if info['status'] == 200:
-                res = json.loads(to_text(r.read(), errors='surrogate_or_strict'))
-                result['name'] = data['name']
-                result['id'] = ds['id']
-                result['before'] = ds
-                result['after'] = payload
-                result['msg'] = "Datasource %s updated %s" % (data['name'], res['message'])
-                result['changed'] = True
-            else:
-                raise GrafanaAPIException('Unable to update the datasource id %d : %s' % (ds['id'], info))
-    else:
-        # create
-        r, info = fetch_url(module, '%s/api/datasources' %
-                            data['grafana_url'], data=json.dumps(payload),
-                            headers=HEADERS, method='POST')
-        if info['status'] == 200:
-            res = json.loads(to_text(r.read(), errors='surrogate_or_strict'))
-            result['msg'] = "Datasource %s created : %s" % (data['name'], res['message'])
-            result['changed'] = True
-            result['name'] = data['name']
-            result['id'] = res['id']
-        else:
-            raise GrafanaAPIException('Unable to create the new datasource %s : %s - %s.' % (data['name'], info['status'], info))
+            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+            self.grafana_switch_organisation(module.params['org_id'])
+        # }}}
 
-    return result
+    def _send_request(self, url, data=None, headers=None, method="GET"):
+        if data is not None:
+            data = json.dumps(data, sort_keys=True)
+        if not headers:
+            headers = []
+
+        full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
+        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+        status_code = info["status"]
+        if status_code == 404:
+            return None
+        elif status_code == 401:
+            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
+        elif status_code == 403:
+            self._module.fail_json(failed=True, msg="Permission Denied")
+        elif status_code == 200:
+            return self._module.from_json(resp.read())
+        self._module.fail_json(failed=True, msg="Grafana API answered with HTTP %d for url %s and data %s" % (status_code, url, data))
+
+    def grafana_switch_organisation(self, org_id):
+        url = "/api/user/using/%d" %  org_id
+        response = self._send_request(url, headers=self.headers, method='POST')
+
+    def grafana_datasource_exists(self, name):
+        datasource_exists = False
+        ds = {}
+        url = "/api/datasources/name/%s" %  quote(name)
+        response = self._send_request(url, headers=self.headers, method='GET')
+        datasource_exists = False
+        if response is not None:
+            datasource_exists = True
+        return datasource_exists, response
+
+    def grafana_delete_datasource(self, name):
+        url = "/api/datasources/name/%s" %  quote(name)
+        self._send_request(url, headers=self.headers, method='DELETE')
+
+    def grafana_update_datasource(self, ds_id, data):
+        url = "/api/datasources/%d" % ds_id
+        self._send_request(url, data=data, headers=self.headers, method='PUT')
+
+    def grafana_create_datasource(self, data):
+        url = "/api/datasources"
+        self._send_request(url, data=data, headers=self.headers, method='POST')
 
 
-def grafana_delete_datasource(module, data):
-
-    # test if datasource already exists
-    datasource_exists, ds = grafana_datasource_exists(module,
-                                                      data['grafana_url'],
-                                                      data['name'],
-                                                      headers=HEADERS)
-
-    result = {}
-    if datasource_exists is True:
-        # delete
-        r, info = fetch_url(module, '%s/api/datasources/name/%s' %
-                            (data['grafana_url'], quote(data['name'])),
-                            headers=HEADERS, method='DELETE')
-        if info['status'] == 200:
-            res = json.loads(to_text(r.read(), errors='surrogate_or_strict'))
-            result['msg'] = "Datasource %s deleted : %s" % (data['name'], res['message'])
-            result['changed'] = True
-            result['name'] = data['name']
-            result['id'] = 0
-        else:
-            raise GrafanaAPIException('Unable to update the datasource id %s : %s' % (ds['id'], info))
-    else:
-        # datasource does not exist, do nothing
-        result = {'msg': "Datasource %s does not exist." % data['name'],
-                  'changed': False,
-                  'id': 0,
-                  'name': data['name']}
-
-    return result
 
 
 def main():
@@ -777,23 +694,48 @@ def main():
         ],
     )
 
-    try:
-        if module.params['state'] == 'present':
-            result = grafana_create_datasource(module, module.params)
-        else:
-            result = grafana_delete_datasource(module, module.params)
-    except GrafanaAPIException as e:
-        module.fail_json(
-            failed=True,
-            msg="error %s : %s " % (type(e), e)
-        )
-        return
+    state = module.params['state']
+    name = module.params['name']
 
-    module.exit_json(
-        failed=False,
-        **result
-    )
-    return
+    grafana_iface = GrafanaInterface(module)
+    datasource_exists, ds = grafana_iface.grafana_datasource_exists(name)
+
+    if state == 'present':
+        payload = get_datasource_payload(module.params)
+        if not datasource_exists:
+            result = grafana_iface.grafana_create_datasource(payload)
+            module.exit_json(changed=True, msg='Datasource %s created' %  name)
+        else:
+            diff = compare_datasources(payload, ds)
+            if diff.get('before') == diff.get('after'):
+                module.exit_json(changed=False, msg='Datasource %s unchanged' %  name)
+            grafana_iface.grafana_update_datasource(ds.get('id'), payload)
+            module.exit_json(changed=True, diff=diff, msg='Datasource %s updated' %  name)
+    else:
+        if not datasource_exists:
+            module.exit_json(changed=False, msg='Datasource %s does not exist.' % name)
+        grafana_iface.grafana_delete_datasource(name)
+        module.exit_json(changed=True, msg='Datasource %s deleted.' % name)
+
+def compare_datasources(new, current):
+    del current['typeLogoUrl']
+    del current['id']
+    if 'version' in current:
+        del current['version']
+    if 'readOnly' in current:
+        del current['readOnly']
+    if current['basicAuth'] is False:
+        del current['basicAuthUser']
+        del current['basicAuthPassword']
+    if 'jsonData' in current:
+        if 'tlsAuth' in current['jsonData'] and current['jsonData']['tlsAuth'] is False:
+            del current['secureJsonFields']
+        if 'tlsAuth' not in current['jsonData']:
+            del current['secureJsonFields']
+    if 'secureJsonData' in new:
+        del new['secureJsonData']
+#    return recursive_diff(new, current)
+    return dict(before=current, after=new)
 
 
 if __name__ == '__main__':
