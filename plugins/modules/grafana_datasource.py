@@ -447,31 +447,55 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
-from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
 from ansible.module_utils._text import to_text
 
 __metaclass__ = type
 
+HEADERS = {"Content-Type": "application/json"}
+HEADERS["Authorization"] = basic_auth_header("admin", "admin")
 
 class GrafanaAPIException(Exception):
     pass
 
 
-def grafana_switch_organisation(module, grafana_url, org_id, headers):
-    r, info = fetch_url(module, '%s/api/user/using/%d' % (grafana_url, org_id), headers=headers, method='POST')
-    if info['status'] != 200:
-        raise GrafanaAPIException('Unable to switch to organization %s : %s' % (org_id, info))
+class GrafanaInterface(object):
+
+    def __init__(self, module):
+        self._module = module
+        self.grafana_url = module.params.get("url")
+        # {{{ Authentication header
+        self.headers = {"Content-Type": "application/json"}
+        if module.params.get('grafana_api_key', None):
+            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
+        else:
+            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+            self.grafana_switch_organisation(module.params['org_id'])
+        # }}}
+
+    def _send_request(self, url, data=None, headers=None, method="GET"):
+        if data is not None:
+            data = json.dumps(data, sort_keys=True)
+        if not headers:
+            headers = []
+
+        full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
+        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+        status_code = info["status"]
+        if status_code == 404:
+            return None
+        elif status_code == 401:
+            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
+        elif status_code == 403:
+            self._module.fail_json(failed=True, msg="Permission Denied")
+        elif status_code == 200:
+            return self._module.from_json(resp.read())
+        self._module.fail_json(failed=True, msg="Grafana API answered with HTTP %d" % status_code)
 
 
-def grafana_headers(module, data):
-    headers = {'content-type': 'application/json; charset=utf8'}
-    if 'grafana_api_key' in data and data['grafana_api_key']:
-        headers['Authorization'] = "Bearer %s" % data['grafana_api_key']
-    else:
-        module.params['force_basic_auth'] = True
-        grafana_switch_organisation(module, data['grafana_url'], data['org_id'], headers)
-
-    return headers
+    def grafana_switch_organisation(self, org_id):
+        url = "/api/user/using/%d" %  org_id
+        response = self._send_request(url, headers=self.headers, method='POST')
 
 
 def grafana_datasource_exists(module, grafana_url, name, headers):
@@ -583,11 +607,11 @@ def grafana_create_datasource(module, data):
 
     payload['jsonData'] = json_data
 
-    # define http header
-    headers = grafana_headers(module, data)
-
     # test if datasource already exists
-    datasource_exists, ds = grafana_datasource_exists(module, data['grafana_url'], data['name'], headers=headers)
+    datasource_exists, ds = grafana_datasource_exists(module,
+                                                      data['grafana_url'],
+                                                      data['name'],
+                                                      headers=HEADERS)
 
     result = {}
     if datasource_exists is True:
@@ -613,7 +637,9 @@ def grafana_create_datasource(module, data):
             result['changed'] = False
         else:
             # update
-            r, info = fetch_url(module, '%s/api/datasources/%d' % (data['grafana_url'], ds['id']), data=json.dumps(payload), headers=headers, method='PUT')
+            r, info = fetch_url(module, '%s/api/datasources/%d' %
+                                (data['grafana_url'], ds['id']),
+                                data=json.dumps(payload), headers=HEADERS, method='PUT')
             if info['status'] == 200:
                 res = json.loads(to_text(r.read(), errors='surrogate_or_strict'))
                 result['name'] = data['name']
@@ -626,7 +652,9 @@ def grafana_create_datasource(module, data):
                 raise GrafanaAPIException('Unable to update the datasource id %d : %s' % (ds['id'], info))
     else:
         # create
-        r, info = fetch_url(module, '%s/api/datasources' % data['grafana_url'], data=json.dumps(payload), headers=headers, method='POST')
+        r, info = fetch_url(module, '%s/api/datasources' %
+                            data['grafana_url'], data=json.dumps(payload),
+                            headers=HEADERS, method='POST')
         if info['status'] == 200:
             res = json.loads(to_text(r.read(), errors='surrogate_or_strict'))
             result['msg'] = "Datasource %s created : %s" % (data['name'], res['message'])
@@ -641,15 +669,18 @@ def grafana_create_datasource(module, data):
 
 def grafana_delete_datasource(module, data):
 
-    headers = grafana_headers(module, data)
-
     # test if datasource already exists
-    datasource_exists, ds = grafana_datasource_exists(module, data['grafana_url'], data['name'], headers=headers)
+    datasource_exists, ds = grafana_datasource_exists(module,
+                                                      data['grafana_url'],
+                                                      data['name'],
+                                                      headers=HEADERS)
 
     result = {}
     if datasource_exists is True:
         # delete
-        r, info = fetch_url(module, '%s/api/datasources/name/%s' % (data['grafana_url'], quote(data['name'])), headers=headers, method='DELETE')
+        r, info = fetch_url(module, '%s/api/datasources/name/%s' %
+                            (data['grafana_url'], quote(data['name'])),
+                            headers=HEADERS, method='DELETE')
         if info['status'] == 200:
             res = json.loads(to_text(r.read(), errors='surrogate_or_strict'))
             result['msg'] = "Datasource %s deleted : %s" % (data['name'], res['message'])
