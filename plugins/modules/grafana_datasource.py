@@ -12,10 +12,12 @@ ANSIBLE_METADATA = {
     'metadata_version': '1.1'
 }
 
-DOCUMENTATION = '''module: grafana_datasource
+DOCUMENTATION = '''
+module: grafana_datasource
 author:
 - Thierry Sallé (@seuf)
 - Martin Wang (@martinwangjian)
+- Rémi REY (@rrey)
 short_description: Manage Grafana datasources
 description:
 - Create/update/delete Grafana datasources via API.
@@ -448,16 +450,8 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
-from ansible.module_utils._text import to_text
-from ansible.module_utils.common.dict_transformations import recursive_diff
 
 __metaclass__ = type
-
-HEADERS = {"Content-Type": "application/json"}
-HEADERS["Authorization"] = basic_auth_header("admin", "admin")
-
-class GrafanaAPIException(Exception):
-    pass
 
 
 def get_datasource_payload(data):
@@ -643,7 +637,7 @@ def main():
                               'sni-thruk-datasource'], required=True),
         url=dict(required=True, type='str', aliases=['ds_url']),
         access=dict(default='proxy', choices=['proxy', 'direct']),
-        database=dict(type='str'),
+        database=dict(type='str', default=""),
         user=dict(default='', type='str'),
         password=dict(default='', no_log=True, type='str'),
         basic_auth_user=dict(type='str'),
@@ -706,7 +700,7 @@ def main():
             result = grafana_iface.grafana_create_datasource(payload)
             module.exit_json(changed=True, msg='Datasource %s created' %  name)
         else:
-            diff = compare_datasources(payload, ds)
+            diff = compare_datasources(payload.copy(), ds.copy())
             if diff.get('before') == diff.get('after'):
                 module.exit_json(changed=False, msg='Datasource %s unchanged' %  name)
             grafana_iface.grafana_update_datasource(ds.get('id'), payload)
@@ -732,9 +726,9 @@ def compare_datasources(new, current):
             del current['secureJsonFields']
         if 'tlsAuth' not in current['jsonData']:
             del current['secureJsonFields']
+    # secureJsonData contains ciphered data which we cannot compare
     if 'secureJsonData' in new:
         del new['secureJsonData']
-#    return recursive_diff(new, current)
     return dict(before=current, after=new)
 
 

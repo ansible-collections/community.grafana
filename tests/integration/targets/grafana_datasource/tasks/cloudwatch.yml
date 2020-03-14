@@ -13,13 +13,15 @@
     aws_access_key: speakFriendAndEnter
     aws_secret_key: mel10n
     aws_custom_metrics_namespaces: n1,n2
+
 - debug:
     var: result
+
 - assert:
     that:
-    - result.changed == true
-    - result.name == 'datasource-cloudwatch'
-    - 'result.msg == ''Datasource datasource-cloudwatch created : Datasource added'''
+    - result.changed
+    - "result.msg == 'Datasource datasource-cloudwatch created'"
+
 - name: Check cloudwatch datasource creation idempotency
   register: result
   grafana_datasource:
@@ -35,24 +37,75 @@
     aws_access_key: speakFriendAndEnter
     aws_secret_key: mel10n
     aws_custom_metrics_namespaces: n1,n2
+
 - debug:
     var: result
+
 - assert:
     that:
-    - result.name == 'datasource-cloudwatch'
-    - result.after.access == 'proxy'
-    - result.after.basicAuth == false
-    - result.after.database == None
-    - result.after.isDefault == false
-    - result.after.jsonData.authType == 'keys'
-    - result.after.jsonData.customMetricsNamespaces == 'n1,n2'
-    - result.after.jsonData.defaultRegion == 'us-west-1'
-    - result.after.jsonData.tlsAuth == false
-    - result.after.jsonData.tlsAuthWithCACert == false
-    - result.after.name == 'datasource-cloudwatch'
-    - result.after.orgId == 1
-    - result.after.password == ''
-    - result.after.type == 'cloudwatch'
-    - result.after.url == 'http://monitoring.us-west-1.amazonaws.com'
-    - result.after.user == ''
-    - result.after.withCredentials == false
+    - not result.changed
+      #    - result.after.access == 'proxy'
+      #    - result.after.basicAuth == false
+      #    - result.after.database == None
+      #    - result.after.isDefault == false
+      #    - result.after.jsonData.authType == 'keys'
+      #    - result.after.jsonData.customMetricsNamespaces == 'n1,n2'
+      #    - result.after.jsonData.defaultRegion == 'us-west-1'
+      #    - result.after.jsonData.tlsAuth == false
+      #    - result.after.jsonData.tlsAuthWithCACert == false
+      #    - result.after.name == 'datasource-cloudwatch'
+      #    - result.after.orgId == 1
+      #    - result.after.password == ''
+      #    - result.after.type == 'cloudwatch'
+      #    - result.after.url == 'http://monitoring.us-west-1.amazonaws.com'
+      #    - result.after.user == ''
+      #    - result.after.withCredentials == false
+
+- name: Delete cloudwatch datasource
+  register: result
+  grafana_datasource:
+    name: datasource-cloudwatch
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+    org_id: '1'
+    ds_type: cloudwatch
+    ds_url: http://monitoring.us-west-1.amazonaws.com
+    aws_auth_type: keys
+    aws_default_region: us-west-1
+    aws_access_key: speakFriendAndEnter
+    aws_secret_key: mel10n
+    aws_custom_metrics_namespaces: n1,n2
+    state: absent
+
+- debug:
+    var: result
+
+- assert:
+    that:
+    - result.changed
+    - "result.msg == 'Datasource datasource-cloudwatch deleted.'"
+
+- name: Delete cloudwatch datasource (idempotency)
+  register: result
+  grafana_datasource:
+    name: datasource-cloudwatch
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+    org_id: '1'
+    ds_type: cloudwatch
+    ds_url: http://monitoring.us-west-1.amazonaws.com
+    aws_auth_type: keys
+    aws_default_region: us-west-1
+    aws_access_key: speakFriendAndEnter
+    aws_secret_key: mel10n
+    aws_custom_metrics_namespaces: n1,n2
+    state: absent
+
+- debug:
+    var: result
+
+- assert:
+    that:
+    - not result.changed
