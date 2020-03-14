@@ -592,9 +592,9 @@ def grafana_create_datasource(module, data):
     result = {}
     if datasource_exists is True:
         del ds['typeLogoUrl']
-        if ds.get('version'):
+        if 'version' in ds:
             del ds['version']
-        if ds.get('readOnly'):
+        if 'readOnly' in ds:
             del ds['readOnly']
         if ds['basicAuth'] is False:
             del ds['basicAuthUser']
