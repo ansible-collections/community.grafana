@@ -12,13 +12,15 @@
     user: postgres
     password: iampgroot
     sslmode: verify-full
+
 - debug:
     var: result
+
 - assert:
     that:
-    - result.changed == true
-    - result.name == 'datasource-postgres'
-    - 'result.msg == ''Datasource datasource-postgres created : Datasource added'''
+    - result.changed
+    - "result.msg == 'Datasource datasource-postgres created'"
+
 - name: Check postgres datasource creation idempotency
   register: result
   grafana_datasource:
@@ -33,20 +35,68 @@
     user: postgres
     password: iampgroot
     sslmode: verify-full
+
 - debug:
     var: result
+
 - assert:
     that:
-    - result.name == 'datasource-postgres'
-    - result.after.basicAuth == false
-    - result.after.database == 'db'
-    - result.after.isDefault == false
-    - result.after.jsonData.sslmode == 'verify-full'
-    - result.after.jsonData.tlsAuth == false
-    - result.after.jsonData.tlsAuthWithCACert == false
-    - result.after.name == 'datasource-postgres'
-    - result.after.orgId == 1
-    - result.after.type == 'postgres'
-    - result.after.url == 'postgres.company.com:5432'
-    - result.after.user == 'postgres'
-    - result.after.withCredentials == false
+    - not result.changed
+        #    - result.after.basicAuth == false
+        #    - result.after.database == 'db'
+        #    - result.after.isDefault == false
+        #    - result.after.jsonData.sslmode == 'verify-full'
+        #    - result.after.jsonData.tlsAuth == false
+        #    - result.after.jsonData.tlsAuthWithCACert == false
+        #    - result.after.name == 'datasource-postgres'
+        #    - result.after.orgId == 1
+        #    - result.after.type == 'postgres'
+        #    - result.after.url == 'postgres.company.com:5432'
+        #    - result.after.user == 'postgres'
+        #    - result.after.withCredentials == false
+
+- name: Delete postgres datasource
+  register: result
+  grafana_datasource:
+    name: datasource-postgres
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: '1'
+    ds_type: postgres
+    ds_url: postgres.company.com:5432
+    database: db
+    user: postgres
+    password: iampgroot
+    sslmode: verify-full
+    state: absent
+
+- debug:
+    var: result
+
+- assert:
+    that:
+    - result.changed
+
+- name: Delete postgres datasource
+  register: result
+  grafana_datasource:
+    name: datasource-postgres
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: '1'
+    ds_type: postgres
+    ds_url: postgres.company.com:5432
+    database: db
+    user: postgres
+    password: iampgroot
+    sslmode: verify-full
+    state: absent
+
+- debug:
+    var: result
+
+- assert:
+    that:
+    - not result.changed

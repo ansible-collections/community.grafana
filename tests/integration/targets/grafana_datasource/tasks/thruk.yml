@@ -11,11 +11,13 @@
     tls_skip_verify: yes
     validate_certs: no
 
+- debug:
+    var: result
+
 - assert:
     that:
-    - result.changed == true
-    - result.name == 'datasource-thruk'
-    - 'result.msg == ''Datasource datasource-thruk created : Datasource added'''
+    - result.changed
+    - "result.msg == 'Datasource datasource-thruk created'"
 
 - name: Check thruk datasource creation idempotency
   register: result
@@ -32,16 +34,55 @@
 
 - assert:
     that:
-    - result.name == 'datasource-thruk'
-    - result.after.basicAuth == false
-    - result.after.access == 'proxy'
-    - result.after.isDefault == false
-    - result.after.jsonData.tlsAuth == false
-    - result.after.jsonData.tlsAuthWithCACert == false
-    - result.after.name == 'datasource-thruk'
-    - result.after.orgId == 1
-    - result.after.password == ''
-    - result.after.type == 'sni-thruk-datasource'
-    - result.after.url == 'https://thruk.company.com/sitename/thruk'
-    - result.after.user == ''
-    - result.after.withCredentials == false
+    - not result.changed
+      #    - result.after.basicAuth == false
+      #    - result.after.access == 'proxy'
+      #    - result.after.isDefault == false
+      #    - result.after.jsonData.tlsAuth == false
+      #    - result.after.jsonData.tlsAuthWithCACert == false
+      #    - result.after.name == 'datasource-thruk'
+      #    - result.after.orgId == 1
+      #    - result.after.password == ''
+      #    - result.after.type == 'sni-thruk-datasource'
+      #    - result.after.url == 'https://thruk.company.com/sitename/thruk'
+      #    - result.after.user == ''
+      #    - result.after.withCredentials == false
+
+- name: Delete thruk datasource
+  register: result
+  grafana_datasource:
+    name: datasource-thruk
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "1"
+    ds_type: sni-thruk-datasource
+    url: "https://thruk.company.com/sitename/thruk"
+    tls_skip_verify: yes
+    validate_certs: no
+    state: absent
+
+- debug:
+    var: result
+
+- assert:
+    that:
+    - result.changed
+
+- name: Delete thruk datasource (idempotency)
+  register: result
+  grafana_datasource:
+    name: datasource-thruk
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "1"
+    ds_type: sni-thruk-datasource
+    url: "https://thruk.company.com/sitename/thruk"
+    tls_skip_verify: yes
+    validate_certs: no
+    state: absent
+
+- assert:
+    that:
+    - not result.changed
