@@ -24,6 +24,24 @@
 - assert:
     that:
     - result.changed
+    - result.datasource.basicAuth
+    - result.datasource.basicAuthUser == 'grafana'
+    - result.datasource.access == 'proxy'
+    - result.datasource.database == '[logstash_]YYYY.MM.DD'
+    - not result.datasource.isDefault
+    - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.interval == 'Daily'
+    - result.datasource.jsonData.maxConcurrentShardRequests == 42
+    - result.datasource.jsonData.timeField == '@timestamp'
+    - not result.datasource.jsonData.tlsAuth
+    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.orgId == 1
+    - result.datasource.password == ''
+    - result.datasource.type == 'elasticsearch'
+    - result.datasource.url == 'https://elastic.company.com:9200'
+    - result.datasource.user == ''
+    - not result.datasource.withCredentials
     - "result.msg == 'Datasource datasource-elastic created'"
 
 - name: Check elasticsearch datasource creation idempotency
@@ -52,24 +70,69 @@
 - assert:
     that:
     - not result.changed
-      #    - result.after.basicAuth == true
-      #    - result.after.basicAuthUser == 'grafana'
-      #    - result.after.access == 'proxy'
-      #    - result.after.database == '[logstash_]YYYY.MM.DD'
-      #    - result.after.isDefault == false
-      #    - result.after.jsonData.esVersion == 56
-      #    - result.after.jsonData.interval == 'Daily'
-      #    - result.after.jsonData.maxConcurrentShardRequests == 42
-      #    - result.after.jsonData.timeField == '@timestamp'
-      #    - result.after.jsonData.tlsAuth == false
-      #    - result.after.jsonData.tlsAuthWithCACert == false
-      #    - result.after.name == 'datasource-elastic'
-      #    - result.after.orgId == 1
-      #    - result.after.password == ''
-      #    - result.after.type == 'elasticsearch'
-      #    - result.after.url == 'https://elastic.company.com:9200'
-      #    - result.after.user == ''
-      #    - result.after.withCredentials == false
+    - result.datasource.basicAuth
+    - result.datasource.basicAuthUser == 'grafana'
+    - result.datasource.access == 'proxy'
+    - result.datasource.database == '[logstash_]YYYY.MM.DD'
+    - not result.datasource.isDefault
+    - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.interval == 'Daily'
+    - result.datasource.jsonData.maxConcurrentShardRequests == 42
+    - result.datasource.jsonData.timeField == '@timestamp'
+    - not result.datasource.jsonData.tlsAuth
+    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.orgId == 1
+    - result.datasource.password == ''
+    - result.datasource.type == 'elasticsearch'
+    - result.datasource.url == 'https://elastic.company.com:9200'
+    - result.datasource.user == ''
+    - not result.datasource.withCredentials
+
+- name: update elasticsearch datasource creation
+  register: result
+  grafana_datasource:
+    name: datasource-elastic
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: '1'
+    ds_type: elasticsearch
+    ds_url: https://elastic.example.com:9200
+    database: '[logstash_]YYYY.MM.DD'
+    basic_auth_user: grafana
+    basic_auth_password: '******'
+    time_field: '@timestamp'
+    time_interval: 1m
+    interval: Daily
+    es_version: 56
+    max_concurrent_shard_requests: 42
+    tls_ca_cert: /etc/ssl/certs/ca.pem
+
+- debug:
+    var: result
+
+- assert:
+    that:
+    - result.changed
+    - result.datasource.basicAuth
+    - result.datasource.basicAuthUser == 'grafana'
+    - result.datasource.access == 'proxy'
+    - result.datasource.database == '[logstash_]YYYY.MM.DD'
+    - not result.datasource.isDefault
+    - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.interval == 'Daily'
+    - result.datasource.jsonData.maxConcurrentShardRequests == 42
+    - result.datasource.jsonData.timeField == '@timestamp'
+    - not result.datasource.jsonData.tlsAuth
+    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.orgId == 1
+    - result.datasource.password == ''
+    - result.datasource.type == 'elasticsearch'
+    - result.datasource.url == 'https://elastic.example.com:9200'
+    - result.datasource.user == ''
+    - not result.datasource.withCredentials
 
 - name: Delete elasticsearch datasource
   register: result

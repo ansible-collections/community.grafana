@@ -348,39 +348,8 @@ EXAMPLES = '''
 
 RETURN = '''
 ---
-name:
-  description: name of the datasource created.
-  returned: success
-  type: str
-  sample: test-ds
-id:
-  description: Id of the datasource
-  returned: success
-  type: int
-  sample: 42
-before:
-  description: datasource returned by grafana api
-  returned: changed
-  type: dict
-  sample: { "access": "proxy",
-        "basicAuth": false,
-        "database": "test_*",
-        "id": 1035,
-        "isDefault": false,
-        "jsonData": {
-            "esVersion": 5,
-            "timeField": "@timestamp",
-            "timeInterval": "1m",
-        },
-        "name": "grafana_datasource_test",
-        "orgId": 1,
-        "type": "elasticsearch",
-        "url": "http://elastic.company.com:9200",
-        "user": "",
-        "password": "",
-        "withCredentials": false }
-after:
-  description: datasource updated by module
+datasource:
+  description: datasource created/updated by module
   returned: changed
   type: dict
   sample: { "access": "proxy",
@@ -539,7 +508,7 @@ class GrafanaInterface(object):
             self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
         else:
             self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
-            self.grafana_switch_organisation(module.params['org_id'])
+            self.switch_organisation(module.params['org_id'])
         # }}}
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
@@ -561,29 +530,25 @@ class GrafanaInterface(object):
             return self._module.from_json(resp.read())
         self._module.fail_json(failed=True, msg="Grafana API answered with HTTP %d for url %s and data %s" % (status_code, url, data))
 
-    def grafana_switch_organisation(self, org_id):
+    def switch_organisation(self, org_id):
         url = "/api/user/using/%d" % org_id
         response = self._send_request(url, headers=self.headers, method='POST')
 
-    def grafana_datasource_exists(self, name):
+    def datasource_by_name(self, name):
         datasource_exists = False
         ds = {}
         url = "/api/datasources/name/%s" % quote(name)
-        response = self._send_request(url, headers=self.headers, method='GET')
-        datasource_exists = False
-        if response is not None:
-            datasource_exists = True
-        return datasource_exists, response
+        return self._send_request(url, headers=self.headers, method='GET')
 
-    def grafana_delete_datasource(self, name):
+    def delete_datasource(self, name):
         url = "/api/datasources/name/%s" % quote(name)
         self._send_request(url, headers=self.headers, method='DELETE')
 
-    def grafana_update_datasource(self, ds_id, data):
+    def update_datasource(self, ds_id, data):
         url = "/api/datasources/%d" % ds_id
         self._send_request(url, data=data, headers=self.headers, method='PUT')
 
-    def grafana_create_datasource(self, data):
+    def create_datasource(self, data):
         url = "/api/datasources"
         self._send_request(url, data=data, headers=self.headers, method='POST')
 
@@ -661,24 +626,26 @@ def main():
     name = module.params['name']
 
     grafana_iface = GrafanaInterface(module)
-    datasource_exists, ds = grafana_iface.grafana_datasource_exists(name)
+    ds = grafana_iface.datasource_by_name(name)
 
     if state == 'present':
         payload = get_datasource_payload(module.params)
-        if not datasource_exists:
-            result = grafana_iface.grafana_create_datasource(payload)
-            module.exit_json(changed=True, msg='Datasource %s created' % name)
+        if ds is None:
+            result = grafana_iface.create_datasource(payload)
+            ds = grafana_iface.datasource_by_name(name)
+            module.exit_json(changed=True, datasource=ds, msg='Datasource %s created' % name)
         else:
             diff = compare_datasources(payload.copy(), ds.copy())
             if diff.get('before') == diff.get('after'):
-                module.exit_json(changed=False, msg='Datasource %s unchanged' % name)
-            grafana_iface.grafana_update_datasource(ds.get('id'), payload)
-            module.exit_json(changed=True, diff=diff, msg='Datasource %s updated' % name)
+                module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
+            grafana_iface.update_datasource(ds.get('id'), payload)
+            ds = grafana_iface.datasource_by_name(name)
+            module.exit_json(changed=True, diff=diff, datasource=ds, msg='Datasource %s updated' % name)
     else:
-        if not datasource_exists:
-            module.exit_json(changed=False, msg='Datasource %s does not exist.' % name)
-        grafana_iface.grafana_delete_datasource(name)
-        module.exit_json(changed=True, msg='Datasource %s deleted.' % name)
+        if ds is None:
+            module.exit_json(changed=False, datasource=None, msg='Datasource %s does not exist.' % name)
+        grafana_iface.delete_datasource(name)
+        module.exit_json(changed=True, datasource=None, msg='Datasource %s deleted.' % name)
 
 
 if __name__ == '__main__':
