@@ -27,95 +27,92 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
 
-DOCUMENTATION = '''callback: grafana_annotations
-callback_type: notification
-short_description: send ansible events as annotations on charts to grafana over http
-  api.
-author: Rémi REY (@rrey)
-description:
-- This callback will report start, failed and stats events to Grafana as annotations
-  (https://grafana.com)
-requirements:
-- whitelisting in configuration
-options:
-  grafana_url:
-    description: Grafana annotations api URL
-    required: true
-    env:
-    - name: GRAFANA_URL
-    ini:
-    - section: callback_grafana_annotations
-      key: grafana_url
-    type: string
-  validate_certs:
-    description: validate the SSL certificate of the Grafana server. (For HTTPS url)
-    env:
-    - name: GRAFANA_VALIDATE_CERT
-    ini:
-    - section: callback_grafana_annotations
-      key: validate_grafana_certs
-    - section: callback_grafana_annotations
-      key: validate_certs
-    default: true
-    type: bool
-    aliases:
-    - validate_grafana_certs
-  http_agent:
-    description: The HTTP 'User-agent' value to set in HTTP requets.
-    env:
-    - name: HTTP_AGENT
-    ini:
-    - section: callback_grafana_annotations
-      key: http_agent
-    default: Ansible (grafana_annotations callback)
-    type: string
-  grafana_api_key:
-    description: Grafana API key, allowing to authenticate when posting on the HTTP
-      API. If not provided, grafana_login and grafana_password will be required.
-    env:
-    - name: GRAFANA_API_KEY
-    ini:
-    - section: callback_grafana_annotations
-      key: grafana_api_key
-    type: string
-  grafana_user:
-    description: Grafana user used for authentication. Ignored if grafana_api_key
-      is provided.
-    env:
-    - name: GRAFANA_USER
-    ini:
-    - section: callback_grafana_annotations
-      key: grafana_user
-    default: ansible
-    type: string
-  grafana_password:
-    description: Grafana password used for authentication. Ignored if grafana_api_key
-      is provided.
-    env:
-    - name: GRAFANA_PASSWORD
-    ini:
-    - section: callback_grafana_annotations
-      key: grafana_password
-    default: ansible
-    type: string
-  grafana_dashboard_id:
-    description: The grafana dashboard id where the annotation shall be created.
-    env:
-    - name: GRAFANA_DASHBOARD_ID
-    ini:
-    - section: callback_grafana_annotations
-      key: grafana_dashboard_id
-    type: integer
-  grafana_panel_ids:
-    description: The grafana panel ids where the annotation shall be created. Give
-      a single integer or a comma-separated list of integers.
-    env:
-    - name: GRAFANA_PANEL_IDS
-    ini:
-    - section: callback_grafana_annotations
-      key: grafana_panel_ids
-    default: []
-    type: list
+DOCUMENTATION = '''
+    callback: grafana_annotations
+    callback_type: notification
+    short_description: send ansible events as annotations on charts to grafana over http api.
+    author: "Rémi REY (@rrey)"
+    description:
+      - This callback will report start, failed and stats events to Grafana as annotations (https://grafana.com)
+    requirements:
+      - whitelisting in configuration
+    options:
+      grafana_url:
+        description: Grafana annotations api URL
+        required: True
+        env:
+          - name: GRAFANA_URL
+        ini:
+          - section: callback_grafana_annotations
+            key: grafana_url
+        type: string
+      validate_certs:
+        description: validate the SSL certificate of the Grafana server. (For HTTPS url)
+        env:
+          - name: GRAFANA_VALIDATE_CERT
+        ini:
+          - section: callback_grafana_annotations
+            key: validate_grafana_certs
+          - section: callback_grafana_annotations
+            key: validate_certs
+        default: True
+        type: bool
+        aliases: [ validate_grafana_certs ]
+      http_agent:
+        description: The HTTP 'User-agent' value to set in HTTP requets.
+        env:
+          - name: HTTP_AGENT
+        ini:
+          - section: callback_grafana_annotations
+            key: http_agent
+        default: 'Ansible (grafana_annotations callback)'
+        type: string
+      grafana_api_key:
+        description: Grafana API key, allowing to authenticate when posting on the HTTP API.
+                     If not provided, grafana_login and grafana_password will
+                     be required.
+        env:
+          - name: GRAFANA_API_KEY
+        ini:
+          - section: callback_grafana_annotations
+            key: grafana_api_key
+        type: string
+      grafana_user:
+        description: Grafana user used for authentication. Ignored if grafana_api_key is provided.
+        env:
+          - name: GRAFANA_USER
+        ini:
+          - section: callback_grafana_annotations
+            key: grafana_user
+        default: ansible
+        type: string
+      grafana_password:
+        description: Grafana password used for authentication. Ignored if grafana_api_key is provided.
+        env:
+          - name: GRAFANA_PASSWORD
+        ini:
+          - section: callback_grafana_annotations
+            key: grafana_password
+        default: ansible
+        type: string
+      grafana_dashboard_id:
+        description: The grafana dashboard id where the annotation shall be created.
+        env:
+          - name: GRAFANA_DASHBOARD_ID
+        ini:
+          - section: callback_grafana_annotations
+            key: grafana_dashboard_id
+        type: integer
+      grafana_panel_ids:
+        description: The grafana panel ids where the annotation shall be created.
+                     Give a single integer or a comma-separated list of integers.
+        env:
+          - name: GRAFANA_PANEL_IDS
+        ini:
+          - section: callback_grafana_annotations
+            key: grafana_panel_ids
+        default: []
+        type: list
 '''
 
 
@@ -165,7 +162,7 @@ class CallbackModule(CallbackBase):
 
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'ansible_community.grafana.grafana_annotations'
+    CALLBACK_NAME = 'community.grafana.grafana_annotations'
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):

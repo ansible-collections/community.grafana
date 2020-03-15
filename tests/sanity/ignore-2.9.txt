@@ -1,8 +1,1 @@
-plugins/modules/grafana_dashboard.py validate-modules:parameter-type-not-in-doc
-plugins/modules/grafana_dashboard.py validate-modules:doc-missing-type
-plugins/modules/grafana_datasource.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/grafana_datasource.py validate-modules:parameter-type-not-in-doc
-plugins/modules/grafana_datasource.py validate-modules:doc-missing-type
-plugins/modules/grafana_plugin.py validate-modules:parameter-type-not-in-doc
-plugins/modules/grafana_plugin.py validate-modules:doc-missing-type
 tests/unit/modules/grafana/grafana_plugin/test_grafana_plugin.py pep8:W291
