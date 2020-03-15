@@ -1,5 +1,9 @@
 # Grafana Collection Changes
 
+## 0.2.1
+  - Bug fixes:
+    - Fix an issue with `grafana_datasource` idempotency
+
 ## 0.2.0
   - New content:
     - Add Thruk as Grafana Datasource
