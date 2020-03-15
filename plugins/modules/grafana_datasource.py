@@ -412,6 +412,27 @@ from ansible_collections.community.grafana.plugins.module_utils.base import graf
 __metaclass__ = type
 
 
+def compare_datasources(new, current):
+    del current['typeLogoUrl']
+    del current['id']
+    if 'version' in current:
+        del current['version']
+    if 'readOnly' in current:
+        del current['readOnly']
+    if current['basicAuth'] is False:
+        del current['basicAuthUser']
+        del current['basicAuthPassword']
+    if 'jsonData' in current:
+        if 'tlsAuth' in current['jsonData'] and current['jsonData']['tlsAuth'] is False:
+            del current['secureJsonFields']
+        if 'tlsAuth' not in current['jsonData']:
+            del current['secureJsonFields']
+    # secureJsonData contains ciphered data which we cannot compare
+    if 'secureJsonData' in new:
+        del new['secureJsonData']
+    return dict(before=current, after=new)
+
+
 def get_datasource_payload(data):
     payload = {
         'orgId': data['org_id'],
@@ -506,6 +527,7 @@ def get_datasource_payload(data):
     payload['jsonData'] = json_data
     return payload
 
+
 class GrafanaInterface(object):
 
     def __init__(self, module):
@@ -540,13 +562,13 @@ class GrafanaInterface(object):
         self._module.fail_json(failed=True, msg="Grafana API answered with HTTP %d for url %s and data %s" % (status_code, url, data))
 
     def grafana_switch_organisation(self, org_id):
-        url = "/api/user/using/%d" %  org_id
+        url = "/api/user/using/%d" % org_id
         response = self._send_request(url, headers=self.headers, method='POST')
 
     def grafana_datasource_exists(self, name):
         datasource_exists = False
         ds = {}
-        url = "/api/datasources/name/%s" %  quote(name)
+        url = "/api/datasources/name/%s" % quote(name)
         response = self._send_request(url, headers=self.headers, method='GET')
         datasource_exists = False
         if response is not None:
@@ -554,7 +576,7 @@ class GrafanaInterface(object):
         return datasource_exists, response
 
     def grafana_delete_datasource(self, name):
-        url = "/api/datasources/name/%s" %  quote(name)
+        url = "/api/datasources/name/%s" % quote(name)
         self._send_request(url, headers=self.headers, method='DELETE')
 
     def grafana_update_datasource(self, ds_id, data):
@@ -564,8 +586,6 @@ class GrafanaInterface(object):
     def grafana_create_datasource(self, data):
         url = "/api/datasources"
         self._send_request(url, data=data, headers=self.headers, method='POST')
-
-
 
 
 def main():
@@ -647,38 +667,18 @@ def main():
         payload = get_datasource_payload(module.params)
         if not datasource_exists:
             result = grafana_iface.grafana_create_datasource(payload)
-            module.exit_json(changed=True, msg='Datasource %s created' %  name)
+            module.exit_json(changed=True, msg='Datasource %s created' % name)
         else:
             diff = compare_datasources(payload.copy(), ds.copy())
             if diff.get('before') == diff.get('after'):
-                module.exit_json(changed=False, msg='Datasource %s unchanged' %  name)
+                module.exit_json(changed=False, msg='Datasource %s unchanged' % name)
             grafana_iface.grafana_update_datasource(ds.get('id'), payload)
-            module.exit_json(changed=True, diff=diff, msg='Datasource %s updated' %  name)
+            module.exit_json(changed=True, diff=diff, msg='Datasource %s updated' % name)
     else:
         if not datasource_exists:
             module.exit_json(changed=False, msg='Datasource %s does not exist.' % name)
         grafana_iface.grafana_delete_datasource(name)
         module.exit_json(changed=True, msg='Datasource %s deleted.' % name)
-
-def compare_datasources(new, current):
-    del current['typeLogoUrl']
-    del current['id']
-    if 'version' in current:
-        del current['version']
-    if 'readOnly' in current:
-        del current['readOnly']
-    if current['basicAuth'] is False:
-        del current['basicAuthUser']
-        del current['basicAuthPassword']
-    if 'jsonData' in current:
-        if 'tlsAuth' in current['jsonData'] and current['jsonData']['tlsAuth'] is False:
-            del current['secureJsonFields']
-        if 'tlsAuth' not in current['jsonData']:
-            del current['secureJsonFields']
-    # secureJsonData contains ciphered data which we cannot compare
-    if 'secureJsonData' in new:
-        del new['secureJsonData']
-    return dict(before=current, after=new)
 
 
 if __name__ == '__main__':
