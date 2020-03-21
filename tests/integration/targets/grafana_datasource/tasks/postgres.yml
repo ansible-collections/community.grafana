@@ -42,18 +42,18 @@
 - assert:
     that:
     - not result.changed
-        #    - result.after.basicAuth == false
-        #    - result.after.database == 'db'
-        #    - result.after.isDefault == false
-        #    - result.after.jsonData.sslmode == 'verify-full'
-        #    - result.after.jsonData.tlsAuth == false
-        #    - result.after.jsonData.tlsAuthWithCACert == false
-        #    - result.after.name == 'datasource-postgres'
-        #    - result.after.orgId == 1
-        #    - result.after.type == 'postgres'
-        #    - result.after.url == 'postgres.company.com:5432'
-        #    - result.after.user == 'postgres'
-        #    - result.after.withCredentials == false
+    - result.datasource.basicAuth == false
+    - result.datasource.database == 'db'
+    - result.datasource.isDefault == false
+    - result.datasource.jsonData.sslmode == 'verify-full'
+    - result.datasource.jsonData.tlsAuth == false
+    - result.datasource.jsonData.tlsAuthWithCACert == false
+    - result.datasource.name == 'datasource-postgres'
+    - result.datasource.orgId == 1
+    - result.datasource.type == 'postgres'
+    - result.datasource.url == 'postgres.company.com:5432'
+    - result.datasource.user == 'postgres'
+    - result.datasource.withCredentials == false
 
 - name: Delete postgres datasource
   register: result
