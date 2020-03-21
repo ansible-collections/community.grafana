@@ -57,6 +57,7 @@ options:
     description:
       - The path to the json file containing the Grafana dashboard to import or export.
       - A http URL is also accepted (since 2.10).
+      - Required if C(state) is C(export) or C(present).
     aliases: [ dashboard_url ]
     type: str
   overwrite:
