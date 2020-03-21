@@ -508,6 +508,10 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
+        required_if=[
+            ['state', 'export', ['path']],
+            ['state', 'present', ['path']],
+        ],
         required_together=[['url_username', 'url_password', 'org_id']],
         mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
     )
