@@ -35,18 +35,18 @@
 - assert:
     that:
     - not result.changed
-      #    - result.after.basicAuth == false
-      #    - result.after.access == 'proxy'
-      #    - result.after.isDefault == false
-      #    - result.after.jsonData.tlsAuth == false
-      #    - result.after.jsonData.tlsAuthWithCACert == false
-      #    - result.after.name == 'datasource-thruk'
-      #    - result.after.orgId == 1
-      #    - result.after.password == ''
-      #    - result.after.type == 'sni-thruk-datasource'
-      #    - result.after.url == 'https://thruk.company.com/sitename/thruk'
-      #    - result.after.user == ''
-      #    - result.after.withCredentials == false
+    - result.datasource.basicAuth == false
+    - result.datasource.access == 'proxy'
+    - result.datasource.isDefault == false
+    - result.datasource.jsonData.tlsAuth == false
+    - result.datasource.jsonData.tlsAuthWithCACert == false
+    - result.datasource.name == 'datasource-thruk'
+    - result.datasource.orgId == 1
+    - result.datasource.password == ''
+    - result.datasource.type == 'sni-thruk-datasource'
+    - result.datasource.url == 'https://thruk.company.com/sitename/thruk'
+    - result.datasource.user == ''
+    - result.datasource.withCredentials == false
 
 - name: Delete thruk datasource
   register: result
