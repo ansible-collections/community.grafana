@@ -103,6 +103,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "martinwangjian",
+      "name": "martinwangjian",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1770277?v=4",
+      "profile": "https://github.com/martinwangjian",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
