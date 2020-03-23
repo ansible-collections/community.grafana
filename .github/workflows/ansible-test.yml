@@ -17,8 +17,8 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: Install ansible-base
-        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+      - name: Install ansible-base (devel)
+        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
@@ -36,8 +36,8 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: Install ansible-base
-        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+      - name: Install ansible-base (devel)
+        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
       - name: Run unit tests
         run: ansible-test units --docker -v --color --python 3.6 --coverage
@@ -73,8 +73,8 @@ jobs:
       - name: Install deps
         run: pip install coverage
 
-      - name: Install ansible-base
-        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+      - name: Install ansible-base (devel)
+        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff
