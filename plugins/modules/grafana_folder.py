@@ -164,6 +164,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
 from ansible.module_utils.six.moves.urllib.parse import quote
+from ansible.module_utils._text import to_text
 
 __metaclass__ = type
 
@@ -223,7 +224,7 @@ class GrafanaFolderInterface(object):
         url = "/api/search?type=dash-folder&query={title}".format(title=quote(title))
         response = self._send_request(url, headers=self.headers, method="GET")
         for item in response:
-            if item.get("title") == title.decode('utf-8'):
+            if item.get("title") == to_text(title):
                 return item
         return None
 
