@@ -1,5 +1,11 @@
 # Grafana Collection Changes
 
+## 0.2.2
+  - Bug fixes:
+    - Fix an issue in `grafana_dashboard` that made dashboard import no more detecting changes and fail.
+  - Improvements:
+    - Refactor module `grafana_datasource` to ease its support.
+
 ## 0.2.1
   - Bug fixes:
     - Fix an issue with `grafana_datasource` idempotency
