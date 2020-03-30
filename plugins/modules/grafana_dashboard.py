@@ -281,7 +281,7 @@ def grafana_dashboard_changed(payload, dashboard):
     if 'meta' in dashboard:
         del(dashboard['meta'])
     if 'meta' in payload:
-        del(payload['meta'])    
+        del(payload['meta'])
 
     # if folderId is not provided in dashboard, set default folderId
     if 'folderId' not in dashboard:
