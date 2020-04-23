@@ -60,6 +60,10 @@ options:
       - Required if C(state) is C(export) or C(present).
     aliases: [ dashboard_url ]
     type: str
+  json:
+    description:
+      - Import the Grafana dashboard from a json string.
+    type: str
   overwrite:
     description:
       - Override existing dashboard when state is present.
@@ -137,6 +141,7 @@ uid:
 '''
 
 import json
+import ast
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -304,11 +309,16 @@ def grafana_create_dashboard(module, data):
     payload = {}
     if data.get('dashboard_id'):
         data['path'] = "https://grafana.com/api/dashboards/%s/revisions/%s/download" % (data['dashboard_id'], data['dashboard_revision'])
-    if data['path'].startswith('http'):
+    if data.get('path') and data['path'].startswith('http'):
         r, info = fetch_url(module, data['path'])
         if info['status'] != 200:
             raise GrafanaAPIException('Unable to download grafana dashboard from url %s : %s' % (data['path'], info))
         payload = json.loads(r.read())
+    elif data.get('json'):
+        try:
+            payload = ast.literal_eval(data['json'])
+        except Exception as e:
+            raise GrafanaMalformedJson("Can't read string into json %s" % to_native(e))
     else:
         try:
             with open(data['path'], 'r') as json_file:
@@ -506,6 +516,7 @@ def main():
         uid=dict(type='str'),
         slug=dict(type='str'),
         path=dict(aliases=['dashboard_url'], type='str'),
+        json=dict(type='str'),
         dashboard_id=dict(type='str'),
         dashboard_revision=dict(type='str', default='1'),
         overwrite=dict(type='bool', default=False),
@@ -519,7 +530,7 @@ def main():
             ['state', 'export', ['path']],
         ],
         required_together=[['url_username', 'url_password', 'org_id']],
-        mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
+        mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id', 'json']],
     )
 
     if 'message' in module.params:
