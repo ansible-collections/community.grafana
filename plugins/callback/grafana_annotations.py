@@ -26,6 +26,10 @@ from ansible.module_utils._text import to_text
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
+import sys
+reload(sys)
+sys.setdefaultencoding('UTF8')
+
 
 DOCUMENTATION = '''
     callback: grafana_annotations
