@@ -27,7 +27,8 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
 import sys
-reload(sys)
+from six.moves import reload_module
+reload_module(sys)
 sys.setdefaultencoding('UTF8')
 
 DOCUMENTATION = '''
