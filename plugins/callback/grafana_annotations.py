@@ -30,7 +30,6 @@ import sys
 reload(sys)
 sys.setdefaultencoding('UTF8')
 
-
 DOCUMENTATION = '''
     callback: grafana_annotations
     callback_type: notification
