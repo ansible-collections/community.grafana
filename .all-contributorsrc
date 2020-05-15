@@ -121,10 +121,19 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Andersson007",
+      "name": "Andrew Klychkov",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/34477873?v=4",
+      "profile": "https://github.com/Andersson007",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "projectName": "grafana",
+  "projectName": "community.grafana",
   "projectOwner": "ansible-collections",
   "repoType": "github",
   "repoHost": "https://github.com",
