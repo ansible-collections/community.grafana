@@ -19,12 +19,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-ANSIBLE_METADATA = {
-    'status': ['preview'],
-    'supported_by': 'community',
-    'metadata_version': '1.1'
-}
-
 DOCUMENTATION = '''
 ---
 module: grafana_user
