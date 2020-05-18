@@ -504,7 +504,7 @@ def main():
         dashboard_revision=dict(type='str', default='1'),
         overwrite=dict(type='bool', default=False),
         commit_message=dict(type='str', aliases=['message'],
-                            deprecated_aliases=[dict(name='message', version='2.14')]),
+                            deprecated_aliases=[dict(name='message', version='2.14.0')]),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
