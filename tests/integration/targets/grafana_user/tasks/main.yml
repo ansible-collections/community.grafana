@@ -2,8 +2,8 @@
 - name: Create a Grafana user without password (expect failure)
   grafana_user:
     url: "{{ grafana_url }}"
-    url_username: admin
-    url_password: admin
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     name: "Bruce Wayne"
     email: batman@gotham.city
     login: batman
@@ -19,8 +19,8 @@
 - name: Create a Grafana user
   grafana_user:
     url: "{{ grafana_url }}"
-    url_username: admin
-    url_password: admin
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     name: "Bruce Wayne"
     email: batman@gotham.city
     login: batman
@@ -37,8 +37,8 @@
 - name: Check idempotency on user creation (password not requiered)
   grafana_user:
     url: "{{ grafana_url }}"
-    url_username: admin
-    url_password: admin
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     name: "Bruce Wayne"
     email: batman@gotham.city
     login: batman
@@ -54,8 +54,8 @@
 - name: Update Grafana user
   grafana_user:
     url: "{{ grafana_url }}"
-    url_username: admin
-    url_password: admin
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     name: "The Dark Knight"
     email: thedarkknight@gotham.city
     login: batman
@@ -73,8 +73,8 @@
 - name: Delete a Grafana user
   grafana_user:
     url: "{{ grafana_url }}"
-    url_username: admin
-    url_password: admin
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     login: batman
     state: absent
   register: result
@@ -86,8 +86,8 @@
 - name: Check idempotency on user deletion
   grafana_user:
     url: "{{ grafana_url }}"
-    url_username: admin
-    url_password: admin
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     login: batman
     state: absent
   register: result
