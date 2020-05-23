@@ -6,5 +6,6 @@
   - include: postgres.yml
   - include: cloudwatch.yml
   - include: thruk.yml
+  - include: loki.yml
 
 ...

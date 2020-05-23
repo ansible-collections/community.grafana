@@ -36,6 +36,7 @@ options:
     - cloudwatch
     - alexanderzobnin-zabbix-datasource
     - sni-thruk-datasource
+    - loki
     type: str
   ds_url:
     description:
@@ -562,7 +563,8 @@ def main():
                               'postgres',
                               'cloudwatch',
                               'alexanderzobnin-zabbix-datasource',
-                              'sni-thruk-datasource'], required=True),
+                              'sni-thruk-datasource',
+                              'loki'], required=True),
         ds_url=dict(required=True, type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         database=dict(type='str', default=""),
