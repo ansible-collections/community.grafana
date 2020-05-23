@@ -3,8 +3,8 @@
 - name: Check import grafana dashboard from url
   grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
-    grafana_user: "admin"
-    grafana_password: "admin"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
@@ -22,8 +22,8 @@
 - name: Check import grafana dashboard from url idempotency
   grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
-    grafana_user: "admin"
-    grafana_password: "admin"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download

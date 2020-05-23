@@ -2,8 +2,8 @@
   uri:
     url: "{{ grafana_url }}/api/admin/users"
     method: POST
-    user: 'admin'
-    password: 'admin'
+    user: "{{ grafana_username }}"
+    password: "{{ grafana_password }}"
     force_basic_auth: yes
     body:
       name: "John"
@@ -17,8 +17,8 @@
   uri:
     url: "{{ grafana_url }}/api/admin/users"
     method: POST
-    user: 'admin'
-    password: 'admin'
+    user: "{{ grafana_username }}"
+    password: "{{ grafana_password }}"
     force_basic_auth: yes
     body:
       name: "Jane"

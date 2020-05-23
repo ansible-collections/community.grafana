@@ -8,8 +8,8 @@
 - name: Check import grafana dashboard from file
   grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
-    grafana_user: "admin"
-    grafana_password: "admin"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     path: /tmp/dashboard.json
@@ -27,8 +27,8 @@
 - name: Check import grafana dashboard from file idempotency
   grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
-    grafana_user: "admin"
-    grafana_password: "admin"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     path: /tmp/dashboard.json
