@@ -1,0 +1,2 @@
+plugins/modules/grafana_dashboard.py validate-modules:invalid-argument-name
+tests/unit/modules/grafana/grafana_plugin/test_grafana_plugin.py pep8:W291
