@@ -131,6 +131,8 @@ options:
     - 2
     - 5
     - 56
+    - 60
+    - 70
     default: 5
     type: int
   max_concurrent_shard_requests:
@@ -579,7 +581,7 @@ def main():
         tls_skip_verify=dict(type='bool', default=False),
         is_default=dict(default=False, type='bool'),
         org_id=dict(default=1, type='int'),
-        es_version=dict(type='int', default=5, choices=[2, 5, 56]),
+        es_version=dict(type='int', default=5, choices=[2, 5, 56, 60, 70]),
         max_concurrent_shard_requests=dict(type='int', default=256),
         time_field=dict(default='@timestamp', type='str'),
         time_interval=dict(type='str'),
@@ -614,7 +616,9 @@ def main():
             ['ds_type', 'mysql', ['database']],
             ['ds_type', 'postgres', ['database', 'sslmode']],
             ['ds_type', 'cloudwatch', ['aws_auth_type', 'aws_default_region']],
-            ['es_version', 56, ['max_concurrent_shard_requests']]
+            ['es_version', 56, ['max_concurrent_shard_requests']],
+            ['es_version', 60, ['max_concurrent_shard_requests']],
+            ['es_version', 70, ['max_concurrent_shard_requests']]
         ],
     )
 
