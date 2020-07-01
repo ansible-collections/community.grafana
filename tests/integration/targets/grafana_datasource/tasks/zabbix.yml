@@ -44,6 +44,19 @@
 - debug:
     var: result
 
+- assert:
+    that:
+    - not result.changed
+    - not result.datasource.isDefault
+    - result.datasource.jsonData.username == 'grafana'
+    - result.datasource.name == 'datasource-zabbix'
+    - result.datasource.orgId == 1
+    - result.datasource.password == ''
+    - result.datasource.type == 'alexanderzobnin-zabbix-datasource'
+    - result.datasource.url == 'https://zabbix.company.com'
+    - result.datasource.user == ''
+    - not result.datasource.withCredentials
+
 - name: Update zabbix datasource
   register: result
   grafana_datasource:
@@ -72,20 +85,7 @@
     - result.datasource.url == 'https://zabbix.example.com'
     - result.datasource.user == ''
     - not result.datasource.withCredentials
-    - "result.msg == 'Datasource datasource-zabbix created'"
-
-- assert:
-    that:
-    - not result.changed
-    - not result.datasource.isDefault
-    - result.datasource.jsonData.username == 'grafana'
-    - result.datasource.name == 'datasource-zabbix'
-    - result.datasource.orgId == 1
-    - result.datasource.password == ''
-    - result.datasource.type == 'alexanderzobnin-zabbix-datasource'
-    - result.datasource.url == 'https://zabbix.company.com'
-    - result.datasource.user == ''
-    - not result.datasource.withCredentials
+    - "result.msg == 'Datasource datasource-zabbix updated'"
 
 - name: Delete elasticsearch datasource
   register: result
