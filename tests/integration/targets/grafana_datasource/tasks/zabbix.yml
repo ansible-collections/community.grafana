@@ -87,7 +87,7 @@
     - not result.datasource.withCredentials
     - "result.msg == 'Datasource datasource-zabbix updated'"
 
-- name: Delete elasticsearch datasource
+- name: Delete zabbix datasource
   register: result
   grafana_datasource:
     name: datasource-zabbix
@@ -106,7 +106,7 @@
     that:
     - result.changed
 
-- name: Delete elasticsearch datasource (idempotency)
+- name: Delete zabbix datasource (idempotency)
   register: result
   grafana_datasource:
     name: datasource-zabbix
