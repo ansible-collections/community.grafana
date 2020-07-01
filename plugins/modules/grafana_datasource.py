@@ -262,6 +262,16 @@ options:
     default: ''
     required: false
     type: str
+  zabbix_user:
+    description:
+    - User for Zabbix API
+    required: false
+    type: str
+  zabbix_password:
+    description:
+    - Password for Zabbix API
+    required: false
+    type: str
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
