@@ -476,6 +476,8 @@ def get_datasource_payload(data):
     if data['ds_type'] == 'alexanderzobnin-zabbix-datasource':
         if data.get('trends'):
             json_data['trends'] = True
+        json_data['username'] = data['zabbix_user']
+        json_data['password'] = data['zabbix_password']
 
     if data['ds_type'] == 'cloudwatch':
         if data.get('aws_credentials_profle'):
@@ -602,6 +604,8 @@ def main():
         aws_credentials_profile=dict(default='', type='str'),
         aws_assume_role_arn=dict(default='', type='str'),
         aws_custom_metrics_namespaces=dict(type='str'),
+        zabbix_user=dict(type='str'),
+        zabbix_password=dict(type='str', no_log=True)
     )
 
     module = AnsibleModule(
