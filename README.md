@@ -1,7 +1,7 @@
 # Grafana Collection for Ansible
 
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
-[![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)](https://codecov.io/gh/ansible-collections/grafana)
+[![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)](https://codecov.io/gh/ansible-collections/community.grafana)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END --> 
