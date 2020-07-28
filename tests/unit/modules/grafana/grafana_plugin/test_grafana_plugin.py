@@ -33,6 +33,25 @@ Restart grafana after installing plugins . <service grafana-server restart>
     return 0, STDOUT, STDERR
 
 
+def run_command_uninstall():
+    STDERR = ""
+    STDOUT = """
+Removing plugin: alexanderzobnin-zabbix-app
+
+Restart grafana after installing plugins . <service grafana-server restart>
+"""
+    return 0, STDOUT, STDERR
+
+
+def run_command_uninstall_again():
+    STDERR = ""
+    STDOUT = """
+Removing plugin: alexanderzobnin-zabbix-app
+Error: ✗ plugin does not exist
+"""
+    return 1, STDOUT, STDERR
+
+
 class GrafanaPlugin(TestCase):
 
     @patch('ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin')
@@ -62,3 +81,31 @@ class GrafanaPlugin(TestCase):
 
         result = grafana_plugin.get_grafana_plugin_version(module, params)
         self.assertEqual(result, "3.10.5")
+
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin')
+    def test_plugin_uninstall(self, mock_grafana_cli_bin):
+        mock_grafana_cli_bin.return_value = "grafana-cli plugins"
+
+        params = {
+            "name": "alexanderzobnin-zabbix-app"
+        }
+
+        module = MagicMock()
+        module.run_command.return_value = run_command_uninstall()
+
+        result = grafana_plugin.get_grafana_plugin_version(module, params)
+        self.assertEqual(result, None)
+
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin')
+    def test_plugin_uninstall_again(self, mock_grafana_cli_bin):
+        mock_grafana_cli_bin.return_value = "grafana-cli plugins"
+
+        params = {
+            "name": "alexanderzobnin-zabbix-app"
+        }
+
+        module = MagicMock()
+        module.run_command.return_value = run_command_uninstall_again()
+
+        result = grafana_plugin.get_grafana_plugin_version(module, params)
+        self.assertEqual(result, None)
