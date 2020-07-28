@@ -209,10 +209,17 @@ def grafana_plugin(module, params):
                     plugin_name, plugin_version = parse_version(line)
                 else:
                     plugin_version = None
-                return {'msg': 'Grafana plugin {0} installed : {1}'.format(params['name'], cmd),
-                        'changed': True,
-                        'version': plugin_version}
+
+                if params['state'] == 'present':
+                    return {'msg': 'Grafana plugin {0} installed : {1}'.format(params['name'], cmd),
+                            'changed': True,
+                            'version': plugin_version}
+                else:
+                    return {'msg': 'Grafana plugin {0} uninstalled : {1}'.format(params['name'], cmd),
+                            'changed': True}
     else:
+        if params['state'] == 'absent' and stdout.find("plugin does not exist"):
+            return {'msg': 'Grafana plugin {0} already uninstalled : {1}'.format(params['name'], cmd), 'changed': False}
         raise GrafanaCliException("'{0}' execution returned an error : [{1}] {2} {3}".format(cmd, rc, stdout, stderr))
 
 
