@@ -12,6 +12,8 @@
     user: postgres
     password: iampgroot
     sslmode: verify-full
+    additional_json_data:
+      timescaledb: true
 
 - debug:
     var: result
@@ -35,6 +37,8 @@
     user: postgres
     password: iampgroot
     sslmode: verify-full
+    additional_json_data:
+      timescaledb: true
 
 - debug:
     var: result
@@ -48,6 +52,7 @@
     - result.datasource.jsonData.sslmode == 'verify-full'
     - result.datasource.jsonData.tlsAuth == false
     - result.datasource.jsonData.tlsAuthWithCACert == false
+    - result.datasource.jsonData.timescaledb == true
     - result.datasource.name == 'datasource-postgres'
     - result.datasource.orgId == 1
     - result.datasource.type == 'postgres'

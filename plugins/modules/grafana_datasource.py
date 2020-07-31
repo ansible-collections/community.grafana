@@ -272,6 +272,13 @@ options:
     - Password for Zabbix API
     required: false
     type: str
+  additional_json_data:
+    description:
+    - Defined data is used for datasource jsonData
+    - Data may be overridden by specifically defined parameters (like zabbix_user)
+    required: false
+    type: dict
+    default: {}
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -324,6 +331,8 @@ EXAMPLES = '''
     user: "postgres"
     password: "iampgroot"
     sslmode: "verify-full"
+    additional_json_data:
+      timescaledb: false
 
 - name: Create cloudwatch datasource
   grafana_datasource:
@@ -420,7 +429,8 @@ def get_datasource_payload(data):
         'withCredentials': data['with_credentials'],
         'isDefault': data['is_default'],
         'user': data['user'],
-        'password': data['password']
+        'password': data['password'],
+        'jsonData': data['additional_json_data']
     }
 
     # define basic auth
@@ -432,7 +442,7 @@ def get_datasource_payload(data):
         payload['basicAuth'] = False
 
     # define tls auth
-    json_data = {}
+    json_data = payload['jsonData']
     if data.get('tls_client_cert') and data.get('tls_client_key'):
         json_data['tlsAuth'] = True
         if data.get('tls_ca_cert'):
@@ -615,7 +625,8 @@ def main():
         aws_assume_role_arn=dict(default='', type='str'),
         aws_custom_metrics_namespaces=dict(type='str'),
         zabbix_user=dict(type='str'),
-        zabbix_password=dict(type='str', no_log=True)
+        zabbix_password=dict(type='str', no_log=True),
+        additional_json_data=dict(type='dict', default={}, required=False)
     )
 
     module = AnsibleModule(
