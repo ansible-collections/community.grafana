@@ -65,6 +65,13 @@ options:
   password:
     description:
     - The datasource password.
+    - Unencrypted! For secure save use additional_secure_json_data.
+    type: str
+  secure_password:
+    description:
+    - Sets the secureJsonData.password field
+    - stored in secureJsonData (see notes!)
+    - Datasource has to support secureJsonData.password!
     type: str
   basic_auth_user:
     description:
@@ -86,16 +93,19 @@ options:
     - The client TLS certificate.
     - If C(tls_client_cert) and C(tls_client_key) are set, this will enable TLS authentication.
     - Starts with ----- BEGIN CERTIFICATE -----
+    - stored in secureJsonData (see notes!)
     type: str
   tls_client_key:
     description:
     - The client TLS private key
     - Starts with ----- BEGIN RSA PRIVATE KEY -----
+    - stored in secureJsonData (see notes!)
     type: str
   tls_ca_cert:
     description:
     - The TLS CA certificate for self signed certificates.
     - Only used when C(tls_client_cert) and C(tls_client_key) are set.
+    - stored in secureJsonData (see notes!)
     type: str
   tls_skip_verify:
     description:
@@ -246,6 +256,7 @@ options:
   aws_secret_key:
     description:
     - AWS secret key for CloudWatch datasource type when C(aws_auth_type) is C(keys)
+    - stored in secureJsonData (see notes!)
     default: ''
     required: false
     type: str
@@ -279,9 +290,23 @@ options:
     required: false
     type: dict
     default: {}
+  additional_secure_json_data:
+    description:
+    - Defined data is used for datasource secureJsonData
+    - Data may be overridden by specifically defined parameters (like tls_client_cert)
+    - stored in secureJsonData (see notes!)
+    required: false
+    type: dict
+    default: {}
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
+
+notes:
+- secureJsonData/secureJsonFields related things:
+-- secureJsonData is converted to encrypted data by Grafana API and shown as secureJsonFields in requests
+-- secureJsonFields shows `true` for all fields set
+-- As the data is encrypted it can not be compared on subsequent runs, thus each run reports `changed=true` for the task
 '''
 
 EXAMPLES = '''
@@ -330,6 +355,7 @@ EXAMPLES = '''
     database: "db"
     user: "postgres"
     password: "iampgroot"
+    # secure_password: "iampgroot"
     sslmode: "verify-full"
     additional_json_data:
       timescaledb: false
@@ -377,6 +403,9 @@ datasource:
             "esVersion": 5,
             "timeField": "@timestamp",
             "timeInterval": "10s",
+        },
+        "secureJsonFields": {
+            "JustASecureTest": true,
         },
         "name": "grafana_datasource_test",
         "orgId": 1,
@@ -434,7 +463,8 @@ def get_datasource_payload(data):
         'isDefault': data['is_default'],
         'user': data['user'],
         'password': data['password'],
-        'jsonData': data['additional_json_data']
+        'jsonData': data['additional_json_data'],
+        'secureJsonData': data['additional_secure_json_data']
     }
 
     # define basic auth
@@ -447,27 +477,22 @@ def get_datasource_payload(data):
 
     # define tls auth
     json_data = payload['jsonData']
+    secure_json_data = payload['secureJsonData']
     if data.get('tls_client_cert') and data.get('tls_client_key'):
         json_data['tlsAuth'] = True
         if data.get('tls_ca_cert'):
-            payload['secureJsonData'] = {
-                'tlsCACert': data['tls_ca_cert'],
-                'tlsClientCert': data['tls_client_cert'],
-                'tlsClientKey': data['tls_client_key']
-            }
+            secure_json_data['tlsCACert'] = data['tls_ca_cert']
+            secure_json_data['tlsClientCert'] = data['tls_client_cert']
+            secure_json_data['tlsClientKey'] = data['tls_client_key']
             json_data['tlsAuthWithCACert'] = True
         else:
-            payload['secureJsonData'] = {
-                'tlsClientCert': data['tls_client_cert'],
-                'tlsClientKey': data['tls_client_key']
-            }
+            secure_json_data['tlsClientCert'] = data['tls_client_cert']
+            secure_json_data['tlsClientKey'] = data['tls_client_key']
     else:
         json_data['tlsAuth'] = False
         json_data['tlsAuthWithCACert'] = False
         if data.get('tls_ca_cert'):
-            payload['secureJsonData'] = {
-                'tlsCACert': data['tls_ca_cert']
-            }
+            secure_json_data['tlsCACert'] = data['tls_ca_cert']
 
     if data.get('tls_skip_verify'):
         json_data['tlsSkipVerify'] = True
@@ -494,8 +519,6 @@ def get_datasource_payload(data):
 
     if data['ds_type'] == 'postgres':
         json_data['sslmode'] = data['sslmode']
-        if data.get('password'):
-            payload['secureJsonData'] = {'password': data.get('password')}
 
     if data['ds_type'] == 'alexanderzobnin-zabbix-datasource':
         if data.get('trends'):
@@ -515,8 +538,14 @@ def get_datasource_payload(data):
         if data.get('aws_assume_role_arn'):
             json_data['assumeRoleArn'] = data.get('aws_assume_role_arn')
         if data.get('aws_access_key') and data.get('aws_secret_key'):
-            payload['secureJsonData'] = {'accessKey': data.get('aws_access_key'), 'secretKey': data.get('aws_secret_key')}
+            secure_json_data['accessKey'] = data.get('aws_access_key')
+            secure_json_data['secretKey'] = data.get('aws_secret_key')
+    
+    if data.get('secure_password'):
+      secure_json_data['password'] = data.get('secure_password')
+
     payload['jsonData'] = json_data
+    payload['secureJsonData'] = secure_json_data
     return payload
 
 
@@ -598,6 +627,7 @@ def main():
         database=dict(type='str', default=""),
         user=dict(default='', type='str'),
         password=dict(default='', no_log=True, type='str'),
+        secure_password=dict(default='', no_log=True, type='str'),
         basic_auth_user=dict(type='str'),
         basic_auth_password=dict(type='str', no_log=True),
         with_credentials=dict(default=False, type='bool'),
@@ -630,7 +660,8 @@ def main():
         aws_custom_metrics_namespaces=dict(type='str'),
         zabbix_user=dict(type='str'),
         zabbix_password=dict(type='str', no_log=True),
-        additional_json_data=dict(type='dict', default={}, required=False)
+        additional_json_data=dict(type='dict', default={}, required=False),
+        additional_secure_json_data=dict(type='dict', default={}, required=False)
     )
 
     module = AnsibleModule(
