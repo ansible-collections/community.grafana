@@ -504,7 +504,7 @@ def get_datasource_payload(data):
         json_data['password'] = data['zabbix_password']
 
     if data['ds_type'] == 'cloudwatch':
-        if data.get('aws_credentials_profle'):
+        if data.get('aws_credentials_profile'):
             payload['database'] = data.get('aws_credentials_profile')
 
         json_data['authType'] = data['aws_auth_type']
