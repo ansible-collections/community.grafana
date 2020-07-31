@@ -407,14 +407,18 @@ def compare_datasources(new, current):
     if current['basicAuth'] is False:
         del current['basicAuthUser']
         del current['basicAuthPassword']
-    if 'jsonData' in current:
-        if 'tlsAuth' in current['jsonData'] and current['jsonData']['tlsAuth'] is False:
-            del current['secureJsonFields']
-        if 'tlsAuth' not in current['jsonData']:
-            del current['secureJsonFields']
-    # secureJsonData contains ciphered data which we cannot compare
-    if 'secureJsonData' in new:
-        del new['secureJsonData']
+
+    # handle secureJsonData/secureJsonFields, some current facts:
+    # - secureJsonFields is reporting each field set as true
+    # - secureJsonFields once set cant be removed (DS has to be deleted)
+    if not new.get('secureJsonData'):
+      # secureJsonData is not provided so just remove booth for comparision
+      new.pop('secureJsonData', None)
+      current.pop('secureJsonFields', None)
+    else:
+      # we have some secure data so just "rename" secureJsonFields for comparison as it will change anyhow everytime
+      current['secureJsonData'] = current.pop('secureJsonFields')
+
     return dict(before=current, after=new)
 
 
@@ -665,6 +669,7 @@ def main():
                 module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
             grafana_iface.update_datasource(ds.get('id'), payload)
             ds = grafana_iface.datasource_by_name(name)
+
             module.exit_json(changed=True, diff=diff, datasource=ds, msg='Datasource %s updated' % name)
     else:
         if ds is None:
