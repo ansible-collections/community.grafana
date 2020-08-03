@@ -298,6 +298,13 @@ options:
     required: false
     type: dict
     default: {}
+  dontReportSecureDataChanges
+    description:
+    - reports a task as `changed=false` even if `secureJsonData` has changed
+    - implemented for backward compatibility reasons, will get deprecated by next releases
+    required: false
+    type: bool
+    default: true
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -661,7 +668,8 @@ def main():
         zabbix_user=dict(type='str'),
         zabbix_password=dict(type='str', no_log=True),
         additional_json_data=dict(type='dict', default={}, required=False),
-        additional_secure_json_data=dict(type='dict', default={}, required=False)
+        additional_secure_json_data=dict(type='dict', default={}, required=False),
+        dontReportSecureDataChanges=dict(type='bool', default=True, required=False)
     )
 
     module = AnsibleModule(
@@ -700,6 +708,17 @@ def main():
                 module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
             grafana_iface.update_datasource(ds.get('id'), payload)
             ds = grafana_iface.datasource_by_name(name)
+
+            # check if backward compatibilty is enabled
+            # if so remove not compareable datasets
+            if module.params.get('dontReportSecureDataChanges'):
+              diff = compare_datasources(payload.copy(), ds.copy())
+              diff['before'].pop('secureJsonData', None)
+              diff['before'].pop('secureJsonFields', None)
+              diff['after'].pop('secureJsonData', None)
+              diff['after'].pop('secureJsonFields', None)
+              if diff.get('before') == diff.get('after'):
+                module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged (secureJson ignored!)' % name)
 
             module.exit_json(changed=True, diff=diff, datasource=ds, msg='Datasource %s updated' % name)
     else:
