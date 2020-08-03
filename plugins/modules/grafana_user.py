@@ -27,7 +27,7 @@ author:
   - Hong Viet LE (@pomverte)
   - Julien Alexandre (@jual)
   - Marc Cyprien (@LeFameux)
-version_added: "2.10"
+version_added: "1.0.0"
 short_description: Manage Grafana User
 description:
   - Create/update/delete Grafana User through the users and admin API.
