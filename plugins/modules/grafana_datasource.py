@@ -298,7 +298,7 @@ options:
     required: false
     type: dict
     default: {}
-  dontReportSecureDataChanges
+  dontReportSecureDataChanges:
     description:
     - reports a task as `changed=false` even if `secureJsonData` has changed
     - implemented for backward compatibility reasons, will get deprecated by next releases
@@ -433,7 +433,7 @@ from ansible_collections.community.grafana.plugins.module_utils.base import graf
 __metaclass__ = type
 
 
-def compare_datasources(new, current):
+def compare_datasources(new, current, ignoreSecureJsonData=True):
     del current['typeLogoUrl']
     del current['id']
     if 'version' in current:
@@ -444,16 +444,24 @@ def compare_datasources(new, current):
         del current['basicAuthUser']
         del current['basicAuthPassword']
 
-    # handle secureJsonData/secureJsonFields, some current facts:
-    # - secureJsonFields is reporting each field set as true
-    # - secureJsonFields once set cant be removed (DS has to be deleted)
-    if not new.get('secureJsonData'):
-        # secureJsonData is not provided so just remove booth for comparision
+    # check if secureJsonData should be ignored
+    if ignoreSecureJsonData:
+        #if so just drop alltogether
         new.pop('secureJsonData', None)
+        new.pop('secureJsonFields', None)
+        current.pop('secureJsonData', None)
         current.pop('secureJsonFields', None)
     else:
-        # we have some secure data so just "rename" secureJsonFields for comparison as it will change anyhow everytime
-        current['secureJsonData'] = current.pop('secureJsonFields')
+        # handle secureJsonData/secureJsonFields, some current facts:
+        # - secureJsonFields is reporting each field set as true
+        # - secureJsonFields once set cant be removed (DS has to be deleted)
+        if not new.get('secureJsonData'):
+            # secureJsonData is not provided so just remove booth for comparision
+            new.pop('secureJsonData', None)
+            current.pop('secureJsonFields', None)
+        else:
+            # we have some secure data so just "rename" secureJsonFields for comparison as it will change anyhow everytime
+            current['secureJsonData'] = current.pop('secureJsonFields')
 
     return dict(before=current, after=new)
 
@@ -699,26 +707,21 @@ def main():
     if state == 'present':
         payload = get_datasource_payload(module.params)
         if ds is None:
-            result = grafana_iface.create_datasource(payload)
+            grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)
             module.exit_json(changed=True, datasource=ds, msg='Datasource %s created' % name)
         else:
-            diff = compare_datasources(payload.copy(), ds.copy())
+            # get diff (always include secureJsonData for update!)
+            diff = compare_datasources(payload.copy(), ds.copy(), False)
             if diff.get('before') == diff.get('after'):
                 module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
+            beforeUpdate = ds.copy()
             grafana_iface.update_datasource(ds.get('id'), payload)
             ds = grafana_iface.datasource_by_name(name)
-
-            # check if backward compatibilty is enabled
-            # if so remove not compareable datasets
-            if module.params.get('dontReportSecureDataChanges'):
-                diff = compare_datasources(payload.copy(), ds.copy())
-                diff['before'].pop('secureJsonData', None)
-                diff['before'].pop('secureJsonFields', None)
-                diff['after'].pop('secureJsonData', None)
-                diff['after'].pop('secureJsonFields', None)
-                if diff.get('before') == diff.get('after'):
-                    module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged (secureJson ignored!)' % name)
+            # get diff again with respect to dontReportSecureDataChanges
+            diff = compare_datasources(payload.copy(), beforeUpdate, module.params.get('dontReportSecureDataChanges', True))
+            if diff.get('before') == diff.get('after'):
+                module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged (secureJson ignored!)' % name)
 
             module.exit_json(changed=True, diff=diff, datasource=ds, msg='Datasource %s updated' % name)
     else:
