@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 module: grafana_dashboard
 author:
   - Thierry Sallé (@seuf)
-version_added: "2.5"
+version_added: "1.0.0"
 short_description: Manage Grafana dashboards
 description:
   - Create, update, delete, export Grafana dashboards via API.
@@ -26,7 +26,7 @@ options:
     description:
       - The Grafana folder where this dashboard will be imported to.
     default: General
-    version_added: '2.10.0'
+    version_added: "1.0.0"
     type: str
   state:
     description:
@@ -43,7 +43,7 @@ options:
         you have to specify the slug parameter because there is no meta section in the exported json.
     type: str
   uid:
-    version_added: '2.7.0'
+    version_added: "1.0.0"
     description:
       - uid of the dashboard to export when C(state) is C(export) or C(absent).
     type: str
@@ -62,13 +62,13 @@ options:
   dashboard_id:
     description:
       - Public Grafana.com dashboard id to import
-    version_added: '2.10.0'
+    version_added: "1.0.0"
     type: str
   dashboard_revision:
     description:
       - Revision of the public grafana dashboard to import
     default: 1
-    version_added: '2.10.0'
+    version_added: "1.0.0"
     type: str
   commit_message:
     description:

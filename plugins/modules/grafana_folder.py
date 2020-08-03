@@ -24,7 +24,7 @@ DOCUMENTATION = '''
 module: grafana_folder
 author:
   - Rémi REY (@rrey)
-version_added: "2.10"
+version_added: "1.0.0"
 short_description: Manage Grafana Folders
 description:
   - Create/update/delete Grafana Folders through the Folders API.
