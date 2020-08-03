@@ -448,12 +448,12 @@ def compare_datasources(new, current):
     # - secureJsonFields is reporting each field set as true
     # - secureJsonFields once set cant be removed (DS has to be deleted)
     if not new.get('secureJsonData'):
-      # secureJsonData is not provided so just remove booth for comparision
-      new.pop('secureJsonData', None)
-      current.pop('secureJsonFields', None)
+        # secureJsonData is not provided so just remove booth for comparision
+        new.pop('secureJsonData', None)
+        current.pop('secureJsonFields', None)
     else:
-      # we have some secure data so just "rename" secureJsonFields for comparison as it will change anyhow everytime
-      current['secureJsonData'] = current.pop('secureJsonFields')
+        # we have some secure data so just "rename" secureJsonFields for comparison as it will change anyhow everytime
+        current['secureJsonData'] = current.pop('secureJsonFields')
 
     return dict(before=current, after=new)
 
@@ -547,9 +547,9 @@ def get_datasource_payload(data):
         if data.get('aws_access_key') and data.get('aws_secret_key'):
             secure_json_data['accessKey'] = data.get('aws_access_key')
             secure_json_data['secretKey'] = data.get('aws_secret_key')
-    
+
     if data.get('secure_password'):
-      secure_json_data['password'] = data.get('secure_password')
+        secure_json_data['password'] = data.get('secure_password')
 
     payload['jsonData'] = json_data
     payload['secureJsonData'] = secure_json_data
@@ -712,13 +712,13 @@ def main():
             # check if backward compatibilty is enabled
             # if so remove not compareable datasets
             if module.params.get('dontReportSecureDataChanges'):
-              diff = compare_datasources(payload.copy(), ds.copy())
-              diff['before'].pop('secureJsonData', None)
-              diff['before'].pop('secureJsonFields', None)
-              diff['after'].pop('secureJsonData', None)
-              diff['after'].pop('secureJsonFields', None)
-              if diff.get('before') == diff.get('after'):
-                module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged (secureJson ignored!)' % name)
+                diff = compare_datasources(payload.copy(), ds.copy())
+                diff['before'].pop('secureJsonData', None)
+                diff['before'].pop('secureJsonFields', None)
+                diff['after'].pop('secureJsonData', None)
+                diff['after'].pop('secureJsonFields', None)
+                if diff.get('before') == diff.get('after'):
+                    module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged (secureJson ignored!)' % name)
 
             module.exit_json(changed=True, diff=diff, datasource=ds, msg='Datasource %s updated' % name)
     else:
