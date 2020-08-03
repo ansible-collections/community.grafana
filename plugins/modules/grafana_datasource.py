@@ -65,13 +65,11 @@ options:
   password:
     description:
     - The datasource password.
-    - Unencrypted! For secure save use additional_secure_json_data.
     type: str
   secure_password:
     description:
-    - Sets the secureJsonData.password field
+    - must be supported by datasource
     - stored in secureJsonData (see notes!)
-    - Datasource has to support secureJsonData.password!
     type: str
   basic_auth_user:
     description:
@@ -256,7 +254,6 @@ options:
   aws_secret_key:
     description:
     - AWS secret key for CloudWatch datasource type when C(aws_auth_type) is C(keys)
-    - stored in secureJsonData (see notes!)
     default: ''
     required: false
     type: str
@@ -300,7 +297,7 @@ options:
     default: {}
   dontReportSecureDataChanges:
     description:
-    - reports a task as `changed=false` even if `secureJsonData` has changed
+    - reports a task as changed=false even if secureJsonData has changed
     - implemented for backward compatibility reasons, will get deprecated by next releases
     required: false
     type: bool
@@ -308,12 +305,11 @@ options:
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
-
 notes:
-- secureJsonData/secureJsonFields related things:
--- secureJsonData is converted to encrypted data by Grafana API and shown as secureJsonFields in requests
--- secureJsonFields shows `true` for all fields set
--- As the data is encrypted it can not be compared on subsequent runs, thus each run reports `changed=true` for the task
+- secureJsonData is converted to encrypted data by Grafana API and shown as secureJsonFields in requests.
+- secureJsonFields shows boolean true for all fields set.
+- As the secureJsonData is encrypted it can not be compared on subsequent runs, thus each run reports `changed=true` for
+  the task. See dontReportSecureDataChanges property.
 '''
 
 EXAMPLES = '''
@@ -446,7 +442,7 @@ def compare_datasources(new, current, ignoreSecureJsonData=True):
 
     # check if secureJsonData should be ignored
     if ignoreSecureJsonData:
-        #if so just drop alltogether
+        # if so just drop alltogether
         new.pop('secureJsonData', None)
         new.pop('secureJsonFields', None)
         current.pop('secureJsonData', None)
