@@ -301,7 +301,7 @@ options:
     - implemented for backward compatibility reasons, will get deprecated by next releases
     required: false
     type: bool
-    default: true
+    default: false
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -631,6 +631,7 @@ def main():
                               'postgres',
                               'cloudwatch',
                               'alexanderzobnin-zabbix-datasource',
+                              'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
                               'loki'], required=True),
         ds_url=dict(required=True, type='str'),
@@ -673,7 +674,7 @@ def main():
         zabbix_password=dict(type='str', no_log=True),
         additional_json_data=dict(type='dict', default={}, required=False),
         additional_secure_json_data=dict(type='dict', default={}, required=False),
-        dontReportSecureDataChanges=dict(type='bool', default=True, required=False)
+        dontReportSecureDataChanges=dict(type='bool', default=False, required=False)
     )
 
     module = AnsibleModule(
