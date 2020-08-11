@@ -36,6 +36,7 @@ options:
     - cloudwatch
     - alexanderzobnin-zabbix-datasource
     - sni-thruk-datasource
+    - camptocamp-prometheus-alertmanager-datasource
     - loki
     type: str
   ds_url:
