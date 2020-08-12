@@ -18,10 +18,13 @@ jobs:
           python-version: 3.6
 
       - name: Install ansible-base (devel)
-        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+        run: pip install antsibull-changelog https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
+
+      - name: Check changelog fragments syntax
+        run: antsibull-changelog lint
 
   units:
     runs-on: ubuntu-latest

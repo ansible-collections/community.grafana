@@ -74,7 +74,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 ---
 - name: Create or update a Grafana user
-  grafana_user:
+  community.grafana.grafana_user:
     url: "https://grafana.example.com"
     url_username: admin
     url_password: changeme
@@ -86,7 +86,7 @@ EXAMPLES = '''
     state: present
 
 - name: Delete a Grafana user
-  grafana_user:
+  community.grafana.grafana_user:
     url: "https://grafana.example.com"
     url_username: admin
     url_password: changeme

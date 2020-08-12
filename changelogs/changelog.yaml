@@ -1,0 +1,50 @@
+ancestor: null
+releases:
+  0.1.0:
+    changes:
+      release_summary: 'Initial migration of Grafana content from Ansible core (2.9/devel)
+
+        '
+    fragments:
+    - 0.1.0.yml
+    release_date: '2020-08-12'
+  0.2.0:
+    changes:
+      bugfixes:
+      - Fix issue `#45` in `grafana_plugin`
+      minor_changes:
+      - Add Thruk as Grafana Datasource
+      - Add `grafana_folder` module
+      - Add `grafana_user` module
+      - Use `module_utils` to allow code factorization
+    fragments:
+    - 0.2.0.yml
+    release_date: '2020-08-12'
+  0.2.1:
+    changes:
+      bugfixes:
+      - Fix an issue with `grafana_datasource` idempotency
+    fragments:
+    - 0.2.1.yml
+    release_date: '2020-08-12'
+  0.2.2:
+    changes:
+      bugfixes:
+      - Fix an issue in `grafana_dashboard` that made dashboard import no more detecting
+        changes and fail.
+      - Refactor module `grafana_datasource` to ease its support.
+    fragments:
+    - 0.2.2.yml
+    release_date: '2020-08-12'
+  1.0.0:
+    changes:
+      known_issues:
+      - grafana_datasource doesn't set password correctly (#113)
+      - secureJsonData related properties aren't updated (#107)
+      major_changes:
+      - Add changelog management for ansible 2.10 (#112)
+      - grafana_datasource ; adding additional_json_data param
+      release_summary: Stable release for Ansible 2.10 and beyond
+    fragments:
+    - 1.0.0.yml
+    release_date: '2020-08-12'

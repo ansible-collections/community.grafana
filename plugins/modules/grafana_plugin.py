@@ -52,7 +52,7 @@ options:
 EXAMPLES = '''
 ---
 - name: Install/update Grafana piechart panel plugin
-  grafana_plugin:
+  community.grafana.grafana_plugin:
     name: grafana-piechart-panel
     version: latest
     state: present

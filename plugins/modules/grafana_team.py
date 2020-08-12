@@ -68,7 +68,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 ---
 - name: Create a team
-  grafana_team:
+  community.grafana.grafana_team:
       url: "https://grafana.example.com"
       grafana_api_key: "{{ some_api_token_value }}"
       name: "grafana_working_group"
@@ -76,7 +76,7 @@ EXAMPLES = '''
       state: present
 
 - name: Create a team with members
-  grafana_team:
+  community.grafana.grafana_team:
       url: "https://grafana.example.com"
       grafana_api_key: "{{ some_api_token_value }}"
       name: "grafana_working_group"
@@ -87,7 +87,7 @@ EXAMPLES = '''
       state: present
 
 - name: Create a team with members and enforce the list of members
-  grafana_team:
+  community.grafana.grafana_team:
       url: "https://grafana.example.com"
       grafana_api_key: "{{ some_api_token_value }}"
       name: "grafana_working_group"
@@ -99,7 +99,7 @@ EXAMPLES = '''
       state: present
 
 - name: Delete a team
-  grafana_team:
+  community.grafana.grafana_team:
       url: "https://grafana.example.com"
       grafana_api_key: "{{ some_api_token_value }}"
       name: "grafana_working_group"
