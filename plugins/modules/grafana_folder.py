@@ -51,14 +51,14 @@ extends_documentation_fragment:
 EXAMPLES = '''
 ---
 - name: Create a folder
-  grafana_folder:
+  community.grafana.grafana_folder:
       url: "https://grafana.example.com"
       grafana_api_key: "{{ some_api_token_value }}"
       title: "grafana_working_group"
       state: present
 
 - name: Delete a folder
-  grafana_folder:
+  community.grafana.grafana_folder:
       url: "https://grafana.example.com"
       grafana_api_key: "{{ some_api_token_value }}"
       title: "grafana_working_group"

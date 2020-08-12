@@ -287,7 +287,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 ---
 - name: Create elasticsearch datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-elastic"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -306,7 +306,7 @@ EXAMPLES = '''
     tls_ca_cert: "/etc/ssl/certs/ca.pem"
 
 - name: Create influxdb datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-influxdb"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -319,7 +319,7 @@ EXAMPLES = '''
     tls_ca_cert: "/etc/ssl/certs/ca.pem"
 
 - name: Create postgres datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-postgres"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -335,7 +335,7 @@ EXAMPLES = '''
       timescaledb: false
 
 - name: Create cloudwatch datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-cloudwatch"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -350,7 +350,7 @@ EXAMPLES = '''
     aws_custom_metrics_namespaces: "n1,n2"
 
 - name: grafana - add thruk datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-thruk"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"

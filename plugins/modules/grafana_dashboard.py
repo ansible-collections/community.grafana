@@ -87,7 +87,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Import Grafana dashboard foo
-      grafana_dashboard:
+      community.grafana.grafana_dashboard:
         grafana_url: http://grafana.company.com
         grafana_api_key: "{{ grafana_api_key }}"
         state: present
@@ -96,7 +96,7 @@ EXAMPLES = '''
         path: /path/to/dashboards/foo.json
 
     - name: Import Grafana dashboard Zabbix
-      grafana_dashboard:
+      community.grafana.grafana_dashboard:
         grafana_url: http://grafana.company.com
         grafana_api_key: "{{ grafana_api_key }}"
         folder: zabbix
@@ -104,14 +104,14 @@ EXAMPLES = '''
         dashbord_revision: 1
 
     - name: Import Grafana dashboard zabbix
-      grafana_dashboard:
+      community.grafana.grafana_dashboard:
         grafana_url: http://grafana.company.com
         grafana_api_key: "{{ grafana_api_key }}"
         folder: public
         dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
 
     - name: Export dashboard
-      grafana_dashboard:
+      community.grafana.grafana_dashboard:
         grafana_url: http://grafana.company.com
         grafana_user: "admin"
         grafana_password: "{{ grafana_password }}"
