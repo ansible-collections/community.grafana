@@ -7,7 +7,7 @@ releases:
         '
     fragments:
     - 0.1.0.yml
-    release_date: '2020-08-12'
+    release_date: '2019-12-27'
   0.2.0:
     changes:
       bugfixes:
@@ -19,14 +19,14 @@ releases:
       - Use `module_utils` to allow code factorization
     fragments:
     - 0.2.0.yml
-    release_date: '2020-08-12'
+    release_date: '2020-02-26'
   0.2.1:
     changes:
       bugfixes:
       - Fix an issue with `grafana_datasource` idempotency
     fragments:
     - 0.2.1.yml
-    release_date: '2020-08-12'
+    release_date: '2020-03-18'
   0.2.2:
     changes:
       bugfixes:
@@ -35,7 +35,7 @@ releases:
       - Refactor module `grafana_datasource` to ease its support.
     fragments:
     - 0.2.2.yml
-    release_date: '2020-08-12'
+    release_date: '2020-03-30'
   1.0.0:
     changes:
       known_issues:
