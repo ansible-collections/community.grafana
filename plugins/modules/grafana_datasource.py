@@ -483,7 +483,7 @@ def compare_datasources(new, current, compareSecureData=True):
         # - secureJsonFields is reporting each field set as true
         # - secureJsonFields once set cant be removed (DS has to be deleted)
         if not new.get('secureJsonData'):
-            # secureJsonData is not provided so just remove booth for comparision
+            # secureJsonData is not provided so just remove both for comparision
             new.pop('secureJsonData', None)
             current.pop('secureJsonFields', None)
         else:
