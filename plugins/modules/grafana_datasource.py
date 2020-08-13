@@ -311,7 +311,7 @@ extends_documentation_fragment:
 - community.grafana.api_key
 notes:
 - Secure data will get encrypted by the Grafana API, thus it can not be compared on subsequent runs. To workaround this, secure
-  data will not be updated after initial creation! To update also secure data you have to set I(enforce_secure_data=True).
+  data will not be updated after initial creation! To force the secure data update you have to set I(enforce_secure_data=True).
 - Hint, with the C(enforce_secure_data) always reporting changed=True, you might just do one Task updateing the datasource without
   any secure data and make a separate playbook/task with changing also the secure data. This way it wont break any workflow.
 '''
