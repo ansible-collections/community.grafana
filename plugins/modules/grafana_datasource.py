@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
 DOCUMENTATION = '''
 module: grafana_datasource
@@ -66,11 +67,12 @@ options:
   password:
     description:
     - The datasource password.
+    - For encrypted password use C(secure_password).
     type: str
   secure_password:
     description:
     - must be supported by datasource
-    - stored in secureJsonData (see notes!)
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
   basic_auth_user:
     description:
@@ -92,19 +94,19 @@ options:
     - The client TLS certificate.
     - If C(tls_client_cert) and C(tls_client_key) are set, this will enable TLS authentication.
     - Starts with ----- BEGIN CERTIFICATE -----
-    - stored in secureJsonData (see notes!)
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
   tls_client_key:
     description:
     - The client TLS private key
     - Starts with ----- BEGIN RSA PRIVATE KEY -----
-    - stored in secureJsonData (see notes!)
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
   tls_ca_cert:
     description:
     - The TLS CA certificate for self signed certificates.
     - Only used when C(tls_client_cert) and C(tls_client_key) are set.
-    - stored in secureJsonData (see notes!)
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
   tls_skip_verify:
     description:
@@ -292,14 +294,15 @@ options:
     description:
     - Defined data is used for datasource secureJsonData
     - Data may be overridden by specifically defined parameters (like tls_client_cert)
-    - stored in secureJsonData (see notes!)
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     required: false
     type: dict
     default: {}
-  dontReportSecureDataChanges:
+  enforce_secure_data:
     description:
-    - reports a task as changed=false even if secureJsonData has changed
-    - implemented for backward compatibility reasons, will get deprecated by next releases
+    - Secure data is not updated per default (see notes!)
+    - To update secure data you have to enable this option!
+    - Enabling this, the task will always report changed=True
     required: false
     type: bool
     default: false
@@ -307,16 +310,16 @@ extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
 notes:
-- secureJsonData is converted to encrypted data by Grafana API and shown as secureJsonFields in requests.
-- secureJsonFields shows boolean true for all fields set.
-- As the secureJsonData is encrypted it can not be compared on subsequent runs, thus each run reports `changed=true` for
-  the task. See dontReportSecureDataChanges property.
+- Secure data will get encrypted by the Grafana API, thus it can not be compared on subsequent runs. To workaround this, secure
+  data will not be updated after initial creation! To update also secure data you have to set I(enforce_secure_data=True).
+- Hint, with the C(enforce_secure_data) always reporting changed=True, you might just do one Task updateing the datasource without
+  any secure data and make a separate playbook/task with changing also the secure data. This way it wont break any workflow.
 '''
 
 EXAMPLES = '''
 ---
 - name: Create elasticsearch datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-elastic"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -335,7 +338,7 @@ EXAMPLES = '''
     tls_ca_cert: "/etc/ssl/certs/ca.pem"
 
 - name: Create influxdb datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-influxdb"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -348,7 +351,7 @@ EXAMPLES = '''
     tls_ca_cert: "/etc/ssl/certs/ca.pem"
 
 - name: Create postgres datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-postgres"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -358,14 +361,13 @@ EXAMPLES = '''
     ds_url: "postgres.company.com:5432"
     database: "db"
     user: "postgres"
-    password: "iampgroot"
-    # secure_password: "iampgroot"
+    secure_password: "iampgroot"
     sslmode: "verify-full"
     additional_json_data:
       timescaledb: false
 
 - name: Create cloudwatch datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-cloudwatch"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -380,7 +382,7 @@ EXAMPLES = '''
     aws_custom_metrics_namespaces: "n1,n2"
 
 - name: grafana - add thruk datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: "datasource-thruk"
     grafana_url: "https://grafana.company.com"
     grafana_user: "admin"
@@ -390,6 +392,36 @@ EXAMPLES = '''
     ds_url: "https://thruk.company.com/sitename/thruk"
     basic_auth_user: "thruk-user"
     basic_auth_password: "******"
+
+# handle secure data - workflow example
+# this will create/update the datasource but dont update the secure data on updates
+# so you can assert if all tasks are changed=False
+- name: create prometheus datasource
+  community.grafana.grafana_datasource:
+    name: openshift_prometheus
+    ds_type: prometheus
+    ds_url: https://openshift-monitoring.company.com
+    access: proxy
+    tls_skip_verify: true
+    additional_json_data:
+      httpHeaderName1: "Authorization"
+    additional_secure_json_data:
+      httpHeaderValue1: "Bearer ihavenogroot"
+
+# in a separate task or even play you then can force to update
+# and assert if each datasource is reporting changed=True
+- name: update prometheus datasource
+  community.grafana.grafana_datasource:
+    name: openshift_prometheus
+    ds_type: prometheus
+    ds_url: https://openshift-monitoring.company.com
+    access: proxy
+    tls_skip_verify: true
+    additional_json_data:
+      httpHeaderName1: "Authorization"
+    additional_secure_json_data:
+      httpHeaderValue1: "Bearer ihavenogroot"
+    enforce_secure_data: true
 '''
 
 RETURN = '''
@@ -427,10 +459,8 @@ from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
 
-__metaclass__ = type
 
-
-def compare_datasources(new, current, ignoreSecureJsonData=True):
+def compare_datasources(new, current, compareSecureData=True):
     del current['typeLogoUrl']
     del current['id']
     if 'version' in current:
@@ -441,9 +471,9 @@ def compare_datasources(new, current, ignoreSecureJsonData=True):
         del current['basicAuthUser']
         del current['basicAuthPassword']
 
-    # check if secureJsonData should be ignored
-    if ignoreSecureJsonData:
-        # if so just drop alltogether
+    # check if secureJsonData should be compared
+    if not compareSecureData:
+        # if we should ignore it just drop alltogether
         new.pop('secureJsonData', None)
         new.pop('secureJsonFields', None)
         current.pop('secureJsonData', None)
@@ -675,7 +705,7 @@ def main():
         zabbix_password=dict(type='str', no_log=True),
         additional_json_data=dict(type='dict', default={}, required=False),
         additional_secure_json_data=dict(type='dict', default={}, required=False),
-        dontReportSecureDataChanges=dict(type='bool', default=False, required=False)
+        enforce_secure_data=dict(type='bool', default=False, required=False)
     )
 
     module = AnsibleModule(
@@ -698,6 +728,7 @@ def main():
 
     state = module.params['state']
     name = module.params['name']
+    enforce_secure_data = module.params['enforce_secure_data']
 
     grafana_iface = GrafanaInterface(module)
     ds = grafana_iface.datasource_by_name(name)
@@ -709,17 +740,13 @@ def main():
             ds = grafana_iface.datasource_by_name(name)
             module.exit_json(changed=True, datasource=ds, msg='Datasource %s created' % name)
         else:
-            # get diff (always include secureJsonData for update!)
-            diff = compare_datasources(payload.copy(), ds.copy(), False)
+            diff = compare_datasources(payload.copy(), ds.copy(), enforce_secure_data)
             if diff.get('before') == diff.get('after'):
                 module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
-            beforeUpdate = ds.copy()
             grafana_iface.update_datasource(ds.get('id'), payload)
             ds = grafana_iface.datasource_by_name(name)
-            # get diff again with respect to dontReportSecureDataChanges
-            diff = compare_datasources(payload.copy(), beforeUpdate, module.params.get('dontReportSecureDataChanges', True))
             if diff.get('before') == diff.get('after'):
-                module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged (secureJson ignored!)' % name)
+                module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
 
             module.exit_json(changed=True, diff=diff, datasource=ds, msg='Datasource %s updated' % name)
     else:
