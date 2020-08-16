@@ -121,8 +121,8 @@ After the version is published, verify it exists on the [Grafana Collection Gala
   * A x.y.0 changelog with y > 0 is not part of a changelog of a later X.*.* (with X > x) or x,Y,* (with Y > y) release.
   * A x.y.z changelog with z > 0 is not part of a changelog of a later (x+1).*.* or x.Y.z (with Y > y) release.
 Since everything adding to the minor/patch changelogs are backports, the same changelog fragments of these minor/patch releases will be in the next major release's changelog. (This is the same behavior as in ansible/ansible.)
-  * Changelogs do not contain previous major releases, and only use the ancestor feature (in changelogs/changelog.yaml) to point to the previous major release.
-  * Changelog fragments are removed after a release is made.
+* Changelogs do not contain previous major releases, and only use the ancestor feature (in changelogs/changelog.yaml) to point to the previous major release.
+* Changelog fragments are removed after a release is made.
 
 See [antsibull-changelog documentation](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelogs.rst#changelog-fragment-categories)
 
