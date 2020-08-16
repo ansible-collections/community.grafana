@@ -23,7 +23,6 @@ Known Issues
 ------------
 
 - grafana_datasource doesn't set password correctly (#113)
-- secureJsonData related properties aren't updated (#107)
 
 v0.2.2
 ======

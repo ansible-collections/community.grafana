@@ -40,11 +40,10 @@ releases:
     changes:
       known_issues:
       - grafana_datasource doesn't set password correctly (#113)
-      - secureJsonData related properties aren't updated (#107)
       major_changes:
       - Add changelog management for ansible 2.10 (#112)
       - grafana_datasource ; adding additional_json_data param
       release_summary: Stable release for Ansible 2.10 and beyond
     fragments:
     - 1.0.0.yml
-    release_date: '2020-08-12'
+    release_date: '2020-08-16'
