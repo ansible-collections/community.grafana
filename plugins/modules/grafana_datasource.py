@@ -67,12 +67,7 @@ options:
   password:
     description:
     - The datasource password.
-    - For encrypted password use C(secure_password).
-    type: str
-  secure_password:
-    description:
-    - must be supported by datasource
-    - Stored as secure data, see C(enforce_secure_data) and notes!
+    - For encrypted password use C(additional_secure_json_data.password).
     type: str
   basic_auth_user:
     description:
@@ -361,10 +356,11 @@ EXAMPLES = '''
     ds_url: "postgres.company.com:5432"
     database: "db"
     user: "postgres"
-    secure_password: "iampgroot"
     sslmode: "verify-full"
     additional_json_data:
       timescaledb: false
+    additional_secure_json_data:
+      password: "iampgroot"
 
 - name: Create cloudwatch datasource
   community.grafana.grafana_datasource:
@@ -583,9 +579,6 @@ def get_datasource_payload(data):
             secure_json_data['accessKey'] = data.get('aws_access_key')
             secure_json_data['secretKey'] = data.get('aws_secret_key')
 
-    if data.get('secure_password'):
-        secure_json_data['password'] = data.get('secure_password')
-
     payload['jsonData'] = json_data
     payload['secureJsonData'] = secure_json_data
     return payload
@@ -670,7 +663,6 @@ def main():
         database=dict(type='str', default=""),
         user=dict(default='', type='str'),
         password=dict(default='', no_log=True, type='str'),
-        secure_password=dict(default='', no_log=True, type='str'),
         basic_auth_user=dict(type='str'),
         basic_auth_password=dict(type='str', no_log=True),
         with_credentials=dict(default=False, type='bool'),
