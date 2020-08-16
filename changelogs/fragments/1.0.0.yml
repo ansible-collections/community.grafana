@@ -4,4 +4,3 @@ major_changes:
 - Add changelog management for ansible 2.10 (#112)
 known_issues:
 - grafana_datasource doesn't set password correctly (#113)
-- secureJsonData related properties aren't updated (#107)

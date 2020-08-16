@@ -48,7 +48,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: community.grafana
-    version: v0.1.0
+    version: 1.0.0
 ```
 
 ### Using modules from the Grafana Collection in your playbooks
@@ -123,6 +123,8 @@ After the version is published, verify it exists on the [Grafana Collection Gala
 Since everything adding to the minor/patch changelogs are backports, the same changelog fragments of these minor/patch releases will be in the next major release's changelog. (This is the same behavior as in ansible/ansible.)
 ** Changelogs do not contain previous major releases, and only use the ancestor feature (in changelogs/changelog.yaml) to point to the previous major release.
 ** Changelog fragments are removed after a release is made.
+
+See [antsibull-changelog documentation](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelogs.rst#changelog-fragment-categories)
 
 ## More Information
 
