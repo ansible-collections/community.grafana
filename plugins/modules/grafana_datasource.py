@@ -630,11 +630,11 @@ class GrafanaInterface(object):
     def datasource_by_name(self, name):
         datasource_exists = False
         ds = {}
-        url = "/api/datasources/name/%s" % quote(name)
+        url = "/api/datasources/name/%s" % quote(name, safe='')
         return self._send_request(url, headers=self.headers, method='GET')
 
     def delete_datasource(self, name):
-        url = "/api/datasources/name/%s" % quote(name)
+        url = "/api/datasources/name/%s" % quote(name, safe='')
         self._send_request(url, headers=self.headers, method='DELETE')
 
     def update_datasource(self, ds_id, data):

@@ -1,7 +1,7 @@
 - name: Create elasticsearch datasource
   register: result
   grafana_datasource:
-    name: datasource-elastic
+    name: "datasource/elastic"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -35,19 +35,19 @@
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
     - result.datasource.jsonData.tlsAuthWithCACert
-    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
     - result.datasource.type == 'elasticsearch'
     - result.datasource.url == 'https://elastic.company.com:9200'
     - result.datasource.user == ''
     - not result.datasource.withCredentials
-    - "result.msg == 'Datasource datasource-elastic created'"
+    - "result.msg == 'Datasource datasource/elastic created'"
 
 - name: Check elasticsearch datasource creation idempotency
   register: result
   grafana_datasource:
-    name: datasource-elastic
+    name: "datasource/elastic"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -81,7 +81,7 @@
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
     - result.datasource.jsonData.tlsAuthWithCACert
-    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
     - result.datasource.type == 'elasticsearch'
@@ -92,7 +92,7 @@
 - name: update elasticsearch datasource creation
   register: result
   grafana_datasource:
-    name: datasource-elastic
+    name: "datasource/elastic"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -126,7 +126,7 @@
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
     - result.datasource.jsonData.tlsAuthWithCACert
-    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
     - result.datasource.type == 'elasticsearch'
@@ -137,7 +137,7 @@
 - name: update elasticsearch datasource (ignoring secureJsonData)
   register: result
   grafana_datasource:
-    name: datasource-elastic
+    name: "datasource/elastic"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -176,7 +176,7 @@
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
     - result.datasource.jsonData.tlsAuthWithCACert
-    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
     - result.datasource.type == 'elasticsearch'
@@ -188,7 +188,7 @@
 - name: update elasticsearch datasource (including secureJsonData)
   register: result
   grafana_datasource:
-    name: datasource-elastic
+    name: "datasource/elastic"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -227,7 +227,7 @@
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
     - result.datasource.jsonData.tlsAuthWithCACert
-    - result.datasource.name == 'datasource-elastic'
+    - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
     - result.datasource.type == 'elasticsearch'
@@ -241,7 +241,7 @@
 - name: Delete elasticsearch datasource
   register: result
   grafana_datasource:
-    name: datasource-elastic
+    name: "datasource/elastic"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -266,7 +266,7 @@
 - name: Delete elasticsearch datasource (idempotency)
   register: result
   grafana_datasource:
-    name: datasource-elastic
+    name: "datasource/elastic"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
