@@ -17,16 +17,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import json
-import socket
-import getpass
-from datetime import datetime
-
-from ansible.module_utils._text import to_text
-from ansible.module_utils.urls import open_url
-from ansible.plugins.callback import CallbackBase
-
-
 DOCUMENTATION = '''
     name: grafana_annotations
     type: notification
@@ -114,6 +104,15 @@ DOCUMENTATION = '''
         default: []
         type: list
 '''
+
+import json
+import socket
+import getpass
+from datetime import datetime
+
+from ansible.module_utils._text import to_text
+from ansible.module_utils.urls import open_url
+from ansible.plugins.callback import CallbackBase
 
 
 PLAYBOOK_START_TXT = """\
