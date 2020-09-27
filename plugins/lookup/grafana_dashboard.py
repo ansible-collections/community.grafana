@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-lookup: grafana_dashboard
+name: grafana_dashboard
 author: Thierry Salle (@seuf)
 short_description: list or search grafana dashboards
 description:
