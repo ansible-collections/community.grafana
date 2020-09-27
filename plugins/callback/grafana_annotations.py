@@ -28,8 +28,8 @@ from ansible.plugins.callback import CallbackBase
 
 
 DOCUMENTATION = '''
-    callback: grafana_annotations
-    callback_type: notification
+    name: grafana_annotations
+    type: notification
     short_description: send ansible events as annotations on charts to grafana over http api.
     author: "Rémi REY (@rrey)"
     description:
