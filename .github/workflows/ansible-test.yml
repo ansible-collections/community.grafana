@@ -5,6 +5,10 @@ on:
 jobs:
   sanity:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version: ["3.6"]
+        ansible_version: ["2.9", "2.10"]
     steps:
 
       - name: Check out code
@@ -12,13 +16,13 @@ jobs:
         with:
           path: ansible_collections/community/grafana
 
-      - name: Set up Python 3.6
+      - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: ${{ matrix.python_version }}
 
-      - name: Install ansible-base (devel)
-        run: pip install antsibull-changelog https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+      - name: Install ansible
+        run: pip install antsibull-changelog ansible==${{ matrix.ansible_version }}
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color
@@ -28,22 +32,26 @@ jobs:
 
   units:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version: ["3.6"]
+        ansible_version: ["2.9", "2.10"]
     steps:
       - name: Check out code
         uses: actions/checkout@v1
         with:
           path: ansible_collections/community/grafana
 
-      - name: Set up Python 3.6
+      - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: ${{ matrix.python_version }}
 
-      - name: Install ansible-base (devel)
-        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+      - name: Install ansible
+        run: pip install ansible==${{ matrix.ansible_version }}
 
       - name: Run unit tests
-        run: ansible-test units --docker -v --color --python 3.6 --coverage
+        run: ansible-test units --docker -v --color --python ${{ matrix.python_version }} --coverage
 
       - name: Generate coverage report.
         run: ansible-test coverage xml -v --requirements --group-by command --group-by version
@@ -57,6 +65,7 @@ jobs:
     strategy:
       matrix:
         grafana_version: ["6.7.4", "7.0.6",  "7.1.3"]
+        ansible_version: ["2.9", "2.10"]
         python_version: ["3.6"]
     container:
       image: python:${{ matrix.python_version }}-alpine
@@ -76,8 +85,8 @@ jobs:
       - name: Install deps
         run: pip install coverage
 
-      - name: Install ansible-base (devel)
-        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+      - name: Install ansible
+        run: pip install ansible==${{ matrix.ansible_version }}
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff
