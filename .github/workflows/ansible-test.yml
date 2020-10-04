@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.6"]
-        ansible_version: ["2.9", "2.10"]
+        ansible_version: ["stable-2.9", "stable-2.10", "devel"]
     steps:
 
       - name: Check out code
@@ -22,20 +22,17 @@ jobs:
           python-version: ${{ matrix.python_version }}
 
       - name: Install ansible
-        run: pip install antsibull-changelog ansible==${{ matrix.ansible_version }}
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color
-
-      - name: Check changelog fragments syntax
-        run: antsibull-changelog lint
 
   units:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python_version: ["3.6"]
-        ansible_version: ["2.9", "2.10"]
+        ansible_version: ["stable-2.9", "stable-2.10", "devel"]
     steps:
       - name: Check out code
         uses: actions/checkout@v1
@@ -48,7 +45,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
 
       - name: Install ansible
-        run: pip install ansible==${{ matrix.ansible_version }}
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run unit tests
         run: ansible-test units --docker -v --color --python ${{ matrix.python_version }} --coverage
@@ -65,7 +62,7 @@ jobs:
     strategy:
       matrix:
         grafana_version: ["6.7.4", "7.0.6",  "7.1.3"]
-        ansible_version: ["2.9", "2.10"]
+        ansible_version: ["stable-2.9", "stable-2.10", "devel"]
         python_version: ["3.6"]
     container:
       image: python:${{ matrix.python_version }}-alpine
@@ -86,7 +83,7 @@ jobs:
         run: pip install coverage
 
       - name: Install ansible
-        run: pip install ansible==${{ matrix.ansible_version }}
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff
