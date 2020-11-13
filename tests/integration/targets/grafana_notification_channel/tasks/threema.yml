@@ -1,0 +1,38 @@
+---
+- name: Create threema notification channel
+  register: result
+  grafana_notification_channel:
+    uid: threema
+    name: threema
+    type: threema
+    threema_gateway_id: xxx
+    threema_recepient_id: yyy
+    threema_api_secret: zzz
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'present'"
+
+- name: Delete threema notification channel
+  register: result
+  grafana_notification_channel:
+    uid: threema
+    state: absent
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'absent'"

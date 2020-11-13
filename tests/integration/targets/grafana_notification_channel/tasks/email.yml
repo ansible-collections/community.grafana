@@ -1,0 +1,38 @@
+---
+- name: Create email notification channel
+  register: result
+  grafana_notification_channel:
+    uid: email
+    name: email
+    type: email
+    email_addresses:
+      - foo@example.org
+      - bar@example.org
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'present'"
+
+- name: Delete discord notification channel
+  register: result
+  grafana_notification_channel:
+    uid: email
+    state: absent
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'absent'"

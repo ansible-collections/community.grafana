@@ -1,0 +1,36 @@
+---
+- name: Create pagerduty notification channel
+  register: result
+  grafana_notification_channel:
+    uid: pagerduty
+    name: pagerduty
+    type: pagerduty
+    pagerduty_integration_key: xxx
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'present'"
+
+- name: Delete pagerduty notification channel
+  register: result
+  grafana_notification_channel:
+    uid: pagerduty
+    state: absent
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'absent'"
