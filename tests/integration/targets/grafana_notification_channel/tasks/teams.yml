@@ -1,0 +1,36 @@
+---
+- name: Create teams notification channel
+  register: result
+  grafana_notification_channel:
+    uid: teams
+    name: teams
+    type: teams
+    teams_url: https://example.org
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'present'"
+
+- name: Delete teams notification channel
+  register: result
+  grafana_notification_channel:
+    uid: teams
+    state: absent
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password}}"
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == True"
+      - "result.state == 'absent'"
