@@ -23,6 +23,7 @@ DOCUMENTATION = '''
 module: grafana_notification_channel
 author:
   - Aliaksandr Mianzhynski (@amenzhinsky)
+version_added: "1.1.0"
 short_description: Manage Grafana Notification Channels
 description:
   - Create/Update/Delete Grafana Notification Channels via API.

@@ -47,3 +47,15 @@ releases:
     fragments:
     - 1.0.0.yml
     release_date: '2020-08-16'
+  1.1.0:
+    changes:
+      minor_changes:
+      - Update the version where `message` alias will disappear from `grafana_dashboard`.
+        (Now 2.0.0)
+    fragments:
+    - update_deprecation.yml
+    modules:
+    - description: Manage Grafana Notification Channels
+      name: grafana_notification_channel
+      namespace: ''
+    release_date: '2020-11-16'

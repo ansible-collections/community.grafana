@@ -5,6 +5,19 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.1.0
+======
+
+Minor Changes
+-------------
+
+- Update the version where `message` alias will disappear from `grafana_dashboard`. (Now 2.0.0)
+
+New Modules
+-----------
+
+- community.grafana.grafana_notification_channel - Manage Grafana Notification Channels
+
 v1.0.0
 ======
 
