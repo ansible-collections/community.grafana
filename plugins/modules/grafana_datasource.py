@@ -358,6 +358,7 @@ EXAMPLES = '''
     user: "postgres"
     sslmode: "verify-full"
     additional_json_data:
+      postgresVersion: 12
       timescaledb: false
     additional_secure_json_data:
       password: "iampgroot"
