@@ -22,6 +22,10 @@ from ansible.module_utils.urls import url_argument_spec
 __metaclass__ = type
 
 
+def clean_url(url):
+    return url.rstrip("/")
+
+
 def grafana_argument_spec():
     argument_spec = url_argument_spec()
 

@@ -155,7 +155,7 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive, clean_url
 
 __metaclass__ = type
 
@@ -168,7 +168,7 @@ class GrafanaUserInterface(object):
         self.headers = {"Content-Type": "application/json"}
         self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
         # }}}
-        self.grafana_url = module.params.get("url")
+        self.grafana_url = clean_url(module.params.get("url"))
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:

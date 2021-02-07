@@ -420,7 +420,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, clean_url
 
 
 class GrafanaAPIException(Exception):
@@ -803,6 +803,8 @@ def main():
             ['type', 'webhook', ['webhook_url']]
         ]
     )
+
+    module.params["grafana_url"] = clean_url(module.params["grafana_url"])
 
     if module.params['state'] == 'present':
         result = grafana_create_or_update_notification_channel(module, module.params)
