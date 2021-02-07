@@ -336,6 +336,7 @@ def grafana_create_dashboard(module, data):
     result = {}
 
     # test if the folder exists
+    folder_exists = False
     if grafana_version >= 5:
         folder_exists, folder_id = grafana_folder_exists(module, data['grafana_url'], data['folder'], headers)
         if folder_exists is False:
