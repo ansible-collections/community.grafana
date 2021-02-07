@@ -1,0 +1,3 @@
+bugfixes:
+- Fix issue with url when grafana_url has a trailing slash (#135)
+- grafana_dashboard, Fix reference before assignment issue (#146)
