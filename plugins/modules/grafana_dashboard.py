@@ -136,7 +136,7 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils._text import to_native
 from ansible.module_utils._text import to_text
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, clean_url
 
 __metaclass__ = type
 
@@ -516,6 +516,8 @@ def main():
         required_together=[['url_username', 'url_password', 'org_id']],
         mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
     )
+
+    module.params["grafana_url"] = clean_url(module.params["grafana_url"])
 
     if 'message' in module.params:
         module.fail_json(msg="'message' is reserved keyword, please change this parameter to 'commit_message'")

@@ -162,7 +162,7 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive
+from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive, clean_url
 
 __metaclass__ = type
 
@@ -178,7 +178,7 @@ class GrafanaTeamInterface(object):
         else:
             self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
         # }}}
-        self.grafana_url = module.params.get("url")
+        self.grafana_url = clean_url(module.params.get("url"))
         grafana_version = self.get_version()
         if grafana_version["major"] < 5:
             self._module.fail_json(failed=True, msg="Teams API is available starting Grafana v5")
