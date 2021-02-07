@@ -28,6 +28,7 @@ version_added: "1.0.0"
 short_description: Manage Grafana Folders
 description:
   - Create/update/delete Grafana Folders through the Folders API.
+requirements:
   - The Folders API is only available starting Grafana 5 and the module will fail if the server version is lower than version 5.
 options:
   name:
@@ -43,6 +44,14 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
+  skip_version_check:
+    description:
+      - Skip Grafana version check and try to reach api endpoint anyway.
+      - This parameter can be useful if you enabled `hide_version` in grafana.ini
+    required: False
+    type: bool
+    default: False
+    version_added: "1.2.0"
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -156,11 +165,15 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive, clean_url
+import ansible_collections.community.grafana.plugins.module_utils.base as base
 from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils._text import to_text
 
 __metaclass__ = type
+
+
+class GrafanaError(Exception):
+    pass
 
 
 class GrafanaFolderInterface(object):
@@ -174,10 +187,14 @@ class GrafanaFolderInterface(object):
         else:
             self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
         # }}}
-        self.grafana_url = clean_url(module.params.get("url"))
-        grafana_version = self.get_version()
-        if grafana_version["major"] < 5:
-            self._module.fail_json(failed=True, msg="Folders API is available starting Grafana v5")
+        self.grafana_url = module.params.get("url")
+        if module.params.get("skip_version_check") is False:
+            try:
+                grafana_version = self.get_version()
+            except GrafanaError as e:
+                self._module.fail_json(failed=True, msg=to_text(e))
+            if grafana_version["major"] < 5:
+                self._module.fail_json(failed=True, msg="Folders API is available starting Grafana v5")
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -205,8 +222,10 @@ class GrafanaFolderInterface(object):
         url = "/api/health"
         response = self._send_request(url, data=None, headers=self.headers, method="GET")
         version = response.get("version")
-        major, minor, rev = version.split(".")
-        return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+        if version is not None:
+            major, minor, rev = version.split(".")
+            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+        raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
     def create_folder(self, title):
         url = "/api/folders"
@@ -232,16 +251,17 @@ def setup_module_object():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=grafana_required_together(),
-        mutually_exclusive=grafana_mutually_exclusive(),
+        required_together=base.grafana_required_together(),
+        mutually_exclusive=base.grafana_mutually_exclusive(),
     )
     return module
 
 
-argument_spec = grafana_argument_spec()
+argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     name=dict(type='str', aliases=['title'], required=True),
     state=dict(type='str', default='present', choices=['present', 'absent']),
+    skip_version_check=dict(type='bool', default=False),
 )
 
 
