@@ -202,6 +202,7 @@ options:
     description:
     - Use trends or not for zabbix datasource type.
     type: bool
+    default: False
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
