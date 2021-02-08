@@ -28,6 +28,9 @@ def grafana_argument_spec():
     del argument_spec['force']
     del argument_spec['force_basic_auth']
     del argument_spec['http_agent']
+    # Avoid sanity error with devel
+    if "use_gssapi" in argument_spec:
+        del argument_spec['use_gssapi']
 
     argument_spec.update(
         state=dict(choices=['present', 'absent'], default='present'),
