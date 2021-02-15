@@ -5,6 +5,20 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.2.0
+======
+
+Major Changes
+-------------
+
+- introduce "skip_version_check" parameter in grafana_teams and grafana_folder modules (#147)
+
+Bugfixes
+--------
+
+- Fix issue with url when grafana_url has a trailing slash (#135)
+- grafana_dashboard, Fix reference before assignment issue (#146)
+
 v1.1.0
 ======
 
