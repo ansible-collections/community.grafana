@@ -455,7 +455,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, grafana_required_together, grafana_mutually_exclusive, clean_url
+import ansible_collections.community.grafana.plugins.module_utils.base as base
 
 
 def compare_datasources(new, current, compareSecureData=True):
@@ -590,7 +590,7 @@ class GrafanaInterface(object):
 
     def __init__(self, module):
         self._module = module
-        self.grafana_url = clean_url(module.params.get("url"))
+        self.grafana_url = base.clean_url(module.params.get("url"))
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
         if module.params.get('grafana_api_key', None):
@@ -644,7 +644,7 @@ class GrafanaInterface(object):
 
 def main():
     # use the predefined argument spec for url
-    argument_spec = grafana_argument_spec()
+    argument_spec = base.grafana_argument_spec()
 
     argument_spec.update(
         name=dict(required=True, type='str'),
