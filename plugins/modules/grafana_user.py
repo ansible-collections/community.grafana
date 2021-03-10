@@ -272,11 +272,12 @@ def main():
     # search user by login
     target_user = grafana_iface.get_user_from_login(login)
     if state == 'present':
+        has_changed = False
 
         if target_user is None:
             # create new user
-            user = grafana_iface.create_user(name, email, login, password)
-            module.exit_json(changed=True, user=user)
+            target_user = grafana_iface.create_user(name, email, login, password)
+            has_changed = True
 
         if is_user_update_required(target_user, email, name, login, is_admin):
             # update found user
@@ -286,7 +287,7 @@ def main():
             user = grafana_iface.update_user(target_user_id, email, name, login)
             module.exit_json(changed=True, user=user)
 
-        module.exit_json(user=target_user)
+        module.exit_json(changed=has_changed, user=target_user)
 
     elif state == 'absent':
         if target_user is None:

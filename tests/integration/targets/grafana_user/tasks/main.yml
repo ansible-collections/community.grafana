@@ -1,4 +1,43 @@
 ---
+- name: Create new admin
+  grafana_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: "Harley Quinn"
+    email: harley.quinn@gotham.city
+    login: harley
+    password: Wy3ta6ob6M3wHELv58MPfqOe126RTnWpcYfEhyJm
+    is_admin: true
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.failed == false"
+      - "result.user.name == 'Harley Quinn'"
+      - "result.user.email == 'harley.quinn@gotham.city'"
+      - "result.user.isGrafanaAdmin == true"
+
+- name: Check idempotency on admin creation
+  grafana_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: "Harley Quinn"
+    email: harley.quinn@gotham.city
+    login: harley
+    password: Wy3ta6ob6M3wHELv58MPfqOe126RTnWpcYfEhyJm
+    is_admin: true
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.user.name == 'Harley Quinn'"
+      - "result.user.email == 'harley.quinn@gotham.city'"
+      - "result.user.isGrafanaAdmin == true"
+
 - name: Create a Grafana user without password (expect failure)
   grafana_user:
     url: "{{ grafana_url }}"
