@@ -34,7 +34,7 @@
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
-    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource-elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
@@ -80,7 +80,7 @@
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
-    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource-elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
@@ -125,7 +125,7 @@
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
-    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource-elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
@@ -175,7 +175,7 @@
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
-    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource-elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
@@ -226,7 +226,7 @@
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
     - not result.datasource.jsonData.tlsAuth
-    - not result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource-elastic'
     - result.datasource.orgId == 1
     - result.datasource.password == ''
