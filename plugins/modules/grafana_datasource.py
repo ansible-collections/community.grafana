@@ -532,6 +532,7 @@ def get_datasource_payload(data):
         json_data['tlsAuth'] = False
         json_data['tlsAuthWithCACert'] = False
         if data.get('tls_ca_cert'):
+            json_data['tlsAuthWithCACert'] = True
             secure_json_data['tlsCACert'] = data['tls_ca_cert']
 
     if data.get('tls_skip_verify'):
