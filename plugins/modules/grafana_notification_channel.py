@@ -757,7 +757,7 @@ def main():
                                    choices=['here', 'channel']),
         slack_token=dict(type='str', no_log=True),
 
-        telegram_bot_token=dict(type='str'),
+        telegram_bot_token=dict(type='str', no_log=True),
         telegram_chat_id=dict(type='str'),
 
         threema_gateway_id=dict(type='str'),
