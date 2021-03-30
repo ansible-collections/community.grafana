@@ -17,10 +17,8 @@ options:
     default: http://127.0.0.1:3000
   grafana_api_key:
     description:
-      - api key of grafana.
-      - when C(grafana_api_key) is set, the options C(grafan_user), C(grafana_password) and C(grafana_org_id) are ignored.
-      - Attention, please remove the two == at the end of the grafana_api_key
-      - because ansible lookup plugins options are split on = (see example).
+      - Grafana API key.
+      - When C(grafana_api_key) is set, the options C(grafana_user), C(grafana_password) and C(grafana_org_id) are ignored.
     env:
       - name: GRAFANA_API_KEY
   grafana_user:
@@ -51,7 +49,7 @@ EXAMPLES = """
 
 - name: get all grafana dashboards
   set_fact:
-    grafana_dashboards: "{{ lookup('grafana_dashboard', 'grafana_url=http://grafana.company.com grafana_api_key=' ~ grafana_api_key|replace('==', '')) }}"
+    grafana_dashboards: "{{ lookup('grafana_dashboard', 'grafana_url=http://grafana.company.com grafana_api_key=' ~ grafana_api_key) }}"
 """
 
 import json
@@ -116,7 +114,15 @@ class GrafanaAPI:
     def grafana_headers(self):
         headers = {'content-type': 'application/json; charset=utf8'}
         if self.grafana_api_key:
-            headers['Authorization'] = "Bearer %s==" % self.grafana_api_key
+            api_key = self.grafana_api_key
+            if len(api_key) % 4 == 2:
+                display.deprecated(
+                    "Passing a mangled version of the API key to the grafana_dashboard lookup is no longer necessary and should not be done.",
+                    "2.0.0",
+                    collection_name='community.grafana',
+                )
+                api_key += '=='
+            headers['Authorization'] = "Bearer %s" % api_key
         else:
             headers['Authorization'] = basic_auth_header(self.grafana_user, self.grafana_password)
             self.grafana_switch_organisation(headers)
@@ -156,7 +162,7 @@ class LookupModule(LookupBase):
 
         for param in grafana_args:
             try:
-                key, value = param.split('=')
+                key, value = param.split('=', 1)
             except ValueError:
                 raise AnsibleError("grafana_dashboard lookup plugin needs key=value pairs, but received %s" % terms)
             grafana_dict[key] = value
