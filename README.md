@@ -48,7 +48,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: community.grafana
-    version: 1.0.0
+    version: 1.2.0
 ```
 
 ### Using modules from the Grafana Collection in your playbooks
