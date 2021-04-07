@@ -199,7 +199,7 @@ class GrafanaUserInterface(object):
         return self.get_user_from_login(login)
 
     def get_user_from_login(self, login):
-        # https://grafana.com/docs/http_api/user/#get-single-user-by-username-login-or-email
+        # https://grafana.com/docs/grafana/latest/http_api/user/#get-single-user-by-usernamelogin-or-email
         url = "/api/users/lookup?loginOrEmail={login}".format(login=login)
         return self._send_request(url, headers=self.headers, method="GET")
 
