@@ -270,29 +270,29 @@ def main():
     grafana_iface = GrafanaUserInterface(module)
 
     # search user by login
-    target_user = grafana_iface.get_user_from_login(login)
+    actual_grafana_user = grafana_iface.get_user_from_login(login)
     if state == 'present':
         has_changed = False
 
-        if target_user is None:
+        if actual_grafana_user is None:
             # create new user
-            target_user = grafana_iface.create_user(name, email, login, password)
+            actual_grafana_user = grafana_iface.create_user(name, email, login, password)
             has_changed = True
 
-        if is_user_update_required(target_user, email, name, login, is_admin):
+        if is_user_update_required(actual_grafana_user, email, name, login, is_admin):
             # update found user
-            target_user_id = target_user.get("id")
-            if is_admin != target_user.get("isGrafanaAdmin"):
-                grafana_iface.update_user_permissions(target_user_id, is_admin)
-            user = grafana_iface.update_user(target_user_id, email, name, login)
+            actual_grafana_user_id = actual_grafana_user.get("id")
+            if is_admin != actual_grafana_user.get("isGrafanaAdmin"):
+                grafana_iface.update_user_permissions(actual_grafana_user_id, is_admin)
+            user = grafana_iface.update_user(actual_grafana_user_id, email, name, login)
             module.exit_json(changed=True, user=user)
 
-        module.exit_json(changed=has_changed, user=target_user)
+        module.exit_json(changed=has_changed, user=actual_grafana_user)
 
     elif state == 'absent':
-        if target_user is None:
+        if actual_grafana_user is None:
             module.exit_json(message="No user found, nothing to do")
-        result = grafana_iface.delete_user(target_user.get("id"))
+        result = grafana_iface.delete_user(actual_grafana_user.get("id"))
         module.exit_json(changed=True, message=result.get("message"))
 
 
