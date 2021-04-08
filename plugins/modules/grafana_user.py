@@ -284,8 +284,8 @@ def main():
             actual_grafana_user_id = actual_grafana_user.get("id")
             if is_admin != actual_grafana_user.get("isGrafanaAdmin"):
                 grafana_iface.update_user_permissions(actual_grafana_user_id, is_admin)
-            user = grafana_iface.update_user(actual_grafana_user_id, email, name, login)
-            module.exit_json(changed=True, user=user)
+            actual_grafana_user = grafana_iface.update_user(actual_grafana_user_id, email, name, login)
+            has_changed = True
 
         module.exit_json(changed=has_changed, user=actual_grafana_user)
 
