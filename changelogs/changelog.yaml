@@ -70,3 +70,10 @@ releases:
     fragments:
     - 1.2.0.yml
     release_date: '2021-02-15'
+  1.2.1:
+    changes:
+      bugfixes:
+      - Fix issue with grafana_user that failed to create admin user (#142)
+    fragments:
+    - 1.2.1.yml
+    release_date: '2021-04-11'

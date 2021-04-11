@@ -5,6 +5,14 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.2.1
+======
+
+Bugfixes
+--------
+
+- Fix issue with grafana_user that failed to create admin user (#142)
+
 v1.2.0
 ======
 
