@@ -130,6 +130,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "vnea",
+      "name": "Victor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10775422?v=4",
+      "profile": "https://github.com/vnea",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
