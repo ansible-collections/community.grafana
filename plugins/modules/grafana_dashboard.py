@@ -378,7 +378,7 @@ def grafana_create_dashboard(module, data):
             else:
                 body = json.loads(info['body'])
                 raise GrafanaAPIException('Unable to update the dashboard %s : %s (HTTP: %d)' %
-                                          (uid, body['commit_message'], info['status']))
+                                          (uid, body['message'], info['status']))
         else:
             # unchanged
             result['uid'] = uid
