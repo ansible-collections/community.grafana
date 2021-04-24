@@ -1,0 +1,4 @@
+bugfixes:
+- grafana_dashboard now explicitely fails if the folder doesn't exist upon creation.
+  It would previously silently pass but not create the dashboard.
+  (https://github.com/ansible-collections/community.grafana/issues/153)

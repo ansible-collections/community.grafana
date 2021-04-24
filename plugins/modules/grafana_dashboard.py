@@ -340,10 +340,7 @@ def grafana_create_dashboard(module, data):
     if grafana_version >= 5:
         folder_exists, folder_id = grafana_folder_exists(module, data['grafana_url'], data['folder'], headers)
         if folder_exists is False:
-            result['msg'] = "Dashboard folder '%s' does not exist." % data['folder']
-            result['uid'] = uid
-            result['changed'] = False
-            return result
+            raise GrafanaAPIException("Dashboard folder '%s' does not exist." % data['folder'])
 
         payload['folderId'] = folder_id
 
@@ -385,10 +382,6 @@ def grafana_create_dashboard(module, data):
             result['msg'] = "Dashboard %s unchanged." % payload['dashboard']['title']
             result['changed'] = False
     else:
-        # create
-        if folder_exists is True:
-            payload['folderId'] = folder_id
-
         # Ensure there is no id in payload
         if 'id' in payload['dashboard']:
             del payload['dashboard']['id']
