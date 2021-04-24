@@ -18,14 +18,14 @@ Click on the name of a plugin or module to view that content's documentation:
   - **Filter Plugins**:
   - **Inventory Source**:
   - **Callback Plugins**:
-    - [grafana_annotations](https://docs.ansible.com/ansible/latest/plugins/callback/grafana_annotations.html)
+    - [grafana_annotations](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_annotations_callback.html)
   - **Lookup Plugins**:
-    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/plugins/lookup/grafana_dashboard.html)
+    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_lookup.html)
   - **Modules**:
-    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/modules/grafana_dashboard_module.html)
-    - [grafana_datasource](https://docs.ansible.com/ansible/latest/modules/grafana_datasource_module.html)
+    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html)
+    - [grafana_datasource](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html)
     - [grafana_folder](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html)
-    - [grafana_plugin](https://docs.ansible.com/ansible/latest/modules/grafana_plugin_module.html)
+    - [grafana_plugin](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_plugin_module.html)
     - [grafana_team](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
     - [grafana_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)
 
