@@ -24,10 +24,10 @@ Click on the name of a plugin or module to view that content's documentation:
   - **Modules**:
     - [grafana_dashboard](https://docs.ansible.com/ansible/latest/modules/grafana_dashboard_module.html)
     - [grafana_datasource](https://docs.ansible.com/ansible/latest/modules/grafana_datasource_module.html)
-    - grafana_folder
+    - [grafana_folder](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html)
     - [grafana_plugin](https://docs.ansible.com/ansible/latest/modules/grafana_plugin_module.html)
-    - grafana_team
-    - grafana_user
+    - [grafana_team](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
+    - [grafana_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)
 
 ## Supported Grafana versions
 
