@@ -239,7 +239,12 @@ def grafana_dashboard_exists(module, grafana_url, uid, headers):
     return dashboard_exists, dashboard
 
 
-def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
+def grafana_dashboard_search(module, grafana_url, folder_id, uid, title, headers):
+    # XXX: there is no easy way of getting the folderId from the dashboard via
+    #      the grafana API, so we hack around this using a search, and, if we
+    #      can't find it in the requested folder, we will not populate the
+    #      entry.
+    #      See https://github.com/grafana/grafana/issues/12491
 
     # search by title
     uri = '%s/api/search?%s' % (grafana_url, urlencode({
@@ -253,8 +258,20 @@ def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
         try:
             dashboards = json.loads(r.read())
             for d in dashboards:
-                if d['title'] == title:
-                    return grafana_dashboard_exists(module, grafana_url, d['uid'], headers)
+                # Always check by uid if we have one, otherwise by title
+                if (uid is not None and d['uid'] == uid) or (uid is None and d['title'] == title):
+                    dashboard_exists, dashboard = grafana_dashboard_exists(
+                        module, grafana_url, d['uid'], headers)
+                    # Augment the result with the folder ID, which is not
+                    # returned by the API.
+                    dashboard["folderId"] = folder_id
+                    return dashboard_exists, dashboard
+
+            # We haven't found the dashboard in this folder. Maybe in another?
+            # In which case, we can't know what folder we are in, and thus the
+            # field will not be populated.
+            if uid is not None:
+                return grafana_dashboard_exists(module, grafana_url, uid, headers)
         except Exception as e:
             raise GrafanaAPIException(e)
     else:
@@ -276,10 +293,6 @@ def grafana_dashboard_changed(payload, dashboard):
         del(dashboard['meta'])
     if 'meta' in payload:
         del(payload['meta'])
-
-    # if folderId is not provided in dashboard, set default folderId
-    if 'folderId' not in dashboard:
-        dashboard['folderId'] = 0
 
     # Ignore dashboard ids since real identifier is uuid
     if 'id' in dashboard['dashboard']:
@@ -348,12 +361,10 @@ def grafana_create_dashboard(module, data):
         payload['folderId'] = folder_id
 
     # test if dashboard already exists
-    if uid:
-        dashboard_exists, dashboard = grafana_dashboard_exists(
-            module, data['grafana_url'], uid, headers=headers)
-    else:
-        dashboard_exists, dashboard = grafana_dashboard_search(
-            module, data['grafana_url'], folder_id, payload['dashboard']['title'], headers=headers)
+    # We always search the folder, even if there is a uid given, otherwise we
+    # can't know if we were in the right folder.
+    dashboard_exists, dashboard = grafana_dashboard_search(
+        module, data['grafana_url'], folder_id, uid, payload['dashboard']['title'], headers=headers)
 
     if dashboard_exists is True:
         if grafana_dashboard_changed(payload, dashboard):
