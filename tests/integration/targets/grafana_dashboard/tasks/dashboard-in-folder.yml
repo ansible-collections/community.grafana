@@ -1,0 +1,80 @@
+---
+- debug: msg="{{ lookup('file', '/tmp/dashboard.json') }}"
+
+- name: Dump the dashboard to a file
+  copy:
+    content: "{{ lookup('file', 'files/dashboard.json') | from_json | combine({'title': 'in-folder', 'uid': 'dashboard-in-folder'}) | to_nice_json(indent=2) }}"
+    dest: "/tmp/dashboard.json"
+
+- debug: msg="{{ lookup('file', '/tmp/dashboard.json') }}"
+
+- name: Create a Folder
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "my/folder"
+      state: present
+
+
+- name: Check import grafana dashboard in a custom folder
+  grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    path: /tmp/dashboard.json
+    folder: my/folder
+    overwrite: true
+  register: result
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.msg == 'Dashboard in-folder created'"
+
+- name: Check import grafana dashboard in a custom folder idempotency
+  grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    path: /tmp/dashboard.json
+    folder: my/folder
+    overwrite: true
+  register: result
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.msg == 'Dashboard in-folder unchanged.'"
+
+- name: Check we can move the dashboard in a different folder
+  grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    path: /tmp/dashboard.json
+    folder: General
+    overwrite: true
+  register: result
+
+- debug:
+    var: result
+
+- assert:
+    that:
+      # FIXME: would be great to be able to check that just the folder has changed
+      - "result.changed == true"
+      - "result.msg == 'Dashboard in-folder updated'"
+      - "result.uid == 'dashboard-in-folder'"
