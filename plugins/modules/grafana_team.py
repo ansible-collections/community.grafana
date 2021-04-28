@@ -173,6 +173,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible.module_utils._text import to_text
 import ansible_collections.community.grafana.plugins.module_utils.base as base
+from ansible.module_utils.six.moves.urllib.parse import quote
 
 __metaclass__ = type
 
@@ -238,7 +239,7 @@ class GrafanaTeamInterface(object):
         return response
 
     def get_team(self, name):
-        url = "/api/teams/search?name={team}".format(team=name)
+        url = "/api/teams/search?name={team}".format(team=quote(name))
         response = self._send_request(url, headers=self.headers, method="GET")
         if not response.get("totalCount") <= 1:
             raise AssertionError("Expected 1 team, got %d" % response["totalCount"])
