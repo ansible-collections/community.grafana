@@ -128,7 +128,7 @@ See [antsibull-changelog documentation](https://github.com/ansible-community/ant
 
 ## More Information
 
-For more information about Ansible's Grafana integration, join the `#ansible-community` channel on Freenode IRC, and browse the resources in the [Grafana Working Group](https://github.com/ansible/community/wiki/Grafana) Community wiki page.
+For more information about Ansible's Grafana integration, join the `#ansible-community` channel on [irc.libera.chat](https://libera.chat/), and browse the resources in the [Grafana Working Group](https://github.com/ansible/community/wiki/Grafana) Community wiki page.
 
 ## License
 
