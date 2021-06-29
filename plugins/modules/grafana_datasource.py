@@ -659,6 +659,7 @@ def main():
                               'cloudwatch',
                               'alexanderzobnin-zabbix-datasource',
                               'camptocamp-prometheus-alertmanager-datasource',
+                              'vertamedia-clickhouse-datasource',
                               'sni-thruk-datasource',
                               'loki'], required=True),
         ds_url=dict(required=True, type='str'),
