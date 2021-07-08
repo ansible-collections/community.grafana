@@ -1,7 +1,7 @@
 ---
 # datasource.0 = grafana_datasource attribute
 - name: add datasource
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password:  "{{ grafana_password }}"
