@@ -1,0 +1,15 @@
+---
+# datasource.0 = grafana_datasource attribute
+- name: add datasource
+  grafana_datasource:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password:  "{{ grafana_password }}"
+    name: "{{ datasource.0.name }}"
+    ds_type: "{{ datasource.0.ds_type }}"
+    ds_url: "{{ datasource.0.ds_url }}"
+    tls_skip_verify: "{{ datasource.0.tls_skip_verify }}"
+  loop: "{{ grafana_datasource|subelements('datasource') }}"
+  loop_control:
+    loop_var: datasource
+  tags: datasource

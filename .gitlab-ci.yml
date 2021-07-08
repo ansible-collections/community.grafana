@@ -1,0 +1,19 @@
+---
+stages:
+  - linting
+
+include:
+  - project: 'shared/gitlab/linting'
+    ref: master
+    file:
+      - markdown.yml
+      - ansible.yml
+
+# the linting stages from the above include need the docker-tag
+# to run on the correct runner
+markdown:
+  tags:
+    - docker
+ansible:
+  tags:
+    - docker

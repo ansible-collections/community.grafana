@@ -1,0 +1,10 @@
+---
+- name: grafana datasource configuration
+  include_tasks: grafana_datasource.yml
+  when: grafana_datasource is defined
+  tags: datasource
+
+- name: grafana folder configuration
+  include_tasks: grafana_folder.yml
+  when: grafana_folder is defined
+  tags: folder
