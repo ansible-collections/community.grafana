@@ -39,6 +39,7 @@ options:
     - sni-thruk-datasource
     - camptocamp-prometheus-alertmanager-datasource
     - loki
+    - redis-datasource
     type: str
   ds_url:
     description:
@@ -660,6 +661,7 @@ def main():
                               'alexanderzobnin-zabbix-datasource',
                               'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
+                              'redis-datasource',
                               'loki'], required=True),
         ds_url=dict(required=True, type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
