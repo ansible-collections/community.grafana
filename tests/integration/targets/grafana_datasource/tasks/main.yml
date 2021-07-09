@@ -8,5 +8,6 @@
   - include: thruk.yml
   - include: loki.yml
   - include: zabbix.yml
+  - include: redis.yml
 
 ...
