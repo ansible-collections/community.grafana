@@ -72,7 +72,7 @@
     - result.datasource.name == 'datasource-redis'
     - result.datasource.orgId == 1
     - result.datasource.type == 'redis-datasource'
-    - result.datasource.url == 'https://redis.company.com:6379'
+    - result.datasource.url == 'https://redisnew.company.com:6379'
 
 - name: Delete redis-datasource datasource  
   register: result
