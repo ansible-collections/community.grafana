@@ -58,7 +58,8 @@
     grafana_password: "{{ grafana_password }}"
     org_id: '1'
     ds_type: redis-datasource
-    ds_url: https://redis.company.com:6379
+    ds_url: https://redisnew.company.com:6379
+    time_interval: 1m
 
 - debug:
     var: result
