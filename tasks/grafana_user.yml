@@ -1,0 +1,16 @@
+---
+- name: manage user
+  community.grafana.grafana_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password:  "{{ grafana_password }}"
+    name: "{{ user }}"
+    email: "{{ user.email| default(omit) }}"
+    login: "{{ user.login }}"
+    password: "{{ user.password | default(omit) }}"
+    is_admin: "{{ user.is_admin | default(omit) }}"
+    state: "{{ user.state | default(omit) }}"
+  loop: "{{ grafana_user }}"
+  loop_control:
+    loop_var: user
+  tags: user
