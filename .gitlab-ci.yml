@@ -1,6 +1,8 @@
 ---
 stages:
   - linting
+  - gitlab_release_information
+  - gitlab_release_build
 
 include:
   - project: 'shared/gitlab/linting'
@@ -8,10 +10,15 @@ include:
     file:
       - markdown.yml
       - ansible.yml
+  - project: 'shared/gitlab/gitlab_generator'
+    ref: master
+    file:
+      - gitlab_release.yml
 
 # the linting stages from the above include need the docker-tag
 # to run on the correct runner
 markdown:
+  allow_failure: true
   tags:
     - docker
 ansible:
