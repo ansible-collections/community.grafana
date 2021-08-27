@@ -14,7 +14,7 @@
     dashboard_id: "{{ dashboard.0.dashboard_id | default(omit) }}"
     dashboard_revision: "{{ dashboard.0.dashboard_revision | default(omit) }}"
     commit_message: "{{ dashboard.0.commit_message | default(omit) }}"
-  loop: "{{ grafana_dashboard |subelements('dashboard_object') }}"
+  loop: "{{ grafana_dashboards |subelements('dashboard_object') }}"
   loop_control:
     loop_var: dashboard
   tags: dashboard
