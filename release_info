@@ -1,0 +1,4 @@
+RELEASE_URL=https://git.mms-support.de/1052/jobs/297225
+RELEASE_DESC="x86_64 GNU/Linux binary"
+RELEASE_SHA=a6eefe5166a8e43182bde19ef824c0589c96a4f0
+RELEASE_VERSION=0.0.1
