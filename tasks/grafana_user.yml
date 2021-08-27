@@ -10,7 +10,7 @@
     password: "{{ user.password | default(omit) }}"
     is_admin: "{{ user.is_admin | default(omit) }}"
     state: "{{ user.state | default(omit) }}"
-  loop: "{{ grafana_user }}"
+  loop: "{{ grafana_users }}"
   loop_control:
     loop_var: user
   tags: user

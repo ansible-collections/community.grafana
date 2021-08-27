@@ -10,7 +10,7 @@
     state: "{{ team.0.state | default(omit) }}"
     enforce_members: "{{ team.0.enforce_members | default(omit) }}"
     skip_version_check: "{{ team.0.skip_version_check | default(omit) }}"
-  loop: "{{ grafana_team|subelements('team_object') }}"
+  loop: "{{ grafana_teams|subelements('team_object') }}"
   loop_control:
     loop_var: team
   tags: team

@@ -1,25 +1,25 @@
 ---
 - name: grafana user configuration
   include_tasks: grafana_user.yml
-  when: grafana_user is defined
+  when: grafana_users is defined
   tags: user
 
 - name: grafana team configuration
   include_tasks: grafana_team.yml
-  when: grafana_team is defined
+  when: grafana_teams is defined
   tags: team
 
 - name: grafana datasource configuration
   include_tasks: grafana_datasource.yml
-  when: grafana_datasource is defined
+  when: grafana_datasources is defined
   tags: datasource
 
 - name: grafana folder configuration
   include_tasks: grafana_folder.yml
-  when: grafana_folder is defined
+  when: grafana_folders is defined
   tags: folder
 
 - name: grafana dashboard configuration
   include_tasks: grafana_dashboard.yml
-  when: grafana_dashboard is defined
+  when: grafana_dashboards is defined
   tags: dashboard

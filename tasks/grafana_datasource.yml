@@ -18,7 +18,7 @@
     password: "{{ datasource.password | default(omit) }}"
     additional_json_data: "{{ datasource.additional_json_data | default(omit) }}"
     additional_secure_json_data: "{{ datasource.additional_secure_json_data | default(omit) }}"
-  loop: "{{ grafana_datasource }}"
+  loop: "{{ grafana_datasources }}"
   loop_control:
     loop_var: datasource
   tags: datasource
