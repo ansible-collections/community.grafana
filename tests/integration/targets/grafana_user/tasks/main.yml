@@ -199,4 +199,4 @@
   register: result
 - assert:
     that:
-      - "result.json.message == 'User not found'"
+      - "result.json.message | lower == 'user not found'"
