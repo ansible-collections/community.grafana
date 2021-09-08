@@ -456,10 +456,12 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
-import ansible_collections.community.grafana.plugins.module_utils.base as base
+from ansible_collections.community.grafana.plugins.module_utils import base
 
 
 def compare_datasources(new, current, compareSecureData=True):
+    if 'uid' in current:
+        del current['uid']
     del current['typeLogoUrl']
     del current['id']
     if 'version' in current:

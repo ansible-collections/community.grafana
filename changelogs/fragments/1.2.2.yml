@@ -4,3 +4,4 @@ bugfixes:
   (https://github.com/ansible-collections/community.grafana/issues/153)
 - grafana_team now able to handle spaces and other utf-8 chars in the name parameter.
   (https://github.com/ansible-collections/community.grafana/issues/164)
+- Fix an issue with datasource uid now returned by the Grafana API (#176)
