@@ -77,3 +77,20 @@ releases:
     fragments:
     - 1.2.1.yml
     release_date: '2021-04-11'
+  1.2.2:
+    changes:
+      bugfixes:
+      - Fix an issue with datasource uid now returned by the Grafana API (#176)
+      - grafana_dashboard lookup - All valid API keys can be used, not just keys ending
+        in '=='.
+      - grafana_dashboard now explicitely fails if the folder doesn't exist upon creation.
+        It would previously silently pass but not create the dashboard. (https://github.com/ansible-collections/community.grafana/issues/153)
+      - grafana_team now able to handle spaces and other utf-8 chars in the name parameter.
+        (https://github.com/ansible-collections/community.grafana/issues/164)
+      deprecated_features:
+      - grafana_dashboard lookup - Providing a mangled version of the API key is no
+        longer preferred.
+    fragments:
+    - 1.2.2.yml
+    - 158-grafana_dashboard-lookup-api-key.yml
+    release_date: '2021-09-08'

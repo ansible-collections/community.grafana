@@ -5,6 +5,22 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.2.2
+======
+
+Deprecated Features
+-------------------
+
+- grafana_dashboard lookup - Providing a mangled version of the API key is no longer preferred.
+
+Bugfixes
+--------
+
+- Fix an issue with datasource uid now returned by the Grafana API (#176)
+- grafana_dashboard lookup - All valid API keys can be used, not just keys ending in '=='.
+- grafana_dashboard now explicitely fails if the folder doesn't exist upon creation. It would previously silently pass but not create the dashboard. (https://github.com/ansible-collections/community.grafana/issues/153)
+- grafana_team now able to handle spaces and other utf-8 chars in the name parameter. (https://github.com/ansible-collections/community.grafana/issues/164)
+
 v1.2.1
 ======
 
