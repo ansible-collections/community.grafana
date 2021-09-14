@@ -187,7 +187,7 @@ class GrafanaFolderInterface(object):
         else:
             self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
         # }}}
-        self.grafana_url = module.params.get("url")
+        self.grafana_url = base.clean_url(module.params.get("url"))
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()

@@ -1,6 +1,6 @@
 - name: Create John Doe for tests purpose through uri module
   uri:
-    url: "{{ grafana_url }}/api/admin/users"
+    url: "{{ grafana_url }}api/admin/users"
     method: POST
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
@@ -15,7 +15,7 @@
 
 - name: Create Jane Doe for tests purpose through uri module
   uri:
-    url: "{{ grafana_url }}/api/admin/users"
+    url: "{{ grafana_url }}api/admin/users"
     method: POST
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
