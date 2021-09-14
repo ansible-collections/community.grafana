@@ -94,3 +94,11 @@ releases:
     - 1.2.2.yml
     - 158-grafana_dashboard-lookup-api-key.yml
     release_date: '2021-09-08'
+  1.2.3:
+    changes:
+      bugfixes:
+      - Fix issue with trailing '/' in provided grafana_url. The modules now support
+        values with trailing slashes.
+    fragments:
+    - 1.2.3.yml
+    release_date: '2021-09-14'

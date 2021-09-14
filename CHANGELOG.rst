@@ -5,6 +5,14 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.2.3
+======
+
+Bugfixes
+--------
+
+- Fix issue with trailing '/' in provided grafana_url. The modules now support values with trailing slashes.
+
 v1.2.2
 ======
 

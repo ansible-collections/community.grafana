@@ -40,7 +40,7 @@
 
 - name: Check user creation with Grafana API
   uri:
-    url: "{{ grafana_url }}/api/users/lookup?loginOrEmail=harley"
+    url: "{{ grafana_url }}api/users/lookup?loginOrEmail=harley"
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
     force_basic_auth: yes
@@ -109,7 +109,7 @@
 
 - name: Check user creation with Grafana API
   uri:
-    url: "{{ grafana_url }}/api/users/lookup?loginOrEmail=batman"
+    url: "{{ grafana_url }}api/users/lookup?loginOrEmail=batman"
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
     force_basic_auth: yes
@@ -145,7 +145,7 @@
 
 - name: Check user update with Grafana API
   uri:
-    url: "{{ grafana_url }}/api/users/lookup?loginOrEmail=batman"
+    url: "{{ grafana_url }}api/users/lookup?loginOrEmail=batman"
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
     force_basic_auth: yes
@@ -188,7 +188,7 @@
 
 - name: Check user deletion with Grafana API (expect 404 Not Found)
   uri:
-    url: "{{ grafana_url }}/api/users/lookup?loginOrEmail=batman"
+    url: "{{ grafana_url }}api/users/lookup?loginOrEmail=batman"
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
     force_basic_auth: yes
