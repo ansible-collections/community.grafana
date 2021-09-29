@@ -72,7 +72,7 @@ jobs:
     steps:
 
       - name: Install requirements on alpine
-        run: apk add bash git gcc python3-dev libc-dev libffi-dev openssl-dev rust cargo
+        run: apk add bash git gcc python3-dev libc-dev libffi-dev openssl-dev rust cargo openssh-keygen
 
       - name: Check out code
         uses: actions/checkout@v1
