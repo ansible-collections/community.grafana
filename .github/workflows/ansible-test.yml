@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ["3.6"]
+        python_version: ["3.8"]
         ansible_version: ["stable-2.10", "stable-2.11", "devel"]
     steps:
 
