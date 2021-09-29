@@ -79,9 +79,6 @@ jobs:
         with:
           path: ansible_collections/community/grafana
 
-      - name: Install deps
-        run: pip install coverage
-
       - name: Install ansible
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
