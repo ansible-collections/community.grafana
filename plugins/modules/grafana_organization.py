@@ -121,7 +121,8 @@ class GrafanaUserInterface(object):
             headers = []
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)  
+        
         status_code = info["status"]
         if status_code == 404:
             return None
@@ -131,7 +132,11 @@ class GrafanaUserInterface(object):
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 200:
             return self._module.from_json(resp.read())
-        self._module.fail_json(failed=True, msg="Grafana Org API answered with HTTP %d" % status_code, body=self._module.from_json(resp.read()))
+        
+        if resp is None:
+            self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'] , status=status_code, url=info['url'])
+        else:
+            self._module.fail_json(failed=True, msg="Grafana Org API answered with HTTP %d" % status_code, body=self._module.from_json(resp.read()))
 
     def get_actual_org(self, name):
         # https://grafana.com/docs/grafana/latest/http_api/org/#get-organization-by-name
@@ -146,7 +151,7 @@ class GrafanaUserInterface(object):
         return self.get_actual_org(name)
 
     def delete_org(self, org_id):
-        #https://grafana.com/docs/http_api/org/#delete-organization
+        # https://grafana.com/docs/http_api/org/#delete-organization
         url = "/api/orgs/{org_id}".format(org_id=org_id)
         return self._send_request(url, headers=self.headers, method="DELETE")
 
