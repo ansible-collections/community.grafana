@@ -134,12 +134,12 @@ class GrafanaUserInterface(object):
         self._module.fail_json(failed=True, msg="Grafana Org API answered with HTTP %d" % status_code, body=self._module.from_json(resp.read()))
 
     def get_actual_org(self, name):
-        # hhttps://grafana.com/docs/http_api/org/#create-organization
+        # https://grafana.com/docs/grafana/latest/http_api/org/#get-organization-by-name
         url = "/api/orgs/name/{name}".format(name=name)
         return self._send_request(url, headers=self.headers, method="GET")
 
     def create_org(self, name):
-        # hhttps://grafana.com/docs/http_api/org/#create-organization
+        # https://grafana.com/docs/http_api/org/#create-organization
         url = "/api/orgs"
         org = dict(name=name)
         self._send_request(url, data=org, headers=self.headers, method="POST")
