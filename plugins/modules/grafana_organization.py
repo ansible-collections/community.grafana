@@ -177,7 +177,7 @@ def main():
     state = module.params['state']
     name = module.params['name']
 
-    grafana_iface = GrafanaUserInterface(module)
+    grafana_iface = GrafanaOrgInterface(module)
 
     # search org by name
     actual_org = grafana_iface.get_actual_org(name)
