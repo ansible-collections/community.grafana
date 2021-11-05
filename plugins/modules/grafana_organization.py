@@ -198,7 +198,7 @@ def main():
             module.exit_json(msg="No org found, nothing to do")
         # delete org
         result = grafana_iface.delete_org(actual_org.get("id"))
-        module.exit_json(changed=True, msg=result.get("message"), org=actual_org)
+        module.exit_json(changed=True, msg=result.get("message"))
 
 
 if __name__ == '__main__':
