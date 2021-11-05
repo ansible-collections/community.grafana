@@ -188,7 +188,7 @@ def main():
             # create new org
             actual_org = grafana_iface.create_org(name)
             has_changed = True
-            module.exit_json(changed=has_changed,msg='Organization %s created.' % name, org=actual_org)
+            module.exit_json(changed=has_changed, msg='Organization %s created.' % name, org=actual_org)
         else:
             module.exit_json(changed=has_changed,msg='Organization %s already created.' % name, org=actual_org)
 
