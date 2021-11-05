@@ -191,7 +191,7 @@ def main():
             has_changed = True
             module.exit_json(changed=has_changed, msg='Organization %s created.' % name, org=actual_org)
         else:
-            module.exit_json(changed=has_changed,msg='Organization %s already created.' % name, org=actual_org)
+            module.exit_json(changed=has_changed, msg='Organization %s already created.' % name, org=actual_org)
 
     elif state == 'absent':
         if actual_org is None:
