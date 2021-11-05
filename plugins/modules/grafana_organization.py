@@ -104,7 +104,7 @@ from ansible_collections.community.grafana.plugins.module_utils import base
 __metaclass__ = type
 
 
-class GrafanaUserInterface(object):
+class GrafanaOrgInterface(object):
 
     def __init__(self, module):
         self._module = module
