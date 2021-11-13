@@ -132,7 +132,6 @@ class GrafanaOrgInterface(object):
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 200:
             return self._module.from_json(resp.read())
-        
         if resp is None:
             self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'], status=status_code, url=info['url'])
         else:
