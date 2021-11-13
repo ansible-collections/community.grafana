@@ -135,7 +135,7 @@ class GrafanaOrgInterface(object):
             return self._module.from_json(resp.read())
         
         if resp is None:
-            self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'] , status=status_code, url=info['url'])
+            self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'], status=status_code, url=info['url'])
         else:
             self._module.fail_json(failed=True, msg="Grafana Org API answered with HTTP %d" % status_code, body=self._module.from_json(resp.read()))
 
