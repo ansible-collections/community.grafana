@@ -23,7 +23,7 @@ DOCUMENTATION = '''
 ---
 module: grafana_organization
 author:
-  - @paytroff (@paytroff)
+  - paytroff (@paytroff)
 version_added: "1.3.0"
 short_description: Manage Grafana Organization
 description:
