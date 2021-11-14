@@ -122,7 +122,7 @@ class GrafanaOrgInterface(object):
             headers = []
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method) 
+        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
         status_code = info["status"]
         if status_code == 404:
             return None
