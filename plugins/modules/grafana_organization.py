@@ -88,12 +88,12 @@ org:
             returned: always
             type: dict
             sample:
-                "address1": "",
-                "address2": "",
-                "city": "",
-                "country": "",
-                "state": "",
-                "zipCode": ""
+                address1: ""
+                address2: ""
+                city: ""
+                country: ""
+                state: ""
+                zipCode: ""
 '''
 
 import json
