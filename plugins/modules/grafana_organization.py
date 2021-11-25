@@ -23,7 +23,7 @@ DOCUMENTATION = '''
 ---
 module: grafana_organization
 author:
-  - @paytroff
+  - paytroff (@paytroff)
 version_added: "1.3.0"
 short_description: Manage Grafana Organization
 description:
@@ -33,7 +33,7 @@ options:
   name:
     description:
       - The name of the Grafana Organization.
-    required: false
+    required: true
     type: str
   state:
     description:
@@ -88,12 +88,12 @@ org:
             returned: always
             type: dict
             sample:
-                "address1": "",
-                "address2": "",
-                "city": "",
-                "country": "",
-                "state": "",
-                "zipCode": ""
+                address1: ""
+                address2: ""
+                city: ""
+                country: ""
+                state: ""
+                zipCode: ""
 '''
 
 import json
@@ -122,8 +122,8 @@ class GrafanaOrgInterface(object):
             headers = []
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)  
-        
+        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+
         status_code = info["status"]
         if status_code == 404:
             return None
@@ -133,9 +133,9 @@ class GrafanaOrgInterface(object):
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 200:
             return self._module.from_json(resp.read())
-        
+
         if resp is None:
-            self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'] , status=status_code, url=info['url'])
+            self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'], status=status_code, url=info['url'])
         else:
             self._module.fail_json(failed=True, msg="Grafana Org API answered with HTTP %d" % status_code, body=self._module.from_json(resp.read()))
 
@@ -171,6 +171,7 @@ argument_spec.update(
     state=dict(choices=['present', 'absent'], default='present'),
     name=dict(type='str', required=True),
 )
+argument_spec.pop('grafana_api_key')
 
 
 def main():
