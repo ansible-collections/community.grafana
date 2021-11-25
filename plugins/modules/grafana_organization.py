@@ -33,11 +33,7 @@ options:
   name:
     description:
       - The name of the Grafana Organization.
-<<<<<<< HEAD
-    required: false
-=======
     required: true
->>>>>>> @{-1}
     type: str
   state:
     description:
@@ -127,10 +123,6 @@ class GrafanaOrgInterface(object):
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
         resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
-<<<<<<< HEAD
-=======
-
->>>>>>> @{-1}
         status_code = info["status"]
         if status_code == 404:
             return None
@@ -140,10 +132,6 @@ class GrafanaOrgInterface(object):
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 200:
             return self._module.from_json(resp.read())
-<<<<<<< HEAD
-=======
-
->>>>>>> @{-1}
         if resp is None:
             self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'], status=status_code, url=info['url'])
         else:
@@ -175,16 +163,11 @@ def setup_module_object():
     )
     return module
 
-
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     state=dict(choices=['present', 'absent'], default='present'),
     name=dict(type='str', required=True),
 )
-<<<<<<< HEAD
-=======
-argument_spec.pop('grafana_api_key')
->>>>>>> @{-1}
 
 
 def main():
