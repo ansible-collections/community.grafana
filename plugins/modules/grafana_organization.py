@@ -171,6 +171,7 @@ argument_spec.update(
 )
 argument_spec.pop('grafana_api_key')
 
+
 def main():
     module = setup_module_object()
     state = module.params['state']
