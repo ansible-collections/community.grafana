@@ -140,6 +140,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "paytroff",
+      "name": "paytroff",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93038288?v=4",
+      "profile": "https://github.com/paytroff",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
