@@ -168,7 +168,7 @@ argument_spec.update(
     state=dict(choices=['present', 'absent'], default='present'),
     name=dict(type='str', required=True),
 )
-
+argument_spec.pop('grafana_api_key')
 
 def main():
     module = setup_module_object()
