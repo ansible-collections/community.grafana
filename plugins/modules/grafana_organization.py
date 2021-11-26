@@ -163,6 +163,7 @@ def setup_module_object():
     )
     return module
 
+
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     state=dict(choices=['present', 'absent'], default='present'),
