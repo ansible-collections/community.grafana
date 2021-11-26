@@ -244,13 +244,11 @@ options:
   pushover_alert_sound:
     type: str
     description:
-      - Alert sound in Pushover.
-      - L(https://pushover.net/api#sounds)
+      - L(Alert sound in Pushover,https://pushover.net/api#sounds)
   pushover_ok_sound:
     type: str
     description:
-      - OK sound in Pushover.
-      - L(https://pushover.net/api#sounds)
+      - L(OK sound in Pushover,https://pushover.net/api#sounds)
   sensu_url:
     type: str
     description:
