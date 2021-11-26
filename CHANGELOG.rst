@@ -5,6 +5,19 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.3.0
+======
+
+Bugfixes
+--------
+
+- Fix issue with datasource names that could not contain slashes (#125)
+
+New Modules
+-----------
+
+- community.grafana.grafana_organization - Manage Grafana Organization
+
 v1.2.3
 ======
 

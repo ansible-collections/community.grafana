@@ -102,3 +102,15 @@ releases:
     fragments:
     - 1.2.3.yml
     release_date: '2021-09-14'
+  1.3.0:
+    changes:
+      bugfixes:
+      - Fix issue with datasource names that could not contain slashes (#125)
+    fragments:
+    - 0-copy_ignore_txt.yml
+    - fix_slashes_in_datasources.yml
+    modules:
+    - description: Manage Grafana Organization
+      name: grafana_organization
+      namespace: ''
+    release_date: '2021-11-26'
