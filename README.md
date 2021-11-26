@@ -3,7 +3,7 @@
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)](https://codecov.io/gh/ansible-collections/community.grafana)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END --> 
 
 This repo hosts the `community.grafana` Ansible Collection.
@@ -167,6 +167,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/CWollinger"><img src="https://avatars2.githubusercontent.com/u/11299733?v=4?s=100" width="100px;" alt=""/><br /><sub><b>cwollinger</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=cwollinger" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Andersson007"><img src="https://avatars3.githubusercontent.com/u/34477873?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrew Klychkov</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=Andersson007" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/vnea"><img src="https://avatars.githubusercontent.com/u/10775422?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victor</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=vnea" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/paytroff"><img src="https://avatars.githubusercontent.com/u/93038288?v=4?s=100" width="100px;" alt=""/><br /><sub><b>paytroff</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=paytroff" title="Code">💻</a> <a href="https://github.com/ansible-collections/community.grafana/commits?author=paytroff" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
