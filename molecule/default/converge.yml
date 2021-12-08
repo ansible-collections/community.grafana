@@ -1,0 +1,37 @@
+---
+- name: Converge
+  hosts: localhost
+  environment:
+    http_proxy: "{{ lookup('env', 'HTTP_PROXY') | default(omit)  }}"
+    https_proxy: "{{ lookup('env', 'HTTPS_PROXY') | default(omit) }}"
+    no_proxy: "{{ lookup('env', 'NO_PROXY') | default(omit) }}"
+  collections:
+    - community.grafana
+  tasks:
+    - name: "Include ansible-role-grafana"
+      include_role:
+        name: "ansible-role-grafana"
+  vars:
+    grafana_url: "http://localhost:3000"
+    grafana_username: "admin"
+    grafana_password: "admin"
+
+    grafana_datasources:
+      - datasource_object:
+        - loki
+        name: "Loki"
+        ds_type: "loki"
+        ds_url: "http://127.0.0.1:3100"
+        tls_skip_verify: yes
+
+    grafana_folders:
+      - folder_object:
+        - my_service
+        - other_service
+
+    grafana_dashboards:
+      - dashboard_object:
+        - dashboard
+        folder: my_service
+        dashboard_uid: "ES5apb27k"
+        path: "test_dashboard.json"
