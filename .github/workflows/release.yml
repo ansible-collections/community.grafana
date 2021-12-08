@@ -1,0 +1,79 @@
+---
+name: New release
+
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  generate_changelog:
+    runs-on: ubuntu-latest
+    name: create release draft
+    steps:
+      - uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@master"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: calculate next version
+        id: version
+        uses: patrickjahns/version-drafter-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate changelog
+        uses: charmixer/auto-changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          future_release: ${{ steps.version.outputs.next-version }}
+          # this excludes all versions prior to the collection-release
+          # since they break the changelog generation with the error:
+          # "No common ancestor between ... and $version"
+          exclude_tags_regex: '[0-6]\.\d\.\d'
+          issue_line_labels: mysql_hardening,os_hardening,ssh_hardening,nginx_hardening
+
+      - name: push changelog
+        uses: github-actions-x/commit@v2.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          push-branch: 'master'
+          commit-message: 'update changelog'
+          force-add: 'true'
+          files: CHANGELOG.md
+          name: dev-sec CI
+          email: hello@dev-sec.io
+
+      # do a second checkout to prevent race situation
+      # changelog gets updated but action works on old commit id
+      - uses: actions/checkout@v2.3.4
+        with:
+          ref: master
+
+      - name: Generate changelog for the release
+        run: |
+          sed '/## \[${{ steps.previoustag.outputs.tag }}\]/Q' CHANGELOG.md > CHANGELOGRELEASE.md
+
+      - name: Read CHANGELOG.md
+        id: package
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./CHANGELOGRELEASE.md
+
+      - name: Create Release draft
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # This token is provided by Actions, you do not need to create your own token
+        with:
+          release_name: ${{ steps.version.outputs.next-version }}
+          tag_name: ${{ steps.version.outputs.next-version }}
+          body: |
+            ${{ steps.package.outputs.content }}
+          draft: true

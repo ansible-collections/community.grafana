@@ -1,4 +1,0 @@
----
-warn_list:
-  - no-log-password
-  - role-name
