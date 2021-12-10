@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  role_name: grafana
+  author: t_systems_mms
+  description: Configure Grafana dashboards, folders, datasources, teams and users
+  license: GPLv3
+  min_ansible_version: 2.9
+  galaxy_tags:
+  - grafana
+  - monitoring
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Fedora
+      versions:
+        - all
+    - name: Amazon
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
