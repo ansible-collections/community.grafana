@@ -2,9 +2,9 @@
 name: Publish to Ansible Galaxy
 
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types:
+      - published
 
 jobs:
   release:
