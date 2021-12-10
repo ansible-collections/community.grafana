@@ -11,9 +11,6 @@ jobs:
     name: ansible galaxy
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v2
-
       - name: galaxy
         uses: robertdebock/galaxy-action@1.1.0
         with:
