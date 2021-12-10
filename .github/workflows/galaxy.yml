@@ -1,5 +1,5 @@
 ---
-name: Release
+name: Publish to Ansible Galaxy
 
 on:
   push:
