@@ -419,28 +419,11 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
 from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, clean_url
+from ansible.module_utils.urls import basic_auth_header
 
 
 class GrafanaAPIException(Exception):
     pass
-
-
-def grafana_switch_organisation(module, grafana_url, org_id, headers):
-    r, info = fetch_url(module, '%s/api/user/using/%s' % (grafana_url, org_id),
-                        headers=headers, method='POST')
-    if info['status'] != 200:
-        raise GrafanaAPIException('Unable to switch to organization %s : %s' %
-                                  (org_id, info))
-
-
-def grafana_headers(module, data):
-    headers = {'content-type': 'application/json; charset=utf8'}
-    if 'grafana_api_key' in data and data['grafana_api_key']:
-        headers['Authorization'] = "Bearer %s" % data['grafana_api_key']
-    else:
-        module.params['force_basic_auth'] = True
-        grafana_switch_organisation(module, data['grafana_url'], data['org_id'], headers)
-    return headers
 
 
 def grafana_notification_channel_payload(data):
@@ -596,82 +579,103 @@ def grafana_notification_channel_payload(data):
     return payload
 
 
-def grafana_create_notification_channel(module, data, headers, payload):
-    r, info = fetch_url(module, '%s/api/alert-notifications' % data['grafana_url'],
-                        data=json.dumps(payload), headers=headers, method='POST')
-    if info['status'] == 200:
-        return {
-            'state': 'present',
-            'changed': True,
-            'channel': json.loads(to_text(r.read())),
-        }
-    else:
-        raise GrafanaAPIException("Unable to create notification channel: %s" % info)
+
+class GrafanaNotificationChannelInterface(object):
+
+    def __init__(self, module):
+        self._module = module
+        # {{{ Authentication header
+        self.headers = {"Content-Type": "application/json"}
+        if module.params.get('grafana_api_key', None):
+            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
+        else:
+            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+        # }}}
+        self.grafana_url = clean_url(module.params.get("url"))
+
+#    def grafana_switch_organisation(self, module, grafana_url, org_id):
+#        r, info = fetch_url(self._module, '%s/api/user/using/%s' % (grafana_url, org_id),
+#                            headers=self.headers, method='POST')
+#        if info['status'] != 200:
+#            raise GrafanaAPIException('Unable to switch to organization %s : %s' %
+#                                      (org_id, info))
 
 
-def grafana_update_notification_channel(module, data, headers, payload, before):
-    r, info = fetch_url(module, '%s/api/alert-notifications/uid/%s' %
-                        (data['grafana_url'], data['uid']),
-                        data=json.dumps(payload), headers=headers, method='PUT')
-    if info['status'] == 200:
-        del before['created']
-        del before['updated']
+    def grafana_create_notification_channel(self, module, data, payload):
+        r, info = fetch_url(self._module, '%s/api/alert-notifications' % data['grafana_url'],
+                            data=json.dumps(payload), headers=self.headers, method='POST')
+        if info['status'] == 200:
+            return {
+                'state': 'present',
+                'changed': True,
+                'channel': json.loads(to_text(r.read())),
+            }
+        else:
+            raise GrafanaAPIException("Unable to create notification channel: %s" % info)
 
-        channel = json.loads(to_text(r.read()))
-        after = channel.copy()
-        del after['created']
-        del after['updated']
 
-        if before == after:
+    def grafana_update_notification_channel(self, module, data, payload, before):
+        r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
+                            (data['grafana_url'], data['uid']),
+                            data=json.dumps(payload), headers=self.headers, method='PUT')
+        if info['status'] == 200:
+            del before['created']
+            del before['updated']
+
+            channel = json.loads(to_text(r.read()))
+            after = channel.copy()
+            del after['created']
+            del after['updated']
+
+            if before == after:
+                return {
+                    'changed': False,
+                    'channel': channel,
+                }
+            else:
+                return {
+                    'changed': True,
+                    'diff': {
+                        'before': before,
+                        'after': after,
+                    },
+                    'channel': channel,
+                }
+        else:
+            raise GrafanaAPIException("Unable to update notification channel %s : %s" %
+                                      (data['uid'], info))
+
+
+    def grafana_create_or_update_notification_channel(self, module, data):
+        payload = grafana_notification_channel_payload(data)
+        r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
+                            (data['grafana_url'], data['uid']), headers=self.headers)
+        if info['status'] == 200:
+            before = json.loads(to_text(r.read()))
+            return self.grafana_update_notification_channel(module, data, payload, before)
+        elif info['status'] == 404:
+            return self.grafana_create_notification_channel(module, data, payload)
+        else:
+            raise GrafanaAPIException("Unable to get notification channel %s : %s" %
+                                      (data['uid'], info))
+
+
+    def grafana_delete_notification_channel(self, module, data):
+        r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
+                            (data['grafana_url'], data['uid']),
+                            headers=self.headers, method='DELETE')
+        if info['status'] == 200:
+            return {
+                'state': 'absent',
+                'changed': True
+            }
+        elif info['status'] == 404:
             return {
                 'changed': False
             }
         else:
-            return {
-                'changed': True,
-                'diff': {
-                    'before': before,
-                    'after': after,
-                },
-                'channel': channel,
-            }
-    else:
-        raise GrafanaAPIException("Unable to update notification channel %s : %s" %
-                                  (data['uid'], info))
-
-
-def grafana_create_or_update_notification_channel(module, data):
-    headers = grafana_headers(module, data)
-    payload = grafana_notification_channel_payload(data)
-    r, info = fetch_url(module, '%s/api/alert-notifications/uid/%s' %
-                        (data['grafana_url'], data['uid']), headers=headers)
-    if info['status'] == 200:
-        before = json.loads(to_text(r.read()))
-        return grafana_update_notification_channel(module, data, headers, payload, before)
-    elif info['status'] == 404:
-        return grafana_create_notification_channel(module, data, headers, payload)
-    else:
-        raise GrafanaAPIException("Unable to get notification channel %s : %s" %
-                                  (data['uid'], info))
-
-
-def grafana_delete_notification_channel(module, data):
-    headers = grafana_headers(module, data)
-    r, info = fetch_url(module, '%s/api/alert-notifications/uid/%s' %
-                        (data['grafana_url'], data['uid']),
-                        headers=headers, method='DELETE')
-    if info['status'] == 200:
-        return {
-            'state': 'absent',
-            'changed': True
-        }
-    elif info['status'] == 404:
-        return {
-            'changed': False
-        }
-    else:
-        raise GrafanaAPIException("Unable to delete notification channel %s : %s" %
-                                  (data['uid'], info))
+            raise GrafanaAPIException("Unable to delete notification channel %s : %s" %
+                                      (data['uid'], info))
 
 
 def main():
@@ -803,12 +807,13 @@ def main():
     )
 
     module.params["grafana_url"] = clean_url(module.params["grafana_url"])
+    alert_channel_iface = GrafanaNotificationChannelInterface(module)
 
     if module.params['state'] == 'present':
-        result = grafana_create_or_update_notification_channel(module, module.params)
+        result = alert_channel_iface.grafana_create_or_update_notification_channel(module, module.params)
         module.exit_json(failed=False, **result)
     else:
-        result = grafana_delete_notification_channel(module, module.params)
+        result = alert_channel_iface.grafana_delete_notification_channel(module, module.params)
         module.exit_json(failed=False, **result)
 
 
