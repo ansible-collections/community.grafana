@@ -21,6 +21,10 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: grafana_notification_channel
+notes:
+- Notification channels are replaced by contact points starting Grafana 8.3 and this module is currently not able to manage contact points.
+- The module will report execution as successful since Grafana maintains backward compatibility with previous alert management, but
+- nothing will be visible in the contact points if new alerting mechanism is enabled.
 author:
   - Aliaksandr Mianzhynski (@amenzhinsky)
   - Rémi REY (@rrey)
