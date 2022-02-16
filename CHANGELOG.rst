@@ -3,7 +3,13 @@ Grafana Collection Release Notes
 ================================
 
 .. contents:: Topics
+v1.3.1
+======
 
+Minor Changes
+-------------
+
+- community.grafana.grafana_datasource supports aws_auth_type of default.
 
 v1.3.0
 ======

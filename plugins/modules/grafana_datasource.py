@@ -213,6 +213,7 @@ options:
     - keys
     - credentials
     - arn
+    - default
     type: str
   aws_default_region:
     description:
@@ -688,7 +689,7 @@ def main():
         tsdb_resolution=dict(type='str', default='second', choices=['second', 'millisecond']),
         sslmode=dict(default='disable', choices=['disable', 'require', 'verify-ca', 'verify-full']),
         trends=dict(default=False, type='bool'),
-        aws_auth_type=dict(default='keys', choices=['keys', 'credentials', 'arn']),
+        aws_auth_type=dict(default='keys', choices=['keys', 'credentials', 'arn', 'default']),
         aws_default_region=dict(default='us-east-1', choices=['ap-northeast-1', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-south-1',
                                                               'ca-central-1',
                                                               'cn-north-1', 'cn-northwest-1',
