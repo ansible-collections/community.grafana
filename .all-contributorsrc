@@ -150,6 +150,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "jseiser",
+      "name": "Justin Seiser",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4855527?v=4",
+      "profile": "https://github.com/jseiser",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
