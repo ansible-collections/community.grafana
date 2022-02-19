@@ -323,7 +323,7 @@ options:
     type: str
     description:
       - 8 character Threema Gateway ID (starting with a *).
-  threema_recepient_id:
+  threema_recipient_id:
     type: str
     description:
       - 8 character Threema ID that should receive the alerts.
@@ -574,10 +574,10 @@ def grafana_notification_channel_payload(data):
         payload['settings']['bottoken'] = data['telegram_bot_token']
         payload['settings']['chatid'] = data['telegram_chat_id']
 
-    elif data['type'] == 'treema':
-        payload['settings']['gateway_id'] = data['settings_gateway_id']
-        payload['settings']['recipient_id'] = data['settings_recipient_id']
-        payload['settings']['api_secret'] = data['settings_api_secret']
+    elif data['type'] == 'threema':
+        payload['settings']['gateway_id'] = data['threema_gateway_id']
+        payload['settings']['recipient_id'] = data['threema_recipient_id']
+        payload['settings']['api_secret'] = data['threema_api_secret']
 
     elif data['type'] == 'victorops':
         payload['settings']['url'] = data['victorops_url']
@@ -759,7 +759,7 @@ def main():
         telegram_chat_id=dict(type='str'),
 
         threema_gateway_id=dict(type='str'),
-        threema_recepient_id=dict(type='str'),
+        threema_recipient_id=dict(type='str'),
         threema_api_secret=dict(type='str', no_log=True),
 
         victorops_url=dict(type='str'),
@@ -795,7 +795,7 @@ def main():
             ['type', 'sensu', ['sensu_url']],
             ['type', 'slack', ['slack_url']],
             ['type', 'telegram', ['telegram_bot_token', 'telegram_chat_id']],
-            ['type', 'threema', ['threema_gateway_id', 'threema_recepient_id',
+            ['type', 'threema', ['threema_gateway_id', 'threema_recipient_id',
                                  'threema_api_secret']],
             ['type', 'victorops', ['victorops_url']],
             ['type', 'webhook', ['webhook_url']]
