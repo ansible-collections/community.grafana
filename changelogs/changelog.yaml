@@ -121,3 +121,11 @@ releases:
     fragments:
     - 1.3.1.yml
     release_date: '2022-02-20'
+  1.3.2:
+    changes:
+      bugfixes:
+      - Fix an issue with threema notification channel that was not creating gateway,
+        recipient and api_secret in Grafana. (#208)
+    fragments:
+    - threema.yml
+    release_date: '2022-02-20'
