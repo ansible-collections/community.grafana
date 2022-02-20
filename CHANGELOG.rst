@@ -5,6 +5,14 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.3.2
+======
+
+Bugfixes
+--------
+
+- Fix an issue with threema notification channel that was not creating gateway, recipient and api_secret in Grafana. (#208)
+
 v1.3.1
 ======
 
