@@ -3,7 +3,7 @@
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/grafana)](https://codecov.io/gh/ansible-collections/community.grafana)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This repo hosts the `community.grafana` Ansible Collection.
@@ -171,6 +171,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/paytroff"><img src="https://avatars.githubusercontent.com/u/93038288?v=4?s=100" width="100px;" alt=""/><br /><sub><b>paytroff</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=paytroff" title="Code">💻</a> <a href="https://github.com/ansible-collections/community.grafana/commits?author=paytroff" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/jseiser"><img src="https://avatars.githubusercontent.com/u/4855527?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Justin Seiser</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=jseiser" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/prndrbr"><img src="https://avatars.githubusercontent.com/u/96344856?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pierre</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/issues?q=author%3Aprndrbr" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
