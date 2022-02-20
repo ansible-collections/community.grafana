@@ -4,6 +4,7 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+
 v1.3.1
 ======
 
