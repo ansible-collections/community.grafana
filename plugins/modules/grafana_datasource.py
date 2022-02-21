@@ -250,12 +250,14 @@ options:
   aws_access_key:
     description:
     - AWS access key for CloudWatch datasource type when C(aws_auth_type) is C(keys)
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     default: ''
     required: false
     type: str
   aws_secret_key:
     description:
     - AWS secret key for CloudWatch datasource type when C(aws_auth_type) is C(keys)
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     default: ''
     required: false
     type: str
