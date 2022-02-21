@@ -68,7 +68,7 @@ options:
   password:
     description:
     - The datasource password.
-    - For encrypted password use C(additional_secure_json_data.password).
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
   basic_auth_user:
     description:
@@ -78,6 +78,7 @@ options:
   basic_auth_password:
     description:
     - The datasource basic auth password, when C(basic auth) is C(yes).
+    - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
   with_credentials:
     description:
@@ -471,7 +472,8 @@ def compare_datasources(new, current, compareSecureData=True):
         del current['readOnly']
     if current['basicAuth'] is False:
         del current['basicAuthUser']
-        del current['basicAuthPassword']
+    del current['password']
+    del current['basicAuthPassword']
 
     # check if secureJsonData should be compared
     if not compareSecureData:
@@ -506,22 +508,26 @@ def get_datasource_payload(data):
         'withCredentials': data['with_credentials'],
         'isDefault': data['is_default'],
         'user': data['user'],
-        'password': data['password'],
         'jsonData': data['additional_json_data'],
         'secureJsonData': data['additional_secure_json_data']
     }
+
+    json_data = payload['jsonData']
+    secure_json_data = payload['secureJsonData']
+
+    # define password
+    if data.get('password'):
+        secure_json_data['password'] = data['password']
 
     # define basic auth
     if 'basic_auth_user' in data and data['basic_auth_user'] and 'basic_auth_password' in data and data['basic_auth_password']:
         payload['basicAuth'] = True
         payload['basicAuthUser'] = data['basic_auth_user']
-        payload['basicAuthPassword'] = data['basic_auth_password']
+        secure_json_data['basicAuthPassword'] = data['basic_auth_password']
     else:
         payload['basicAuth'] = False
 
     # define tls auth
-    json_data = payload['jsonData']
-    secure_json_data = payload['secureJsonData']
     if data.get('tls_client_cert') and data.get('tls_client_key'):
         json_data['tlsAuth'] = True
         if data.get('tls_ca_cert'):
