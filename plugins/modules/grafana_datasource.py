@@ -459,8 +459,12 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
+from ansible.module_utils._text import to_text
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
+
+
+PROMETHEUS_DS_TEST_QUERY = '{"queries":[{"refId":"test","expr":"1+1","instant":true,"queryType":"timeSeriesQuery","exemplar":false,"requestId":"0test","utcOffsetSec":3600,"legendFormat":"","datasource":{"type":"prometheus","uid":"%s"},"datasourceId":%d,"intervalMs":60000,"maxDataPoints":1}],"range":{"from":"2022-02-27T09:41:22.947Z","to":"2022-02-27T09:41:23.947Z"},"from":"1645954882947","to":"1645954883947"}'
 
 
 def compare_datasources(new, current, compareSecureData=True):
@@ -622,37 +626,70 @@ class GrafanaInterface(object):
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
         resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
         status_code = info["status"]
+
+        body = None
+        if resp:
+            body = resp.read()
+
         if status_code == 404:
             return None
         elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
+            self._module.fail_json(msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
         elif status_code == 403:
-            self._module.fail_json(failed=True, msg="Permission Denied")
+            self._module.fail_json(msg="Permission Denied")
         elif status_code == 200:
-            return self._module.from_json(resp.read())
-        self._module.fail_json(failed=True, msg="Grafana API answered with HTTP %d for url %s and data %s" % (status_code, url, data))
+            return self._module.from_json(body)
+        raise base.GrafanaHttpError("Unhandled Grafana API response", status_code, info.get("body"), full_url)
 
     def switch_organisation(self, org_id):
         url = "/api/user/using/%d" % org_id
-        response = self._send_request(url, headers=self.headers, method='POST')
+        try:
+            response = self._send_request(url, headers=self.headers, method='POST')
+        except base.GrafanaHttpError as err:
+            self._module.fail_json(msg=to_text(err), http_code=err.http_code, response=err.response, url=err.url)
 
     def datasource_by_name(self, name):
         datasource_exists = False
         ds = {}
         url = "/api/datasources/name/%s" % quote(name, safe='')
-        return self._send_request(url, headers=self.headers, method='GET')
+        try:
+            return self._send_request(url, headers=self.headers, method='GET')
+        except base.GrafanaHttpError as err:
+            self._module.fail_json(msg=to_text(err), http_code=err.http_code, response=err.response, url=err.url)
 
     def delete_datasource(self, name):
         url = "/api/datasources/name/%s" % quote(name, safe='')
-        self._send_request(url, headers=self.headers, method='DELETE')
+        try:
+            self._send_request(url, headers=self.headers, method='DELETE')
+        except base.GrafanaHttpError as err:
+            self._module.fail_json(msg=to_text(err), http_code=err.http_code, response=err.response, url=err.url)
 
     def update_datasource(self, ds_id, data):
         url = "/api/datasources/%d" % ds_id
-        self._send_request(url, data=data, headers=self.headers, method='PUT')
+        try:
+            ds = self._send_request(url, data=data, headers=self.headers, method='PUT')
+        except base.GrafanaHttpError as err:
+            self._module.fail_json(msg=to_text(err), http_code=err.http_code, response=err.response, url=err.url)
+        self.test_datasource(ds.get("datasource"))
 
     def create_datasource(self, data):
         url = "/api/datasources"
-        self._send_request(url, data=data, headers=self.headers, method='POST')
+        try:
+            ds = self._send_request(url, data=data, headers=self.headers, method='POST')
+        except base.GrafanaHttpError as err:
+            self._module.fail_json(msg=to_text(err), http_code=err.http_code, response=err.response, url=err.url)
+        self.test_datasource(ds.get("datasource"))
+
+    def test_datasource(self, ds):
+        """Test the datasource by using the same method as the Grafana WUI and its 'Save & test' button"""
+        if ds["type"] != "prometheus":
+            return
+        url = "/api/ds/query"
+        data = json.loads(PROMETHEUS_DS_TEST_QUERY % (ds["uid"], ds["id"]))
+        try:
+            self._send_request(url, data=data, headers=self.headers, method="POST")
+        except base.GrafanaHttpError as err:
+            self._module.fail_json(msg="Datasource test failed", http_code=err.http_code, response=err.response, url=err.url)
 
 
 def main():
