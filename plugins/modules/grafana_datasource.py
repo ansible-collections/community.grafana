@@ -692,8 +692,7 @@ class GrafanaInterface(object):
         self._send_request(url, data=data, headers=self.headers, method='POST')
 
 
-def main():
-    # use the predefined argument spec for url
+def setup_module_object():
     argument_spec = base.grafana_argument_spec()
 
     argument_spec.update(
@@ -776,6 +775,11 @@ def main():
             ['es_version', 70, ['max_concurrent_shard_requests']]
         ],
     )
+    return module
+
+
+def main():
+    module = setup_module_object()
 
     state = module.params['state']
     name = module.params['name']
