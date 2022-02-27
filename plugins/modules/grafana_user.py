@@ -67,6 +67,8 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
+notes:
+- Unlike other modules from the collection, this module does not support `grafana_api_key` authentication type. The Grafana API endpoint for users management requires basic auth and admin privileges.
 extends_documentation_fragment:
 - community.grafana.basic_auth
 '''
