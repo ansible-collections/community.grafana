@@ -5,6 +5,14 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.3.3
+======
+
+Bugfixes
+--------
+
+- Fix an issue with grafana_datasource for Prometheus with basic auth credential management. (#204)
+
 v1.3.2
 ======
 
