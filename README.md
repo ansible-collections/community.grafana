@@ -92,6 +92,7 @@ The `tests` directory contains configuration for running sanity and integration 
 You can run the collection's test suites with the commands:
 
     ansible-test sanity --docker -v --color
+    ansible-test units --docker -v --color
     ansible-test integration --docker -v --color
 
 ## Publishing New Versions
