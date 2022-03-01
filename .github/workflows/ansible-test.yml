@@ -12,7 +12,7 @@ jobs:
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/community/grafana
 
@@ -26,6 +26,7 @@ jobs:
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color
+        working-directory: ./ansible_collections/community/grafana
 
   units:
     runs-on: ubuntu-latest
@@ -35,7 +36,7 @@ jobs:
         ansible_version: ["stable-2.9", "stable-2.10", "stable-2.11", "stable-2.12", "devel"]
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/community/grafana
 
@@ -49,9 +50,11 @@ jobs:
 
       - name: Run unit tests
         run: ansible-test units --docker -v --color --python ${{ matrix.python_version }} --coverage
+        working-directory: ./ansible_collections/community/grafana
 
       - name: Generate coverage report.
         run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        working-directory: ./ansible_collections/community/grafana
 
       - uses: codecov/codecov-action@v2
         with:
@@ -75,7 +78,7 @@ jobs:
         run: apk add bash git gcc python3-dev libc-dev libffi-dev openssl-dev rust cargo openssh-keygen
 
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/community/grafana
 
@@ -84,3 +87,4 @@ jobs:
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration -v --color --retry-on-error --requirements --python ${{ matrix.python_version }} --continue-on-error --diff
+        working-directory: ./ansible_collections/community/grafana
