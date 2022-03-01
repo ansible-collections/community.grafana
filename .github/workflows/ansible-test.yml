@@ -28,7 +28,7 @@ jobs:
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
-        run: ansible-test sanity --docker -v --color
+        run: ansible-test sanity --docker -v --color --coverage
         working-directory: ./ansible_collections/community/grafana
       
       - name: Generate coverage report
@@ -97,7 +97,7 @@ jobs:
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run integration tests on Python ${{ matrix.python_version }}
-        run: ansible-test integration -v --color --retry-on-error --requirements --python ${{ matrix.python_version }} --continue-on-error --diff
+        run: ansible-test integration -v --color --retry-on-error --requirements --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
         working-directory: ./ansible_collections/community/grafana
       
       - name: Generate coverage report
