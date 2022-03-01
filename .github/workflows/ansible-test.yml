@@ -27,6 +27,14 @@ jobs:
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color
         working-directory: ./ansible_collections/community/grafana
+      
+      - name: Generate coverage report
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        working-directory: ./ansible_collections/community/grafana
+
+      - uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: false
 
   units:
     runs-on: ubuntu-latest
@@ -88,3 +96,11 @@ jobs:
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration -v --color --retry-on-error --requirements --python ${{ matrix.python_version }} --continue-on-error --diff
         working-directory: ./ansible_collections/community/grafana
+      
+      - name: Generate coverage report
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        working-directory: ./ansible_collections/community/grafana
+
+      - uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: false
