@@ -79,14 +79,11 @@ jobs:
         ansible_version: ["stable-2.9", "stable-2.10", "stable-2.11", "stable-2.12", "devel"]
         python_version: ["3.8"]
     container:
-      image: python:${{ matrix.python_version }}-alpine
+      image: python:${{ matrix.python_version }}
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
     steps:
-
-      - name: Install requirements on alpine
-        run: apk add bash git gcc python3-dev libc-dev libffi-dev openssl-dev rust cargo openssh-keygen
 
       - name: Check out code
         uses: actions/checkout@v2
