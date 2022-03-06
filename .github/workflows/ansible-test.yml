@@ -38,6 +38,7 @@ jobs:
       - uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: false
+          flags: sanity
 
   units:
     runs-on: ubuntu-latest
@@ -70,6 +71,7 @@ jobs:
       - uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: false
+          flags: units
 
   integration:
     runs-on: ubuntu-latest
@@ -104,3 +106,4 @@ jobs:
       - uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: false
+          flags: integration
