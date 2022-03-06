@@ -67,13 +67,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: '1'
-    ds_type: postgres
-    ds_url: postgres.company.com:5432
-    database: db
-    user: postgres
-    password: iampgroot
-    sslmode: verify-full
     state: absent
 
 - debug:
@@ -90,13 +83,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: '1'
-    ds_type: postgres
-    ds_url: postgres.company.com:5432
-    database: db
-    user: postgres
-    password: iampgroot
-    sslmode: verify-full
     state: absent
 
 - debug:

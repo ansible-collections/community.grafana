@@ -55,11 +55,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: "1"
-    ds_type: sni-thruk-datasource
-    ds_url: "https://thruk.company.com/sitename/thruk"
-    tls_skip_verify: yes
-    validate_certs: no
     state: absent
 
 - debug:
@@ -76,11 +71,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: "1"
-    ds_type: sni-thruk-datasource
-    ds_url: "https://thruk.company.com/sitename/thruk"
-    tls_skip_verify: yes
-    validate_certs: no
     state: absent
 
 - assert:
