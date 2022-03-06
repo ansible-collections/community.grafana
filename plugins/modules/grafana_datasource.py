@@ -25,7 +25,7 @@ options:
   ds_type:
     description:
     - The type of the datasource.
-    required: true
+    - Required when C(state=present).
     choices:
     - graphite
     - prometheus
@@ -44,7 +44,7 @@ options:
   ds_url:
     description:
     - The URL of the datasource.
-    required: true
+    - Required when C(state=present).
     type: str
   access:
     description:
@@ -673,8 +673,8 @@ def main():
                               'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
                               'redis-datasource',
-                              'loki'], required=True),
-        ds_url=dict(required=True, type='str'),
+                              'loki']),
+        ds_url=dict(type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         database=dict(type='str', default=""),
         user=dict(default='', type='str'),
@@ -722,6 +722,7 @@ def main():
         required_together=[['url_username', 'url_password', 'org_id'], ['tls_client_cert', 'tls_client_key']],
         mutually_exclusive=[['url_username', 'grafana_api_key'], ['tls_ca_cert', 'tls_skip_verify']],
         required_if=[
+            ['state', 'present', ['ds_type', 'ds_url']],
             ['ds_type', 'opentsdb', ['tsdb_version', 'tsdb_resolution']],
             ['ds_type', 'influxdb', ['database']],
             ['ds_type', 'elasticsearch', ['database', 'es_version', 'time_field', 'interval']],

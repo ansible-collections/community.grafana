@@ -81,9 +81,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: '1'
-    ds_type: redis-datasource
-    ds_url: https://redis.company.com:6379
     state: absent
 
 - assert:
@@ -97,9 +94,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: '1'
-    ds_type: redis-datasource
-    ds_url: https://redis.company.com:6379
     state: absent
 
 - assert:

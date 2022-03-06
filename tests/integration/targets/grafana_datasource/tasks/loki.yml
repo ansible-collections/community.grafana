@@ -55,9 +55,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password}}"
-    org_id: '1'
-    ds_type: loki
-    ds_url: https://loki.company.com:3100
     state: absent
 
 - debug:
@@ -75,9 +72,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password}}"
-    org_id: '1'
-    ds_type: loki
-    ds_url: https://loki.company.com:3100
     state: absent
 
 - debug:

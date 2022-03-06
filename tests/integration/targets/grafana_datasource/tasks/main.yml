@@ -1,6 +1,7 @@
 ---
 
 - block:
+  - include: errors.yml
   - include: elastic.yml
   - include: influx.yml
   - include: postgres.yml
