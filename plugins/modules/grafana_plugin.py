@@ -162,8 +162,11 @@ class GrafanaPluginInterface(object):
     def __init__(self, module):
         self.module = module
         self.grafana_cli = grafana_cli_bin(module.params)
+        self.check_mode = module.check_mode
 
     def install_plugin(self, name, version):
+        if self.check_mode:
+            return
         cmd = '{0} install {1} {2}'.format(self.grafana_cli, name, version)
         rc, stdout, stderr = self.module.run_command(cmd)
         if rc != 0:
@@ -171,6 +174,8 @@ class GrafanaPluginInterface(object):
                     stdout=stdout, stderr=stderr, cmd=cmd)
 
     def update_plugin(self, name, version):
+        if self.check_mode:
+            return
         cmd = '{0} update {1} {2}'.format(self.grafana_cli, name, version)
         rc, stdout, stderr = self.module.run_command(cmd)
         if rc != 0:
@@ -178,6 +183,8 @@ class GrafanaPluginInterface(object):
                     stdout=stdout, stderr=stderr, cmd=cmd)
 
     def delete_plugin(self, name):
+        if self.check_mode:
+            return
         cmd = '{0} uninstall {1}'.format(self.grafana_cli, name)
         rc, stdout, stderr = self.module.run_command(cmd)
         if rc != 0 and stdout.find("plugin does not exist") == -1:
@@ -188,8 +195,7 @@ class GrafanaPluginInterface(object):
 def setup_module_object():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True,
-                      type='str'),
+            name=dict(required=True, type='str'),
             version=dict(type='str', default="latest"),
             grafana_plugins_dir=dict(type='str'),
             grafana_repo=dict(type='str'),
@@ -197,7 +203,7 @@ def setup_module_object():
             state=dict(choices=['present', 'absent'],
                        default='present')
         ),
-        supports_check_mode=False
+        supports_check_mode=True
     )
     return module
 
