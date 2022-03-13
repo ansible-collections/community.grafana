@@ -157,78 +157,40 @@ def get_grafana_plugin_version_latest(module, params):
     return None
 
 
-def grafana_plugin(module, params):
-    '''
-    Install update or remove grafana plugin
+class GrafanaPluginInterface(object):
 
-    :param module: ansible module object. used to run system commands.
-    :param params: ansible module params.
-    '''
-    grafana_cli = grafana_cli_bin(params)
+    def __init__(self, module):
+        self.module = module
+        self.grafana_cli = grafana_cli_bin(module.params)
 
-    if params['state'] == 'present':
-        grafana_plugin_version = get_grafana_plugin_version(module, params)
-        if grafana_plugin_version is not None:
-            if 'version' in params and params['version']:
-                if params['version'] == grafana_plugin_version:
-                    return {'msg': 'Grafana plugin already installed',
-                            'changed': False,
-                            'version': grafana_plugin_version}
-                else:
-                    if params['version'] == 'latest' or params['version'] is None:
-                        latest_version = get_grafana_plugin_version_latest(module, params)
-                        if latest_version == grafana_plugin_version:
-                            return {'msg': 'Grafana plugin already installed',
-                                    'changed': False,
-                                    'version': grafana_plugin_version}
-                        cmd = '{0} update {1}'.format(grafana_cli, params['name'])
-                    else:
-                        cmd = '{0} install {1} {2}'.format(grafana_cli, params['name'], params['version'])
-            else:
-                return {'msg': 'Grafana plugin already installed',
-                        'changed': False,
-                        'version': grafana_plugin_version}
-        else:
-            if 'version' in params:
-                if params['version'] == 'latest' or params['version'] is None:
-                    cmd = '{0} install {1}'.format(grafana_cli, params['name'])
-                else:
-                    cmd = '{0} install {1} {2}'.format(grafana_cli, params['name'], params['version'])
-            else:
-                cmd = '{0} install {1}'.format(grafana_cli, params['name'])
-    else:
-        cmd = '{0} uninstall {1}'.format(grafana_cli, params['name'])
+    def install_plugin(self, name, version):
+        cmd = '{0} install {1} {2}'.format(self.grafana_cli, name, version)
+        rc, stdout, stderr = self.module.run_command(cmd)
+        if rc != 0:
+            self.module.fail_json(msg='Failed to install plugin',
+                    stdout=stdout, stderr=stderr, cmd=cmd)
 
-    rc, stdout, stderr = module.run_command(cmd)
-    if rc == 0:
-        stdout_lines = stdout.split("\n")
-        for line in stdout_lines:
-            if line.find(params['name']):
-                if line.find(' @ ') != -1:
-                    line = line.rstrip()
-                    plugin_name, plugin_version = parse_version(line)
-                else:
-                    plugin_version = None
+    def update_plugin(self, name, version):
+        cmd = '{0} update {1} {2}'.format(self.grafana_cli, name, version)
+        rc, stdout, stderr = self.module.run_command(cmd)
+        if rc != 0:
+            self.module.fail_json(msg='Failed to update plugin',
+                    stdout=stdout, stderr=stderr, cmd=cmd)
 
-                if params['state'] == 'present':
-                    return {'msg': 'Grafana plugin {0} installed : {1}'.format(params['name'], cmd),
-                            'changed': True,
-                            'version': plugin_version}
-                else:
-                    return {'msg': 'Grafana plugin {0} uninstalled : {1}'.format(params['name'], cmd),
-                            'changed': True}
-    else:
-        if params['state'] == 'absent' and stdout.find("plugin does not exist"):
-            return {'msg': 'Grafana plugin {0} already uninstalled : {1}'.format(params['name'], cmd), 'changed': False}
-        raise GrafanaCliException("'{0}' execution returned an error : [{1}] {2} {3}".format(cmd, rc, stdout, stderr))
+    def delete_plugin(self, name):
+        cmd = '{0} uninstall {1}'.format(self.grafana_cli, name)
+        rc, stdout, stderr = self.module.run_command(cmd)
+        if rc != 0 and stdout.find("plugin does not exist") == -1:
+            self.module.fail_json(msg='Failed to unintall plugin',
+                    stdout=stdout, stderr=stderr, cmd=cmd)
 
 
-def main():
+def setup_module_object():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True,
                       type='str'),
-            version=dict(type='str'),
+            version=dict(type='str', default="latest"),
             grafana_plugins_dir=dict(type='str'),
             grafana_repo=dict(type='str'),
             grafana_plugin_url=dict(type='str'),
@@ -237,27 +199,38 @@ def main():
         ),
         supports_check_mode=False
     )
+    return module
 
-    try:
-        result = grafana_plugin(module, module.params)
-    except GrafanaCliException as e:
-        module.fail_json(
-            failed=True,
-            msg="{0}".format(e)
-        )
-        return
-    except Exception as e:
-        module.fail_json(
-            failed=True,
-            msg="{0} : {1} ".format(type(e), e)
-        )
-        return
+def main():
 
-    module.exit_json(
-        failed=False,
-        **result
-    )
-    return
+    module = setup_module_object()
+    name = module.params['name']
+    state = module.params['state']
+
+    desired_version = module.params['version']
+    if params['version'] == 'latest':
+        desired_version = get_grafana_plugin_version_latest(module, module.params)
+
+    current_version = get_grafana_plugin_version(module, module.params)
+    grafana = GrafanaPluginInterface(module)
+
+    if state == 'present':
+        if current_version is None:
+            grafana.install_plugin(name, desired_version)
+        elif desired_version == current_version:
+            module.exit_json(
+                    msg='Grafana plugin already installed',
+                    changed=True, version=desired_version)
+        else:
+            grafana.update_plugin(name, desired_version)
+            module.exit_json(
+                    msg='Grafana plugin updated',
+                    changed=True, version=desired_version)
+    else:
+        if current_version is None:
+            module.exit_json(msg='Grafana plugin already uninstalled', changed=False)
+        grafana.delete_plugin(name)
+        module.exit_json(msg='Grafana plugin deleted', changed=True)
 
 
 if __name__ == '__main__':
