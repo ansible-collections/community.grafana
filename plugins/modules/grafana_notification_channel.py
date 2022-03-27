@@ -627,7 +627,7 @@ class GrafanaNotificationChannelInterface(object):
                                       (org_id, info))
 
     def grafana_create_notification_channel(self, data, payload):
-        r, info = fetch_url(self._module, '%s/api/alert-notifications' % data['grafana_url'],
+        r, info = fetch_url(self._module, '%s/api/alert-notifications' % data['url'],
                             data=json.dumps(payload), headers=self.headers, method='POST')
         if info['status'] == 200:
             return {
@@ -640,7 +640,7 @@ class GrafanaNotificationChannelInterface(object):
 
     def grafana_update_notification_channel(self, data, payload, before):
         r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
-                            (data['grafana_url'], data['uid']),
+                            (data['url'], data['uid']),
                             data=json.dumps(payload), headers=self.headers, method='PUT')
         if info['status'] == 200:
             del before['created']
@@ -672,7 +672,7 @@ class GrafanaNotificationChannelInterface(object):
     def grafana_create_or_update_notification_channel(self, data):
         payload = grafana_notification_channel_payload(data)
         r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
-                            (data['grafana_url'], data['uid']), headers=self.headers)
+                            (data['url'], data['uid']), headers=self.headers)
         if info['status'] == 200:
             before = json.loads(to_text(r.read()))
             return self.grafana_update_notification_channel(data, payload, before)
@@ -684,7 +684,7 @@ class GrafanaNotificationChannelInterface(object):
 
     def grafana_delete_notification_channel(self, data):
         r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
-                            (data['grafana_url'], data['uid']),
+                            (data['url'], data['uid']),
                             headers=self.headers, method='DELETE')
         if info['status'] == 200:
             return {
@@ -828,7 +828,7 @@ def main():
         ]
     )
 
-    module.params["grafana_url"] = clean_url(module.params["grafana_url"])
+    module.params["url"] = clean_url(module.params["url"])
     alert_channel_iface = GrafanaNotificationChannelInterface(module)
 
     if module.params['state'] == 'present':
