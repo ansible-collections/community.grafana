@@ -83,6 +83,45 @@ You can either call modules by their Fully Qualified Collection Namespace (FQCN)
 
 For documentation on how to use individual modules and other content included in this collection, please see the links in the 'Included content' section earlier in this README.
 
+### Using module group defaults
+
+In your playbooks, you can set [module defaults](https://github.com/ansible/ansible/blob/v2.12.3/docs/docsite/rst/user_guide/playbooks_module_defaults.rst#module-defaults-groups) for the `community.grafana.grafana` group to avoid repeating the same parameters (e.g., `grafana_url`, `grafana_user`, `grafana_password`) in your tasks: 
+
+
+```yaml
+- hosts: localhost
+  gather_facts: false
+  connection: local
+
+  collections:
+    - community.grafana
+  
+  module_defaults:
+    group/community.grafana.grafana:
+      grafana_url: "https://grafana.company.com"
+      grafana_user: "admin"
+      grafana_password: "xxxxxx"
+
+  tasks:
+    - name: Ensure Influxdb datasource exists.
+      grafana_datasource:
+        name: "datasource-influxdb"
+        org_id: "1"
+        ds_type: "influxdb"
+        ds_url: "https://influx.company.com:8086"
+        database: "telegraf"
+        time_interval: ">10s"
+        tls_ca_cert: "/etc/ssl/certs/ca.pem"
+    
+    - name: Create or update a Grafana user
+      grafana_user:
+        name: "Bruce Wayne"
+        email: "batman@gotham.city"
+        login: "batman"
+        password: "robin"
+        is_admin: true
+```
+
 ## Testing and Development
 
 If you want to develop new content for this collection or improve what's already here, the easiest way to work on the collection is to clone it into one of the configured [`COLLECTIONS_PATHS`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths), and work on it there.
