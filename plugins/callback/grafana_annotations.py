@@ -103,6 +103,7 @@ DOCUMENTATION = '''
             key: grafana_panel_ids
         default: []
         type: list
+        elements: integer
 '''
 
 import json
