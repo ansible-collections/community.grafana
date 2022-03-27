@@ -67,7 +67,7 @@ options:
   dashboard_revision:
     description:
       - Revision of the public grafana dashboard to import
-    default: 1
+    default: '1'
     version_added: "1.0.0"
     type: str
   commit_message:
