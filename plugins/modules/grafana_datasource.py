@@ -471,7 +471,7 @@ from ansible_collections.community.grafana.plugins.module_utils import base
 
 def compare_datasources(new, current, compareSecureData=True):
     if 'uid' not in current:
-      del new['uid']
+        del new['uid']
     del current['typeLogoUrl']
     del current['id']
     if 'version' in current:
