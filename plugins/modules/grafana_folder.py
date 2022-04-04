@@ -52,6 +52,14 @@ options:
     type: bool
     default: False
     version_added: "1.2.0"
+  permissions:
+    description:
+      - Set the permissions of the folder.
+      - Able to define it for a I(role), I(teamId) and I(userId)
+      - Values for I(permission) are C(1) = View, C(2) = Edit, C(4) = Admin
+      - This will remove existing permissions if they are not included.
+    type: list
+    elements: dict
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -65,6 +73,20 @@ EXAMPLES = '''
       grafana_api_key: "{{ some_api_token_value }}"
       title: "grafana_working_group"
       state: present
+
+- name: Create a folder and set permissions
+  community.grafana.grafana_folder:
+      url: "https://grafana.example.com"
+      grafana_api_key: "{{ some_api_token_value }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: 2
+        - role: "Viewer"
+          permission: 1
+        - userId: 2
+          permission: 4
 
 - name: Delete a folder
   community.grafana.grafana_folder:
@@ -246,6 +268,15 @@ class GrafanaFolderInterface(object):
         response = self._send_request(url, headers=self.headers, method="DELETE")
         return response
 
+    def create_folder_permission(self, folder_uid, perm):
+        url = "/api/folders/{folder_uid}/permissions".format(folder_uid=folder_uid)
+        items = {
+            "items": []
+        }
+        items["items"].extend(perm)
+        response = self._send_request(url, data=items, headers=self.headers, method="POST")
+        return response
+
 
 def setup_module_object():
     module = AnsibleModule(
@@ -262,6 +293,7 @@ argument_spec.update(
     name=dict(type='str', aliases=['title'], required=True),
     state=dict(type='str', default='present', choices=['present', 'absent']),
     skip_version_check=dict(type='bool', default=False),
+    permissions=dict(type='list', elements='dict'),
 )
 
 
@@ -270,6 +302,7 @@ def main():
     module = setup_module_object()
     state = module.params['state']
     title = module.params['name']
+    permissions = module.params['permissions']
 
     grafana_iface = GrafanaFolderInterface(module)
 
@@ -281,6 +314,9 @@ def main():
             folder = grafana_iface.get_folder(title)
             changed = True
         folder = grafana_iface.get_folder(title)
+        if permissions is not None:
+            grafana_iface.create_folder_permission(folder.get("uid"), permissions)
+            changed = True
         module.exit_json(changed=changed, folder=folder)
     elif state == 'absent':
         folder = grafana_iface.get_folder(title)

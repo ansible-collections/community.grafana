@@ -14,6 +14,25 @@
       - "result.changed == true"
       - "result.folder.title == 'grafana_working_group'"
 
+- name: Set permissions of a Folder
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: 2
+        - role: "Viewer"
+          permission: 1
+  register: result
+
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.folder.title == 'grafana_working_group'"
+
 - name: Test folder creation idempotency
   grafana_folder:
       url: "{{ grafana_url }}"
