@@ -56,10 +56,34 @@ options:
     description:
       - Set the permissions of the folder.
       - Able to define it for a I(role), I(teamId) and I(userId)
-      - Values for I(permission) are C(1) = View, C(2) = Edit, C(4) = Admin
       - This will remove existing permissions if they are not included.
     type: list
     elements: dict
+    suboptions:
+        role:
+            description:
+                - The name of the role.
+            choices:
+                - Viewer
+                - Editor
+            type: str
+        username:
+            description:
+                - The name of the user.
+            type: str
+        team:
+            description:
+                - The name of the team.
+            type: str
+        permission:
+            description:
+                - The permission to be added.
+            choices:
+                - view
+                - edit
+                - admin
+            required: true
+            type: str
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -80,13 +104,12 @@ EXAMPLES = '''
       grafana_api_key: "{{ some_api_token_value }}"
       title: "grafana_working_group"
       state: present
-      permissions:
         - role: "Editor"
-          permission: 2
-        - role: "Viewer"
-          permission: 1
-        - userId: 2
-          permission: 4
+          permission: "admin"
+        - username: "myuser"
+          permission: "edit"
+        - team: "myteam"
+          permission: "view"
 
 - name: Delete a folder
   community.grafana.grafana_folder:
@@ -268,14 +291,81 @@ class GrafanaFolderInterface(object):
         response = self._send_request(url, headers=self.headers, method="DELETE")
         return response
 
-    def create_folder_permission(self, folder_uid, perm):
+    def get_folder_permission(self, folder_uid):
+        url = "/api/folders/{folder_uid}/permissions".format(folder_uid=folder_uid)
+        response = self._send_request(url, headers=self.headers, method="GET")
+        for items in response:
+            del items['created']
+            del items['inherited']
+            del items['slug']
+            del items['teamAvatarUrl']
+            del items['teamEmail']
+            del items['title']
+            del items['uid']
+            del items['updated']
+            del items['url']
+            del items['userAvatarUrl']
+            del items['userEmail']
+            del items['userLogin']
+            del items['folderId']
+            del items['permissionName']
+            del items['team']
+            del items['isFolder']
+            if items['userId'] == 0:
+                del items['userId']
+            if items['teamId'] == 0:
+                del items['teamId']
+        return response
+
+    def create_folder_permission(self, folder_uid, permissions):
         url = "/api/folders/{folder_uid}/permissions".format(folder_uid=folder_uid)
         items = {
             "items": []
         }
-        items["items"].extend(perm)
+        items["items"].extend(permissions)
         response = self._send_request(url, data=items, headers=self.headers, method="POST")
         return response
+
+    def get_user_id_from_mail(self, email):
+        url = "/api/users/lookup?loginOrEmail={email}".format(email=email)
+        user = self._send_request(url, headers=self.headers, method="GET")
+        if user is None:
+            self._module.fail_json(failed=True, msg="User '%s' does not exists" % email)
+        return user.get("id")
+
+    def get_team(self, name):
+        url = "/api/teams/search?name={team}".format(team=quote(name))
+        response = self._send_request(url, headers=self.headers, method="GET")
+        if len(response.get("teams")) == 0:
+            self._module.fail_json(failed=True, msg="Team '%s' does not exists" % name)
+        return response.get("teams")[0]["id"]
+
+    def process_permission_input(self, input):
+        for i in input:
+            if i["username"] is None:
+                del i["username"]
+            if i["team"] is None:
+                del i["team"]
+            if i["role"] is None:
+                del i["role"]
+
+            if "username" in i:
+                i["userId"] = i.pop("username")
+                i["userId"] = self.get_user_id_from_mail(i["userId"])
+
+            if "team" in i:
+                i["teamId"] = i.pop("team")
+                i["teamId"] = self.get_team(i["teamId"])
+
+            if i["permission"] == "view":
+                i["permission"] = 1
+            elif i["permission"] == "edit":
+                i["permission"] = 2
+            elif i["permission"] == "admin":
+                i["permission"] = 4
+            else:
+                self._module.fail_json(failed=True, msg="Use view, edit or admin as value for permission")
+        return input
 
 
 def setup_module_object():
@@ -288,12 +378,19 @@ def setup_module_object():
     return module
 
 
+permissions_spec = dict(
+    role=dict(type='str', choices=['Viewer', 'Editor']),
+    team=dict(type='str'),
+    username=dict(type='str'),
+    permission=dict(type='str', choices=['view', 'edit', 'admin']),
+)
+
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     name=dict(type='str', aliases=['title'], required=True),
     state=dict(type='str', default='present', choices=['present', 'absent']),
     skip_version_check=dict(type='bool', default=False),
-    permissions=dict(type='list', elements='dict'),
+    permissions=dict(type='list', elements='dict', options=permissions_spec),
 )
 
 
@@ -315,8 +412,12 @@ def main():
             changed = True
         folder = grafana_iface.get_folder(title)
         if permissions is not None:
-            grafana_iface.create_folder_permission(folder.get("uid"), permissions)
-            changed = True
+            current_permissions = grafana_iface.get_folder_permission(folder.get("uid"))
+            new_permissions = grafana_iface.process_permission_input(permissions)
+            if current_permissions != new_permissions:
+                grafana_iface.create_folder_permission(folder.get("uid"), permissions)
+                changed = True
+
         module.exit_json(changed=changed, folder=folder)
     elif state == 'absent':
         folder = grafana_iface.get_folder(title)

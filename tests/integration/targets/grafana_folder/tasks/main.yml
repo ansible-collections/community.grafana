@@ -14,25 +14,6 @@
       - "result.changed == true"
       - "result.folder.title == 'grafana_working_group'"
 
-- name: Set permissions of a Folder
-  grafana_folder:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      title: "grafana_working_group"
-      state: present
-      permissions:
-        - role: "Editor"
-          permission: 2
-        - role: "Viewer"
-          permission: 1
-  register: result
-
-- assert:
-    that:
-      - "result.changed == true"
-      - "result.folder.title == 'grafana_working_group'"
-
 - name: Test folder creation idempotency
   grafana_folder:
       url: "{{ grafana_url }}"
@@ -46,6 +27,62 @@
     that:
       - "result.changed == false"
       - "result.folder.title == 'grafana_working_group'"
+
+
+- name: Change folder permissions
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: "admin"
+  register: result
+
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.folder.title == 'grafana_working_group'"
+
+- name: Test folder permission idempotency
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: "admin"
+  register: result
+
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.folder.title == 'grafana_working_group'"
+
+- name: Test folder permission user lookup
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: "admin"
+        - role: "unknown"
+          permission: "edit"
+  register: result
+  ignore_errors: true
+
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.failed == true"
+      - "result.msg == 'value of role must be one of: Viewer, Editor, got: unknown found in permissions'"
 
 - name: Delete a Folder
   grafana_folder:
