@@ -56,6 +56,8 @@
       permissions:
         - role: "Editor"
           permission: "admin"
+        - role: "Viewer"
+          permission: "view"
   register: result
 
 - assert:
@@ -73,16 +75,43 @@
       permissions:
         - role: "Editor"
           permission: "admin"
-        - role: "unknown"
+        - role: "Viewer"
+          permission: "view"
+        - username: "unknown"
           permission: "edit"
   register: result
   ignore_errors: true
+
+- set_fact:
+    expected_error: "User 'unknown' does not exists"
 
 - assert:
     that:
       - "result.changed == false"
       - "result.failed == true"
-      - "result.msg == 'value of role must be one of: Viewer, Editor, got: unknown found in permissions'"
+      - "result.msg == expected_error"
+
+- name: Test folder permission team lookup
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - team: "unknown"
+          permission: "edit"
+  register: result
+  ignore_errors: true
+
+- set_fact:
+    expected_error: "Team 'unknown' does not exists"
+
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.failed == true"
+      - "result.msg == expected_error"
 
 - name: Delete a Folder
   grafana_folder:
