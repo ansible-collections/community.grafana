@@ -104,6 +104,7 @@ EXAMPLES = '''
       grafana_api_key: "{{ some_api_token_value }}"
       title: "grafana_working_group"
       state: present
+      permissions:
         - role: "Editor"
           permission: "admin"
         - username: "myuser"
