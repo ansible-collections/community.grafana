@@ -39,6 +39,8 @@
       permissions:
         - role: "Editor"
           permission: "admin"
+        - role: "Viewer"
+          permission: "view"
   register: result
 
 - assert:
