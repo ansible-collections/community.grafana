@@ -383,7 +383,7 @@ permissions_spec = dict(
     role=dict(type='str', choices=['Viewer', 'Editor']),
     team=dict(type='str'),
     username=dict(type='str'),
-    permission=dict(type='str', choices=['view', 'edit', 'admin']),
+    permission=dict(type='str', choices=['view', 'edit', 'admin'], required=True),
 )
 
 argument_spec = base.grafana_argument_spec()
