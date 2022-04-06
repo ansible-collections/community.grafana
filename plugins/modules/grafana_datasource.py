@@ -469,9 +469,17 @@ from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_h
 from ansible_collections.community.grafana.plugins.module_utils import base
 
 
-def compare_datasources(new, current, compareSecureData=True):
-    if 'uid' not in current:
-        del new['uid']
+def compare_datasources(new, current, compareSecureData=True, version=0):
+    if version >= 8:
+      if new['uid'] is None:
+          del new['uid']
+          del current['uid']
+
+    if version < 8:
+      del new['uid']
+      if 'uid' in current:
+       del current['uid']
+
     del current['typeLogoUrl']
     del current['id']
     if 'version' in current:
@@ -661,6 +669,14 @@ class GrafanaInterface(object):
         url = "/api/datasources"
         self._send_request(url, data=data, headers=self.headers, method='POST')
 
+    def get_version(self):
+          url = "/api/health"
+          response = self._send_request(url, data=None, headers=self.headers, method="GET")
+          version = response.get("version")
+          if version is not None:
+              major, minor, rev = version.split(".")
+              return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+          raise GrafanaInterface("Failed to retrieve version from '%s'" % url)
 
 def main():
     # use the predefined argument spec for url
@@ -756,7 +772,8 @@ def main():
             ds = grafana_iface.datasource_by_name(name)
             module.exit_json(changed=True, datasource=ds, msg='Datasource %s created' % name)
         else:
-            diff = compare_datasources(payload.copy(), ds.copy(), enforce_secure_data)
+            version = grafana_iface.get_version()
+            diff = compare_datasources(payload.copy(), ds.copy(), enforce_secure_data, version["major"])
             if diff.get('before') == diff.get('after'):
                 module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
             grafana_iface.update_datasource(ds.get('id'), payload)
