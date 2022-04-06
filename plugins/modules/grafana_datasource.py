@@ -470,15 +470,14 @@ from ansible_collections.community.grafana.plugins.module_utils import base
 
 
 def compare_datasources(new, current, compareSecureData=True, version=0):
-    if version >= 8:
-      if new['uid'] is None:
-          del new['uid']
-          del current['uid']
+    if version >= 8 and new['uid'] is None:
+        del new['uid']
+        del current['uid']
 
     if version < 8:
-      del new['uid']
-      if 'uid' in current:
-       del current['uid']
+        del new['uid']
+        if 'uid' in current:
+            del current['uid']
 
     del current['typeLogoUrl']
     del current['id']
@@ -670,13 +669,14 @@ class GrafanaInterface(object):
         self._send_request(url, data=data, headers=self.headers, method='POST')
 
     def get_version(self):
-          url = "/api/health"
-          response = self._send_request(url, data=None, headers=self.headers, method="GET")
-          version = response.get("version")
-          if version is not None:
-              major, minor, rev = version.split(".")
-              return {"major": int(major), "minor": int(minor), "rev": int(rev)}
-          raise GrafanaInterface("Failed to retrieve version from '%s'" % url)
+        url = "/api/health"
+        response = self._send_request(url, data=None, headers=self.headers, method="GET")
+        version = response.get("version")
+        if version is not None:
+            major, minor, rev = version.split(".")
+            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+        self._module.fail_json(failed=True, msg="Failed to retrieve version from '%s'" % url)
+
 
 def main():
     # use the predefined argument spec for url
