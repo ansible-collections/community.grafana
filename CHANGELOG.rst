@@ -5,6 +5,16 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.4.0
+======
+
+Minor Changes
+-------------
+
+- Remove requirement for `ds_type` and `ds_url` parameters when deleting a datasource
+- add `grafana` action group in `meta/runtime.yml` to support for module group defaults
+- refactor grafana_notification_channel module
+
 v1.3.3
 ======
 

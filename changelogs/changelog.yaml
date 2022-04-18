@@ -137,3 +137,16 @@ releases:
     fragments:
     - datasource-issue-204.yml
     release_date: '2022-02-27'
+  1.4.0:
+    changes:
+      minor_changes:
+      - Remove requirement for `ds_type` and `ds_url` parameters when deleting a datasource
+      - add `grafana` action group in `meta/runtime.yml` to support for module group
+        defaults
+      - refactor grafana_notification_channel module
+    fragments:
+    - 136_add_grafana_action_groups.yml
+    - 170_remove_requirement_ds_type_ds_url.yml
+    - grafana_users_note.yaml
+    - notifi_channel_refacto.yml
+    release_date: '2022-04-18'
