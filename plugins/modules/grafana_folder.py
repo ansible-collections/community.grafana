@@ -295,23 +295,11 @@ class GrafanaFolderInterface(object):
     def get_folder_permission(self, folder_uid):
         url = "/api/folders/{folder_uid}/permissions".format(folder_uid=folder_uid)
         response = self._send_request(url, headers=self.headers, method="GET")
+        KEYS_TO_REMOVE = ['created', 'inherited', 'slug', 'teamAvatarUrl', 'teamEmail', 'title', 'uid', 'updated', 'url',
+                          'userAvatarUrl', 'userEmail', 'userLogin', 'folderId', 'permissionName', 'team', 'isFolder']
         for items in response:
-            del items['created']
-            del items['inherited']
-            del items['slug']
-            del items['teamAvatarUrl']
-            del items['teamEmail']
-            del items['title']
-            del items['uid']
-            del items['updated']
-            del items['url']
-            del items['userAvatarUrl']
-            del items['userEmail']
-            del items['userLogin']
-            del items['folderId']
-            del items['permissionName']
-            del items['team']
-            del items['isFolder']
+            for k in KEYS_TO_REMOVE:
+                del items[k]
             if items['userId'] == 0:
                 del items['userId']
             if items['teamId'] == 0:
