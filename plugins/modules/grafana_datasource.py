@@ -36,6 +36,7 @@ options:
     - postgres
     - cloudwatch
     - alexanderzobnin-zabbix-datasource
+    - grafana-azure-monitor-datasource
     - sni-thruk-datasource
     - camptocamp-prometheus-alertmanager-datasource
     - loki
@@ -272,6 +273,32 @@ options:
     description:
     - Namespaces of Custom Metrics for CloudWatch datasource type
     default: ''
+    required: false
+    type: str
+  azure_cloud:
+    description:
+    - The national cloud for your Azure account
+    default: 'azuremonitor'
+    required: false
+    type: str
+    choices:
+    - azuremonitor
+    - chinaazuremonitor
+    - govazuremonitor
+    - germanyazuremonitor
+  azure_tenant:
+    description:
+    - The directory/tenant ID for the Azure AD app registration to use for authentication
+    required: false
+    type: str
+  azure_client:
+    description:
+    - The application/client ID for the Azure AD app registration to use for authentication.
+    required: false
+    type: str
+  azure_secret:
+    description:
+    - The application client secret for the Azure AD app registration to use for auth
     required: false
     type: str
   zabbix_user:
@@ -579,6 +606,14 @@ def get_datasource_payload(data):
         json_data['username'] = data['zabbix_user']
         json_data['password'] = data['zabbix_password']
 
+    if data['ds_type'] == 'grafana-azure-monitor-datasource':
+        json_data['tenantId'] = data['azure_tenant']
+        json_data['clientId'] = data['azure_client']
+        json_data['cloudName'] = data['azure_cloud']
+        json_data['clientsecret'] = 'clientsecret'
+        if data.get('azure_secret'):
+            secure_json_data['clientSecret'] = data['azure_secret']
+
     if data['ds_type'] == 'cloudwatch':
         if data.get('aws_credentials_profile'):
             payload['database'] = data.get('aws_credentials_profile')
@@ -670,6 +705,7 @@ def main():
                               'postgres',
                               'cloudwatch',
                               'alexanderzobnin-zabbix-datasource',
+                              'grafana-azure-monitor-datasource',
                               'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
                               'redis-datasource',
@@ -709,6 +745,10 @@ def main():
         aws_credentials_profile=dict(default='', type='str'),
         aws_assume_role_arn=dict(default='', type='str'),
         aws_custom_metrics_namespaces=dict(type='str'),
+        azure_cloud=dict(type='str', default='azuremonitor', choices=['azuremonitor', 'chinaazuremonitor', 'govazuremonitor', 'germanyazuremonitor']),
+        azure_tenant=dict(type='str'),
+        azure_client=dict(type='str'),
+        azure_secret=dict(type='str', no_log=True),
         zabbix_user=dict(type='str'),
         zabbix_password=dict(type='str', no_log=True),
         additional_json_data=dict(type='dict', default={}, required=False),
