@@ -1,0 +1,79 @@
+---
+- name: Create test user
+  grafana_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: orgtest
+    email: orgtest@example.com
+    login: orgtest
+    password: userpassword
+    state: present
+
+- name: Remove user from organization
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    login: orgtest
+    state: absent
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == true"
+
+- name: Check idempotency on user removal
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    login: orgtest
+    state: absent
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == false"
+
+- name: Add user to organization
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    login: orgtest
+    role: viewer
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == true"
+
+- name: Update existing user role
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    login: orgtest
+    role: editor
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == true"
+
+- name: Check idempotency on user update
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    login: orgtest
+    role: editor
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == false"
