@@ -182,6 +182,7 @@ See LICENCE to see the full text.
 
 Any contribution is welcome and we only ask contributors to:
 * Provide *at least* integration tests for any contribution.
+* The Pull Request *MUST* contain a changelog fragment. See [Ansible documentation](https://docs.ansible.com/ansible/latest/community/development_process.html#creating-a-changelog-fragment) about fragments.
 * Create an issue for any significant contribution that would change a large portion of the code base.
 
 ## Contributors ✨
