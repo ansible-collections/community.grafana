@@ -1,1 +1,2 @@
 tests/unit/modules/grafana/grafana_plugin/test_grafana_plugin.py pep8:W291
+hacking/check_fragment.sh shebang
