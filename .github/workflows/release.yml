@@ -35,7 +35,7 @@ jobs:
           future_release: ${{ steps.version.outputs.next-version }}
 
       - name: push changelog
-        uses: github-actions-x/commit@v2.6
+        uses: github-actions-x/commit@v2.9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           push-branch: 'main'
