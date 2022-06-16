@@ -501,8 +501,10 @@ def compare_datasources(new, current, compareSecureData=True):
         del current['readOnly']
     if current['basicAuth'] is False:
         del current['basicAuthUser']
-    del current['password']
-    del current['basicAuthPassword']
+    if 'password' in current:
+        del current['password']
+    if 'basicAuthPassword' in current:
+        del current['basicAuthPassword']
 
     # check if secureJsonData should be compared
     if not compareSecureData:
