@@ -21,7 +21,7 @@
     - result.datasource.jsonData.username == 'grafana'
     - result.datasource.name == 'datasource-zabbix'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'alexanderzobnin-zabbix-datasource'
     - result.datasource.url == 'https://zabbix.company.com'
     - result.datasource.user == ''
@@ -51,7 +51,7 @@
     - result.datasource.jsonData.username == 'grafana'
     - result.datasource.name == 'datasource-zabbix'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'alexanderzobnin-zabbix-datasource'
     - result.datasource.url == 'https://zabbix.company.com'
     - result.datasource.user == ''
@@ -80,7 +80,7 @@
     - result.datasource.jsonData.username == 'grafana'
     - result.datasource.name == 'datasource-zabbix'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'alexanderzobnin-zabbix-datasource'
     - result.datasource.url == 'https://zabbix.example.com'
     - result.datasource.user == ''

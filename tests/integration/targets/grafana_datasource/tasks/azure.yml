@@ -31,7 +31,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert == false
     - result.datasource.name == 'datasource-azure'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'grafana-azure-monitor-datasource'
     - result.datasource.url == 'http://example.com'
     - result.datasource.user == ''
@@ -69,7 +69,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert == false
     - result.datasource.name == 'datasource-azure'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'grafana-azure-monitor-datasource'
     - result.datasource.url == 'http://example.com'
     - result.datasource.user == ''

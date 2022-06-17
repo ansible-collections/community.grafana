@@ -37,7 +37,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'elasticsearch'
     - result.datasource.url == 'https://elastic.company.com:9200'
     - result.datasource.user == ''
@@ -83,7 +83,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'elasticsearch'
     - result.datasource.url == 'https://elastic.company.com:9200'
     - result.datasource.user == ''
@@ -128,7 +128,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'elasticsearch'
     - result.datasource.url == 'https://elastic.example.com:9200'
     - result.datasource.user == ''
@@ -178,7 +178,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'elasticsearch'
     - result.datasource.url == 'https://elastic.example.com:9200'
     - result.datasource.user == ''
@@ -229,7 +229,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource/elastic'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'elasticsearch'
     - result.datasource.url == 'https://elastic.example.com:9200'
     - result.datasource.user == ''
