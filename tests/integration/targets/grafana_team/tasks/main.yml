@@ -1,6 +1,6 @@
 ---
 
-- name: Create a Team without members
+- name: Create a Team
   grafana_team:
       url: "{{ grafana_url }}"
       url_username: "{{ grafana_username }}"
@@ -10,13 +10,20 @@
       state: present
   register: result
 
+- set_fact:
+    # From Grafana 9.0.0, the API user automatically becomes a member of the team
+    auto_member: "{{ result.team.memberCount == 1 }}"
+
+- set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost'], []) }}"
+
 - assert:
     that:
       - "result.changed == true"
       - "result.team.name == 'grafana_working_group'"
-      - "result.team.memberCount == 0"
-      - "result.team.members == []"
       - "result.team.email == 'foo.bar@example.com'"
+      - "result.team.memberCount == (expected_members|length)"
+      - "result.team.members == expected_members"
 
 - name: Check idempotency on team creation
   grafana_team:
@@ -32,9 +39,9 @@
     that:
       - "result.changed == false"
       - "result.team.name == 'grafana_working_group'"
-      - "result.team.memberCount == 0"
-      - "result.team.members == []"
       - "result.team.email == 'foo.bar@example.com'"
+      - "result.team.memberCount == (expected_members|length)"
+      - "result.team.members == expected_members"
 
 - name: Check a team can be deleted
   grafana_team:
@@ -82,13 +89,16 @@
       state: present
   register: result
 
+- set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john.doe@example.com'], ['jane.doe@example.com', 'john.doe@example.com']) }}"
+
 - assert:
     that:
       - "result.changed == true"
       - "result.team.name == 'grafana_working_group'"
-      - "result.team.memberCount == 2"
-      - "result.team.members == ['jane.doe@example.com', 'john.doe@example.com']"
       - "result.team.email == 'foo.bar@example.com'"
+      - "result.team.memberCount == (expected_members|length)"
+      - "result.team.members == expected_members"
 
 - name: Ensure a Team exists with member not enforced
   grafana_team:
@@ -106,9 +116,13 @@
     that:
       - "result.changed == false"
       - "result.team.name == 'grafana_working_group'"
-      - "result.team.memberCount == 2"
-      - "result.team.members == ['jane.doe@example.com', 'john.doe@example.com']"
       - "result.team.email == 'foo.bar@example.com'"
+      - "result.team.memberCount == (expected_members|length)"
+      - "result.team.members == expected_members"
+
+- set_fact:
+    enforced_members: "{{ auto_member | ternary(['admin@localhost', 'john.doe@example.com'], ['john.doe@example.com']) }}"
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'john.doe@example.com'], ['john.doe@example.com']) }}"
 
 - name: Ensure a Team exists with member enforced
   grafana_team:
@@ -117,8 +131,7 @@
       url_password: "{{ grafana_password }}"
       name: "grafana_working_group"
       email: "foo.bar@example.com"
-      members:
-          - "john.doe@example.com"
+      members: "{{ enforced_members }}"
       enforce_members: true
       state: present
   register: result
@@ -127,9 +140,9 @@
     that:
       - "result.changed == true"
       - "result.team.name == 'grafana_working_group'"
-      - "result.team.memberCount == 1"
-      - "result.team.members == ['john.doe@example.com']"
       - "result.team.email == 'foo.bar@example.com'"
+      - "result.team.memberCount == (expected_members|length)"
+      - "result.team.members == expected_members"
 
 - name: Ensure a Team exists with members omitted
   grafana_team:
@@ -145,9 +158,9 @@
     that:
       - "result.changed == false"
       - "result.team.name == 'grafana_working_group'"
-      - "result.team.memberCount == 1"
-      - "result.team.members == ['john.doe@example.com']"
       - "result.team.email == 'foo.bar@example.com'"
+      - "result.team.memberCount == (expected_members|length)"
+      - "result.team.members == expected_members"
 
 - name: Add new member to existing Team
   grafana_team:
@@ -162,10 +175,13 @@
       state: present
   register: result
 
+- set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john.doe@example.com'], ['jane.doe@example.com', 'john.doe@example.com']) }}"
+
 - assert:
     that:
       - "result.changed == true"
       - "result.team.name == 'grafana_working_group'"
-      - "result.team.memberCount == 2"
-      - "result.team.members == ['jane.doe@example.com', 'john.doe@example.com']"
       - "result.team.email == 'foo.bar@example.com'"
+      - "result.team.memberCount == (expected_members|length)"
+      - "result.team.members == expected_members"

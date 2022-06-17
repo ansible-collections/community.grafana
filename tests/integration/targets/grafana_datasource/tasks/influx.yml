@@ -49,7 +49,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource-influxdb'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'influxdb'
     - result.datasource.url == 'https://influx.company.com:8086'
     - result.datasource.user == ''

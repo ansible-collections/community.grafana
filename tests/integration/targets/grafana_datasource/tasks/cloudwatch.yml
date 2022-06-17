@@ -32,7 +32,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert == false
     - result.datasource.name == 'datasource-cloudwatch'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'cloudwatch'
     - result.datasource.url == 'http://monitoring.us-west-1.amazonaws.com'
     - result.datasource.user == ''
@@ -71,7 +71,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert == false
     - result.datasource.name == 'datasource-cloudwatch'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'cloudwatch'
     - result.datasource.url == 'http://monitoring.us-west-1.amazonaws.com'
     - result.datasource.user == ''
