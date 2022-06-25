@@ -15,3 +15,4 @@ EOF
 
 FRAGMENTS=$(git fetch && git diff --name-only --diff-filter=ACMRT origin/main..HEAD | grep "changelogs/fragments")
 [ -z "$FRAGMENTS" ] && fail
+exit 0
