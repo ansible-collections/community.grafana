@@ -11,7 +11,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Automatic Rebase
+    - name: Check that changelog fragment exists
       run: ./hacking/check_fragment.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
