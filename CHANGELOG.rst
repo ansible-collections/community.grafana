@@ -5,6 +5,20 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.5.0
+======
+
+Minor Changes
+-------------
+
+- community.grafana.grafana_datasource supports grafana-azure-monitor-datasource.
+
+Bugfixes
+--------
+
+- Fix a bug that causes a fatal error when using `url` parameter in `grafana_dashboard` and `grafana_notification_channel` modules.
+- Fix a bug that causes an update error when using the `grafana_datasource` module on Grafana >=9.0.0 (https://github.com/ansible-collections/community.grafana/issues/248).
+
 v1.4.0
 ======
 

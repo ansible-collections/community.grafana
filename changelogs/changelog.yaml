@@ -150,3 +150,18 @@ releases:
     - grafana_users_note.yaml
     - notifi_channel_refacto.yml
     release_date: '2022-04-18'
+  1.5.0:
+    changes:
+      bugfixes:
+      - Fix a bug that causes a fatal error when using `url` parameter in `grafana_dashboard`
+        and `grafana_notification_channel` modules.
+      - Fix a bug that causes an update error when using the `grafana_datasource`
+        module on Grafana >=9.0.0 (https://github.com/ansible-collections/community.grafana/issues/248).
+      minor_changes:
+      - community.grafana.grafana_datasource supports grafana-azure-monitor-datasource.
+    fragments:
+    - 172_support_azure_datasource.yml
+    - 186_check_fragments.yml
+    - 239_keyerror_grafana_url.yml
+    - 248_ds_update_error_grafana_9.yml
+    release_date: '2022-06-25'
