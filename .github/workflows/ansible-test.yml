@@ -77,8 +77,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        grafana_version: ["8.1.8",  "8.2.7", "8.3.3", "9.0.0"]
-        ansible_version: ["stable-2.9", "stable-2.10", "stable-2.11", "stable-2.12", "stable-2.13", "devel"]
+        grafana_version: TEST 
+        ansible_version: ["stable-2.11", "stable-2.12", "stable-2.13", "devel"]
         python_version: ["3.8"]
     container:
       image: python:${{ matrix.python_version }}
