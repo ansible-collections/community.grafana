@@ -1,23 +1,17 @@
 #!/bin/bash
 
-function comment() {
-    echo "No fragment detected"
-    if [ -n "$PR_NUMBER" ]; then
-        gh pr review "$PR_NUMBER" -r -F "$(git rev-parse --show-toplevel)/hacking/NEED_FRAGMENT"
-    fi
+function fail() {
+    cat << EOF
+    Dear contributor,
+
+    Thank you for you Pull Request !
+    To ease the work of maintainers you need to add a [changelog fragment](https://docs.ansible.com/ansible/latest/community/development_process.html#creating-a-changelog-fragment) in you PR.
+
+    It will help your change be released faster !
+    Thank you !
+EOF
     exit 1
 }
 
-function approve() {
-    if [ -n "$PR_NUMBER" ]; then
-        gh pr review "$PR_NUMBER" -a
-    fi
-}
-
 FRAGMENTS=$(git fetch && git diff --name-only --diff-filter=ACMRT origin/main..HEAD | grep "changelogs/fragments")
-
-if [ -z "$FRAGMENTS" ]; then
-    comment
-else
-    approve
-fi
+[ -z "$FRAGMENTS" ] && fail
