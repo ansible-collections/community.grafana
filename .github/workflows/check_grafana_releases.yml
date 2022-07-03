@@ -24,7 +24,7 @@ jobs:
       - name: Get the latest major releases of Grafana and update repo
         run: |
           RELEASES_LIST="$(python3 hacking/find_grafana_versions.py)"
-          sed -i "s/grafana_version:.*/grafana_version: TEST $RELEASES_LIST/" .github/workflows/ansible-test.yml README.md
+          sed -i "s/grafana_version:.*/grafana_version: $RELEASES_LIST/" .github/workflows/ansible-test.yml README.md
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
