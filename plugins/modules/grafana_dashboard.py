@@ -470,7 +470,7 @@ def grafana_export_dashboard(module, data):
     if dashboard_exists is True:
         try:
             with open(data['path'], 'w') as f:
-                f.write(json.dumps(dashboard))
+                f.write(json.dumps(dashboard, indent=2))
         except Exception as e:
             raise GrafanaExportException("Can't write json file : %s" % to_native(e))
         result = {'msg': "Dashboard %s exported to %s" % (uid, data['path']),
