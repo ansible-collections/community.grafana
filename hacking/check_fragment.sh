@@ -13,6 +13,6 @@ EOF
     exit 1
 }
 
-FRAGMENTS=$(git fetch && git diff --name-only --diff-filter=ACMRT origin/main..HEAD | grep "changelogs/fragments")
+FRAGMENTS=$(git fetch && git diff --name-only --diff-filter=ACMRT origin/main..HEAD | grep "changelogs")
 [ -z "$FRAGMENTS" ] && fail
 exit 0
