@@ -165,3 +165,13 @@ releases:
     - 239_keyerror_grafana_url.yml
     - 248_ds_update_error_grafana_9.yml
     release_date: '2022-06-25'
+  1.5.1:
+    changes:
+      minor_changes:
+      - Export dashboard with pretty printed JSON so that it becomes easier to compare
+        changes with the previous version (#257)
+    fragments:
+    - 00_drop_eol_ansible.yml
+    - 01_grafana_bump.yml
+    - 257_pretty_printed_dashboard_export.yml
+    release_date: '2022-07-17'

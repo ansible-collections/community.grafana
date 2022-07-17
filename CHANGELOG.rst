@@ -5,6 +5,14 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.5.1
+======
+
+Minor Changes
+-------------
+
+- Export dashboard with pretty printed JSON so that it becomes easier to compare changes with the previous version (#257)
+
 v1.5.0
 ======
 
