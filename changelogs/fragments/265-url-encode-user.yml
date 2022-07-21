@@ -1,0 +1,2 @@
+bugfixes:
+- Ensure user email/login is url encoded when searching for the user (#264)
