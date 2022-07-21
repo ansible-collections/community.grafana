@@ -276,7 +276,7 @@ class GrafanaTeamInterface(object):
         self._send_request(url, headers=self.headers, method="DELETE")
 
     def get_user_id_from_mail(self, email):
-        url = "/api/users/lookup?loginOrEmail={email}".format(email=email)
+        url = "/api/users/lookup?loginOrEmail={email}".format(email=quote(email))
         user = self._send_request(url, headers=self.headers, method="GET")
         if user is None:
             self._module.fail_json(failed=True, msg="User '%s' does not exists" % email)
