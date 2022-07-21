@@ -159,6 +159,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
+from ansible.module_utils.six.moves.urllib.parse import quote
 
 __metaclass__ = type
 
@@ -203,7 +204,7 @@ class GrafanaUserInterface(object):
 
     def get_user_from_login(self, login):
         # https://grafana.com/docs/grafana/latest/http_api/user/#get-single-user-by-usernamelogin-or-email
-        url = "/api/users/lookup?loginOrEmail={login}".format(login=login)
+        url = "/api/users/lookup?loginOrEmail={login}".format(login=quote(login))
         return self._send_request(url, headers=self.headers, method="GET")
 
     def update_user(self, user_id, email, name, login):
