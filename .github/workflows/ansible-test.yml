@@ -8,70 +8,43 @@ on:
 jobs:
   sanity:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: Sanity (Ⓐ$${{ matrix.ansible }})
     strategy:
       matrix:
-        python_version: ["3.8"]
-        ansible_version: ["stable-2.11", "stable-2.12", "stable-2.13", "devel"]
+        ansible:
+          - stable-2.11
+          - stable-2.12
+          - stable-2.13
+          - devel
     steps:
-
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Perform testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          path: ansible_collections/community/grafana
-
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python_version }}
-
-      - name: Install ansible
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
-
-      - name: Run sanity tests
-        run: ansible-test sanity --docker -v --color --coverage
-        working-directory: ./ansible_collections/community/grafana
-      
-      - name: Generate coverage report
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/grafana
-
-      - uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: false
-          flags: sanity
+          ansible-core-version: ${{ matrix.ansible }}
+          python-version: 3.8
+          target-python-version: 3.8
+          testing-type: sanity
 
   units:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: Units (Ⓐ${{ matrix.ansible }})
     strategy:
       matrix:
-        python_version: ["3.8"]
-        ansible_version: ["stable-2.11", "stable-2.12", "stable-2.13", "devel"]
+        ansible:
+          - stable-2.11
+          - stable-2.12
+          - stable-2.13
+          - devel
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Perform testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          path: ansible_collections/community/grafana
-
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python_version }}
-
-      - name: Install ansible
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
-
-      - name: Run unit tests
-        run: ansible-test units --docker -v --color --python ${{ matrix.python_version }} --coverage
-        working-directory: ./ansible_collections/community/grafana
-
-      - name: Generate coverage report.
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/grafana
-
-      - uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: false
-          flags: units
+          ansible-core-version: ${{ matrix.ansible }}
+          python-version: 3.8
+          target-python-version: 3.8
+          testing-type: units
 
   integration:
     runs-on: ubuntu-latest
@@ -79,32 +52,19 @@ jobs:
       fail-fast: false
       matrix:
         grafana_version: ["9.0.2", "8.5.6", "7.5.16"]
-        ansible_version: ["stable-2.11", "stable-2.12", "stable-2.13", "devel"]
-        python_version: ["3.8"]
-    container:
-      image: python:${{ matrix.python_version }}
+        ansible: 
+          - stable-2.11
+          - stable-2.12
+          - stable-2.13
+          - devel
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
     steps:
-
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Perform testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          path: ansible_collections/community/grafana
-
-      - name: Install ansible
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
-
-      - name: Run integration tests on Python ${{ matrix.python_version }}
-        run: ansible-test integration -v --color --retry-on-error --requirements --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
-        working-directory: ./ansible_collections/community/grafana
-      
-      - name: Generate coverage report
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/grafana
-
-      - uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: false
-          flags: integration
+          ansible-core-version: ${{ matrix.ansible }}
+          python-version: 3.8
+          target-python-version: 3.8
+          testing-type: integration
