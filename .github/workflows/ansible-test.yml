@@ -57,30 +57,13 @@ jobs:
         exclude:
           - python_version: "3.8"
             ansible_version: "devel"
-    container:
-      image: python:${{ matrix.python_version }}
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
     steps:
-
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Perform testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          path: ansible_collections/community/grafana
-
-      - name: Install ansible
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
-
-      - name: Run integration tests on Python ${{ matrix.python_version }}
-        run: ansible-test integration -v --color --retry-on-error --requirements --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
-        working-directory: ./ansible_collections/community/grafana
-      
-      - name: Generate coverage report
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/grafana
-
-      - uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: false
-          flags: integration
+          ansible-core-version: ${{ matrix.ansible_version }}
+          target-python-version: ${{ matrix.python_version }}
+          testing-type: integration
