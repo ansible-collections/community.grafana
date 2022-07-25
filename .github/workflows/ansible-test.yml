@@ -58,7 +58,7 @@ jobs:
           - stable-2.13
           - devel
     container:
-      image: quay.io/ansible/default-test-container:6.4.0
+      image: python:3.9
 
     services:
       grafana:
