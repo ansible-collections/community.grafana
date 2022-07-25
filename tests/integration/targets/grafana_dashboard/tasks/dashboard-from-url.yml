@@ -1,5 +1,9 @@
 ---
 
+- name: debug!
+  debug:
+    var: ansible_facts.env
+
 - name: Check import grafana dashboard from url
   grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
