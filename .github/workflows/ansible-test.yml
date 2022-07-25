@@ -61,6 +61,8 @@ jobs:
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
+        ports:
+          - 3000:3000
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
