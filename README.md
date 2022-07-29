@@ -27,6 +27,7 @@ Click on the name of a plugin or module to view that content's documentation:
     - [grafana_folder](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html)
     - [grafana_notification_channel](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_notification_channel_module.html)
     - [grafana_organization](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_module.html)
+    - [grafana_organization_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_user_module.html)
     - [grafana_plugin](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_plugin_module.html)
     - [grafana_team](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
     - [grafana_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)

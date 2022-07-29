@@ -1,5 +1,5 @@
 ---
-- name: Create test user
+- name: Create test user (default org 1)
   grafana_user:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
@@ -9,8 +9,9 @@
     login: orgtest
     password: userpassword
     state: present
+  register: result
 
-- name: Remove user from organization
+- name: Remove user from organization (default org 1)
   community.grafana.grafana_organization_user:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
@@ -23,7 +24,7 @@
       - "result.failed == false"
       - "result.changed == true"
 
-- name: Check idempotency on user removal
+- name: Check idempotency on user removal from org
   community.grafana.grafana_organization_user:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
@@ -49,6 +50,8 @@
     that:
       - "result.failed == false"
       - "result.changed == true"
+      - "result.user.orgId == 1"
+      - "result.user.role == 'Viewer'"
 
 - name: Update existing user role
   community.grafana.grafana_organization_user:
@@ -63,6 +66,8 @@
     that:
       - "result.failed == false"
       - "result.changed == true"
+      - "result.user.orgId == 1"
+      - "result.user.role == 'Editor'"
 
 - name: Check idempotency on user update
   community.grafana.grafana_organization_user:
@@ -77,3 +82,29 @@
     that:
       - "result.failed == false"
       - "result.changed == false"
+
+- name: Create a new organization
+  community.grafana.grafana_organization:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: neworgtest
+    state: present
+  register: org
+
+- name: Add user to the organization
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    org_id: "{{ org.org.id }}"
+    login: orgtest
+    role: admin
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == true"
+      - "result.user.orgId == org.org.id"
+      - "result.user.role == 'Admin'"
