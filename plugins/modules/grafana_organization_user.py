@@ -24,10 +24,11 @@ DOCUMENTATION = '''
 module: grafana_organization_user
 author:
   - Aliaksandr Mianzhynski (@amenzhinsky)
-version_added: "1.5.0"
+version_added: "1.6.0"
 short_description: Manage Grafana Organization Users.
 description:
   - Add or remove users or change their roles in Grafana organizations through org API.
+  - The user has to exist before using this module. See U(https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html).
 options:
   login:
     type: str
@@ -80,6 +81,59 @@ EXAMPLES = '''
     state: absent
 '''
 
+# "avatarUrl": "/avatar/955c24be176f4feee34912a74de4ec01",
+# "email": "orgtest@example.com",
+# "lastSeenAt": "2012-07-29T13:42:00+04:00",
+# "lastSeenAtAge": "10 years",
+# "login": "orgtest",
+# "name": "orgtest",
+# "orgId": 1,
+# "role": "Editor",
+# "userId": 3
+
+RETURN = '''
+---
+user:
+    description: Information about the organization user
+    returned: when state present
+    type: complex
+    contains:
+        email:
+            description: The User email address
+            returned: always
+            type: str
+            sample:
+                - "foo.bar@example.com"
+        login:
+            description: The User login
+            returned: always
+            type: str
+            sample:
+                - "batman"
+        name:
+            description: The User name (same as login)
+            returned: always
+            type: str
+            sample:
+                - "batman"
+        orgId:
+            description: The organization id that the team is part of.
+            returned: always
+            type: int
+            sample:
+                - 1
+        role:
+            description: The user role in the organization
+            returned: always
+            type: str
+            choices:
+                - Viewer
+                - Editor
+                - Admin
+            sample:
+              - Viewer
+'''
+
 
 import json
 
@@ -118,53 +172,69 @@ class GrafanaOrganizationUserInterface(object):
             raise GrafanaAPIException("Unable to retrieve organization users: %s" % info)
         return json.loads(to_text(r.read()))
 
-    def create_or_update_user(self, org_id, login, role):
-        r, info = self._api_call('POST', 'orgs/%d/users' % org_id, {
+    def _create_organization_user(self, org_id, login, role):
+        return self._api_call('POST', 'orgs/%d/users' % org_id, {
             "loginOrEmail": login,
             "role": role,
         })
+
+    def _update_organization_user_role(self, org_id, user_id, role):
+        return self._api_call('PATCH', 'orgs/%d/users/%s' % (org_id, user_id), {
+            "role": role,
+        })
+
+    def _remove_organization_user(self, org_id, user_id):
+        return self._api_call('DELETE', 'orgs/%d/users/%s' % (org_id, user_id), None)
+
+    def _organization_user_by_login(self, org_id, login):
+        for user in self._organization_users(org_id):
+            if user['name'] == login or user['email'] == login:
+                return user
+
+    def create_or_update_user(self, org_id, login, role):
+        r, info = self._create_organization_user(org_id, login, role)
         if info['status'] == 200:
             return {
                 'state': 'present',
-                'changed': True
+                'changed': True,
+                'user': self._organization_user_by_login(org_id, login),
             }
         if info['status'] == 409:  # already member
-            for user in self._organization_users(org_id):
-                if user['name'] == login or user['email'] == login:
-                    if user['role'] == role:
-                        return {
-                            'changed': False
-                        }
+            user = self._organization_user_by_login(org_id, login)
+            if not user:
+                raise Exception("[BUG] User not found in organization")
 
-                    r, info = self._api_call('PATCH', 'orgs/%d/users/%s' % (org_id, user['userId']), {
-                        "role": role,
-                    })
-                    if info['status'] == 200:
-                        return {
-                            'changed': True
-                        }
-                    else:
-                        raise GrafanaAPIException("Unable to update organization user: %s" % info)
+            if user['role'] == role:
+                return {
+                    'changed': False
+                }
 
-            raise Exception("[BUG] User not found in organization")
+            r, info = self._update_organization_user_role(org_id, user['userId'], role)
+            if info['status'] == 200:
+                return {
+                    'changed': True,
+                    'user': self._organization_user_by_login(org_id, login),
+                }
+            else:
+                raise GrafanaAPIException("Unable to update organization user: %s" % info)
         else:
             raise GrafanaAPIException("Unable to add user to organization: %s" % info)
 
     def remove_user(self, org_id, login):
-        for user in self._organization_users(org_id):
-            if user['name'] == login or user['email'] == login:
-                r, info = self._api_call('DELETE', 'orgs/%d/users/%s' % (org_id, user['userId']), None)
-                if info['status'] == 200:
-                    return {
-                        'state': 'absent',
-                        'changed': True
-                    }
-                else:
-                    raise GrafanaAPIException("Unable to delete organization user: %s" % info)
+        user = self._organization_user_by_login(org_id, login)
+        if not user:
+            return {
+                'changed': False
+            }
 
-        return {
-            'changed': False
-        }
+        r, info = self._remove_organization_user(org_id, user['userId'])
+        if info['status'] == 200:
+            return {
+                'state': 'absent',
+                'changed': True
+            }
+        else:
+            raise GrafanaAPIException("Unable to delete organization user: %s" % info)
 
 
 def main():
