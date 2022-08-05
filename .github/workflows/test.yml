@@ -17,7 +17,7 @@ jobs:
           - 3000:3000
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v4
