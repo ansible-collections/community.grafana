@@ -7,7 +7,7 @@
     force_basic_auth: yes
     body:
       name: "John"
-      email: "john.doe@example.com"
+      email: "john+doe@example.com"
       login: "john"
       password: "userpassword"
     body_format: json

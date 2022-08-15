@@ -200,3 +200,38 @@
 - assert:
     that:
       - "result.json.message | lower == 'user not found'"
+
+- name: Create a Grafana user with character encoding
+  grafana_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: "Bruce Wayne"
+    email: bruce+wayne@gotham.city
+    login: bruce+wayne@gotham.city
+    password: robin
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.user.name == 'Bruce Wayne'"
+      - "result.user.email == 'bruce+wayne@gotham.city'"
+      - "result.user.isGrafanaAdmin == false"
+
+- name: Check idempotency on user creation (password not requiered)
+  grafana_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: "Bruce Wayne"
+    email: bruce+wayne@gotham.city
+    login: bruce+wayne@gotham.city
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.user.name == 'Bruce Wayne'"
+      - "result.user.email == 'bruce+wayne@gotham.city'"
+      - "result.user.isGrafanaAdmin == false"
