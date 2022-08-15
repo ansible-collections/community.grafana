@@ -84,13 +84,13 @@
       name: "grafana_working_group"
       email: "foo.bar@example.com"
       members:
-          - "john.doe@example.com"
+          - "john+doe@example.com"
           - "jane.doe@example.com"
       state: present
   register: result
 
 - set_fact:
-    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john.doe@example.com'], ['jane.doe@example.com', 'john.doe@example.com']) }}"
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com']) }}"
 
 - assert:
     that:
@@ -108,7 +108,7 @@
       name: "grafana_working_group"
       email: "foo.bar@example.com"
       members:
-          - "john.doe@example.com"
+          - "john+doe@example.com"
       state: present
   register: result
 
@@ -121,8 +121,8 @@
       - "result.team.members == expected_members"
 
 - set_fact:
-    enforced_members: "{{ auto_member | ternary(['admin@localhost', 'john.doe@example.com'], ['john.doe@example.com']) }}"
-    expected_members: "{{ auto_member | ternary(['********@localhost', 'john.doe@example.com'], ['john.doe@example.com']) }}"
+    enforced_members: "{{ auto_member | ternary(['admin@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
 
 - name: Ensure a Team exists with member enforced
   grafana_team:
@@ -170,13 +170,13 @@
       name: "grafana_working_group"
       email: "foo.bar@example.com"
       members:
-          - "john.doe@example.com"
+          - "john+doe@example.com"
           - "jane.doe@example.com"
       state: present
   register: result
 
 - set_fact:
-    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john.doe@example.com'], ['jane.doe@example.com', 'john.doe@example.com']) }}"
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com']) }}"
 
 - assert:
     that:
