@@ -141,22 +141,15 @@ You can run the collection's test suites with the commands:
 
 ## Publishing New Versions
 
-The current process for publishing new versions of the Grafana Collection is manual, and requires a user who has access to the `community.grafana` namespace on Ansible Galaxy to publish the build artifact.
+The collection is automatically released on [Galaxy](//galaxy.ansible.com/community/grafana) when a tag is created on the repository.
+The release pipeline is managed by the Ansible Team as the collection is part of the `community` namespace.
 
-  1. Ensure `CHANGELOG.md` contains all the latest changes.
-  2. Update `galaxy.yml` and this README's `requirements.yml` example with the new `version` for the collection.
-  3. Tag the version in Git and push to GitHub.
-  4. Run the following commands to build and release the new version on Galaxy:
-
-     ```
-     ansible-galaxy collection build
-     ansible-galaxy collection publish ./community-grafana-$VERSION_HERE.tar.gz
-     ```
-
-After the version is published, verify it exists on the [Grafana Collection Galaxy page](https://galaxy.ansible.com/community/grafana).
+The current process for creating a tag is manual.
 
 ## Changelogs
 
+Abstract from Ansible requirements for Collections:
+```
 * Every change that does not only affect docs or tests must have a changelog fragment.
   * Exception: fixing/extending a feature that already has a changelog fragment and has not yet been released. Such PRs must always link to the original PR(s) they update.
   * Use your common sense!
@@ -168,12 +161,16 @@ After the version is published, verify it exists on the [Grafana Collection Gala
 Since everything adding to the minor/patch changelogs are backports, the same changelog fragments of these minor/patch releases will be in the next major release's changelog. (This is the same behavior as in ansible/ansible.)
 * Changelogs do not contain previous major releases, and only use the ancestor feature (in changelogs/changelog.yaml) to point to the previous major release.
 * Changelog fragments are removed after a release is made.
+```
 
-See [antsibull-changelog documentation](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelogs.rst#changelog-fragment-categories)
+See [antsibull-changelog documentation](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelogs.rst#changelog-fragment-categories) for fragments format.
 
-## More Information
-
-For more information about Ansible's Grafana integration, join the `#ansible-community` channel on [irc.libera.chat](https://libera.chat/), and browse the resources in the [Grafana Working Group](https://github.com/ansible/community/wiki/Grafana) Community wiki page.
+Generate a new changelog:
+1. Update the collection version in `galaxy.yml` if required.
+2. Generate the changelog:
+```
+$ antsibull-changelog release
+```
 
 ## License
 
