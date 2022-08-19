@@ -5,6 +5,14 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.5.2
+======
+
+Bugfixes
+--------
+
+- Ensure user email/login is url encoded when searching for the user (#264)
+
 v1.5.1
 ======
 
