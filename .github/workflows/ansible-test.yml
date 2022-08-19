@@ -10,8 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ["3.8"]
+        python_version: ["3.8", "3.9"]
         ansible_version: ["stable-2.11", "stable-2.12", "stable-2.13", "devel"]
+        exclude:
+          - python_version: "3.8"
+            ansible_version: "devel"
     steps:
 
       - name: Check out code
@@ -30,7 +33,7 @@ jobs:
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --coverage
         working-directory: ./ansible_collections/community/grafana
-      
+
       - name: Generate coverage report
         run: ansible-test coverage xml -v --requirements --group-by command --group-by version
         working-directory: ./ansible_collections/community/grafana
@@ -44,8 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ["3.8"]
+        python_version: ["3.8", "3.9"]
         ansible_version: ["stable-2.11", "stable-2.12", "stable-2.13", "devel"]
+        exclude:
+          - python_version: "3.8"
+            ansible_version: "devel"
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -80,7 +86,10 @@ jobs:
       matrix:
         grafana_version: ["9.0.2", "8.5.6", "7.5.16"]
         ansible_version: ["stable-2.11", "stable-2.12", "stable-2.13", "devel"]
-        python_version: ["3.8"]
+        python_version: ["3.8", "3.9"]
+        exclude:
+          - python_version: "3.8"
+            ansible_version: "devel"
     container:
       image: python:${{ matrix.python_version }}
     services:
