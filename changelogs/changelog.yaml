@@ -175,3 +175,10 @@ releases:
     - 01_grafana_bump.yml
     - 257_pretty_printed_dashboard_export.yml
     release_date: '2022-07-17'
+  1.5.2:
+    changes:
+      bugfixes:
+      - Ensure user email/login is url encoded when searching for the user (#264)
+    fragments:
+    - 265-url-encode-user.yml
+    release_date: '2022-08-19'
