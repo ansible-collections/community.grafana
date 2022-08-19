@@ -267,15 +267,15 @@ def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
 def grafana_dashboard_changed(payload, dashboard):
     # you don't need to set the version, but '0' is incremented to '1' by Grafana's API
     if 'version' in payload['dashboard']:
-        del(payload['dashboard']['version'])
+        del payload['dashboard']['version']
     if 'version' in dashboard['dashboard']:
-        del(dashboard['dashboard']['version'])
+        del dashboard['dashboard']['version']
 
     # remove meta key if exists for compare
     if 'meta' in dashboard:
-        del(dashboard['meta'])
+        del dashboard['meta']
     if 'meta' in payload:
-        del(payload['meta'])
+        del payload['meta']
 
     # if folderId is not provided in dashboard, set default folderId
     if 'folderId' not in dashboard:
@@ -283,9 +283,9 @@ def grafana_dashboard_changed(payload, dashboard):
 
     # Ignore dashboard ids since real identifier is uuid
     if 'id' in dashboard['dashboard']:
-        del(dashboard['dashboard']['id'])
+        del dashboard['dashboard']['id']
     if 'id' in payload['dashboard']:
-        del(payload['dashboard']['id'])
+        del payload['dashboard']['id']
 
     if payload == dashboard:
         return False
