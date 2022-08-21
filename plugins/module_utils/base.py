@@ -18,8 +18,18 @@
 
 from __future__ import (absolute_import, division, print_function)
 from ansible.module_utils.urls import url_argument_spec
+from ansible.module_utils._text import to_text
 
 __metaclass__ = type
+
+
+class GrafanaHttpError(Exception):
+
+    def __init__(self, message, http_code, response, url):
+        self.message = message
+        self.http_code = http_code
+        self.response = response
+        self.url = url
 
 
 def clean_url(url):
