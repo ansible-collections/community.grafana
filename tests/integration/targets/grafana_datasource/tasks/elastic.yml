@@ -1,7 +1,8 @@
-- name: Create elasticsearch datasource
+---
+- name: Create elasticsearch datasource with legacy elasticsearch format
   register: result
   grafana_datasource:
-    name: "datasource/elastic"
+    name: "datasource/elasticLegacy"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -30,6 +31,52 @@
     - result.datasource.database == '[logstash_]YYYY.MM.DD'
     - not result.datasource.isDefault
     - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.interval == 'Daily'
+    - result.datasource.jsonData.maxConcurrentShardRequests == 42
+    - result.datasource.jsonData.timeField == '@timestamp'
+    - not result.datasource.jsonData.tlsAuth
+    - result.datasource.jsonData.tlsAuthWithCACert
+    - result.datasource.name == 'datasource/elasticLegacy'
+    - result.datasource.orgId == 1
+    - ('password' not in result.datasource) or (result.datasource.password == '')
+    - result.datasource.type == 'elasticsearch'
+    - result.datasource.url == 'https://elastic.company.com:9200'
+    - result.datasource.user == ''
+    - not result.datasource.withCredentials
+    - "result.msg == 'Datasource datasource/elasticLegacy created'"
+
+- name: Create elasticsearch datasource with new elsaticsearch version format
+  register: result
+  grafana_datasource:
+    name: "datasource/elastic"
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: '1'
+    ds_type: elasticsearch
+    ds_url: https://elastic.company.com:9200
+    database: '[logstash_]YYYY.MM.DD'
+    basic_auth_user: grafana
+    basic_auth_password: '******'
+    time_field: '@timestamp'
+    time_interval: 1m
+    interval: Daily
+    es_version: "7.10+"
+    max_concurrent_shard_requests: 42
+    tls_ca_cert: /etc/ssl/certs/ca.pem
+
+- debug:
+    var: result
+
+- assert:
+    that:
+    - result.changed
+    - result.datasource.basicAuth
+    - result.datasource.basicAuthUser == 'grafana'
+    - result.datasource.access == 'proxy'
+    - result.datasource.database == '[logstash_]YYYY.MM.DD'
+    - not result.datasource.isDefault
+    - result.datasource.jsonData.esVersion == "7.10.0"
     - result.datasource.jsonData.interval == 'Daily'
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
@@ -60,7 +107,7 @@
     time_field: '@timestamp'
     time_interval: 1m
     interval: Daily
-    es_version: 56
+    es_version: "7.10+"
     max_concurrent_shard_requests: 42
     tls_ca_cert: /etc/ssl/certs/ca.pem
 
@@ -75,7 +122,7 @@
     - result.datasource.access == 'proxy'
     - result.datasource.database == '[logstash_]YYYY.MM.DD'
     - not result.datasource.isDefault
-    - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.esVersion == '7.10.0'
     - result.datasource.jsonData.interval == 'Daily'
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
@@ -105,7 +152,7 @@
     time_field: '@timestamp'
     time_interval: 1m
     interval: Daily
-    es_version: 56
+    es_version: "7.10+"
     max_concurrent_shard_requests: 42
     tls_ca_cert: /etc/ssl/certs/ca.pem
 
@@ -120,7 +167,7 @@
     - result.datasource.access == 'proxy'
     - result.datasource.database == '[logstash_]YYYY.MM.DD'
     - not result.datasource.isDefault
-    - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.esVersion == '7.10.0'
     - result.datasource.jsonData.interval == 'Daily'
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
@@ -150,7 +197,7 @@
     time_field: '@timestamp'
     time_interval: 1m
     interval: Daily
-    es_version: 56
+    es_version: "7.10+"
     max_concurrent_shard_requests: 42
     tls_ca_cert: /etc/ssl/certs/ca.pem
     enforce_secure_data: false
@@ -170,7 +217,7 @@
     - result.datasource.access == 'proxy'
     - result.datasource.database == '[logstash_]YYYY.MM.DD'
     - not result.datasource.isDefault
-    - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.esVersion == '7.10.0'
     - result.datasource.jsonData.interval == 'Daily'
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
@@ -201,7 +248,7 @@
     time_field: '@timestamp'
     time_interval: 1m
     interval: Daily
-    es_version: 56
+    es_version: "7.10+"
     max_concurrent_shard_requests: 42
     tls_ca_cert: /etc/ssl/certs/ca.pem
     enforce_secure_data: true
@@ -221,7 +268,7 @@
     - result.datasource.access == 'proxy'
     - result.datasource.database == '[logstash_]YYYY.MM.DD'
     - not result.datasource.isDefault
-    - result.datasource.jsonData.esVersion == 56
+    - result.datasource.jsonData.esVersion == '7.10.0'
     - result.datasource.jsonData.interval == 'Daily'
     - result.datasource.jsonData.maxConcurrentShardRequests == 42
     - result.datasource.jsonData.timeField == '@timestamp'
