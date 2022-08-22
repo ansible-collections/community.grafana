@@ -137,13 +137,16 @@ options:
     - Version 56 is for elasticsearch 5.6+ where you can specify the C(max_concurrent_shard_requests)
       option.
     choices:
-    - 2
-    - 5
-    - 56
-    - 60
-    - 70
-    default: 5
-    type: int
+    - "2"
+    - "5"
+    - "56"
+    - "60"
+    - "70"
+    - "7.7+"
+    - "7.10+"
+    - "8.0+"
+    default: "7.10+"
+    type: str
   max_concurrent_shard_requests:
     description:
     - Starting with elasticsearch 5.6, you can specify the max concurrent shard per
@@ -490,6 +493,13 @@ from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_h
 from ansible_collections.community.grafana.plugins.module_utils import base
 
 
+ES_VERSION_MAPPING = {
+    "7.7+": "7.7.0",
+    "7.10+": "7.10.0",
+    "8.0+": "8.0.0",
+}
+
+
 def compare_datasources(new, current, compareSecureData=True):
     if 'uid' in current:
         del current['uid']
@@ -581,12 +591,22 @@ def get_datasource_payload(data):
 
     # datasource type related parameters
     if data['ds_type'] == 'elasticsearch':
-        json_data['esVersion'] = data['es_version']
+
+        json_data['maxConcurrentShardRequests'] = data['max_concurrent_shard_requests']
         json_data['timeField'] = data['time_field']
         if data.get('interval'):
             json_data['interval'] = data['interval']
-        if data['es_version'] >= 56:
-            json_data['maxConcurrentShardRequests'] = data['max_concurrent_shard_requests']
+
+        # Handle changes in es_version format in Grafana < 8.x which used to
+        # be integers and is now semver format
+        try:
+            es_version = int(data['es_version'])
+            if es_version < 56:
+                json_data.pop('maxConcurrentShardRequests')
+        except ValueError:
+            # Retrieve the Semver format expected by API
+            es_version = ES_VERSION_MAPPING.get(data['es_version'])
+        json_data['esVersion'] = es_version
 
     if data['ds_type'] == 'elasticsearch' or data['ds_type'] == 'influxdb':
         if data.get('time_interval'):
@@ -725,7 +745,9 @@ def setup_module_object():
         tls_skip_verify=dict(type='bool', default=False),
         is_default=dict(default=False, type='bool'),
         org_id=dict(default=1, type='int'),
-        es_version=dict(type='int', default=5, choices=[2, 5, 56, 60, 70]),
+        es_version=dict(type='str', default="7.10+", choices=["2", "5", "56", "60",
+                                                              "70", "7.7+", "7.10+",
+                                                              "8.0+"]),
         max_concurrent_shard_requests=dict(type='int', default=256),
         time_field=dict(default='@timestamp', type='str'),
         time_interval=dict(type='str'),
@@ -770,9 +792,9 @@ def setup_module_object():
             ['ds_type', 'mysql', ['database']],
             ['ds_type', 'postgres', ['database', 'sslmode']],
             ['ds_type', 'cloudwatch', ['aws_auth_type', 'aws_default_region']],
-            ['es_version', 56, ['max_concurrent_shard_requests']],
-            ['es_version', 60, ['max_concurrent_shard_requests']],
-            ['es_version', 70, ['max_concurrent_shard_requests']]
+            ['es_version', "56", ['max_concurrent_shard_requests']],
+            ['es_version', "60", ['max_concurrent_shard_requests']],
+            ['es_version', "70", ['max_concurrent_shard_requests']]
         ],
     )
     return module
