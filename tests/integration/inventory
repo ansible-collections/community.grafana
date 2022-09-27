@@ -1,2 +1,0 @@
-[testgroup]
-testhost ansible_connection="local" ansible_pipelining="yes" ansible_python_interpreter="/opt/homebrew/Cellar/ansible/6.1.0/libexec/bin/python3.10"
