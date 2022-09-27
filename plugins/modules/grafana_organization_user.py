@@ -81,16 +81,6 @@ EXAMPLES = '''
     state: absent
 '''
 
-# "avatarUrl": "/avatar/955c24be176f4feee34912a74de4ec01",
-# "email": "orgtest@example.com",
-# "lastSeenAt": "2012-07-29T13:42:00+04:00",
-# "lastSeenAtAge": "10 years",
-# "login": "orgtest",
-# "name": "orgtest",
-# "orgId": 1,
-# "role": "Editor",
-# "userId": 3
-
 RETURN = '''
 ---
 user:
