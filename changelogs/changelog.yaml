@@ -182,3 +182,12 @@ releases:
     fragments:
     - 265-url-encode-user.yml
     release_date: '2022-08-19'
+  1.5.3:
+    changes:
+      bugfixes:
+      - Add support for more elasticsearch version as datasource (#263)
+    fragments:
+    - add-units-datasource.yml
+    - ci.yml
+    - fix-263.yaml
+    release_date: '2022-10-06'

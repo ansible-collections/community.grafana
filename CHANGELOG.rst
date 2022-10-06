@@ -5,6 +5,14 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.5.3
+======
+
+Bugfixes
+--------
+
+- Add support for more elasticsearch version as datasource (#263)
+
 v1.5.2
 ======
 
