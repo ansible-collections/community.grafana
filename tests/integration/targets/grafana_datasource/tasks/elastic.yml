@@ -3,7 +3,6 @@
   register: result
   grafana_datasource:
     name: "datasource/elasticLegacy"
-    uid: "myuid"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -96,7 +95,6 @@
   register: result
   grafana_datasource:
     name: "datasource/elastic"
-    uid: "myuid"
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"

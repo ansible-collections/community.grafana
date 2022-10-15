@@ -11,5 +11,6 @@
   - include: zabbix.yml
   - include: redis.yml
   - include: azure.yml
+  - include: uid.yml
 
 ...
