@@ -25,7 +25,6 @@ options:
   uid:
     description:
     - The uid of the datasource.
-    - This only applies to Grafana version 8 and higher.
     required: false
     type: str
   ds_type:
