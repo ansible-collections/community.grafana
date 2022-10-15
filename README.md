@@ -25,14 +25,19 @@ Click on the name of a plugin or module to view that content's documentation:
     - [grafana_dashboard](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html)
     - [grafana_datasource](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html)
     - [grafana_folder](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html)
+    - [grafana_notification_channel](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_notification_channel_module.html)
+    - [grafana_organization](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_module.html)
     - [grafana_plugin](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_plugin_module.html)
     - [grafana_team](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
     - [grafana_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)
 
 ## Supported Grafana versions
 
-We aim at keeping the last 3 minor versions (at least) of Grafana tested.
-This collection is currently testing the modules against Grafana versions `7.0.6`, `7.1.3` and `8.1.2`.
+We aim at keeping the last 3 Major versions of Grafana tested.
+This collection is currently testing the modules against following versions of Grafana:
+```
+grafana_version: ["9.1.7", "8.5.13", "7.5.16"]
+```
 
 ## Installation and Usage
 
@@ -81,6 +86,45 @@ You can either call modules by their Fully Qualified Collection Namespace (FQCN)
 
 For documentation on how to use individual modules and other content included in this collection, please see the links in the 'Included content' section earlier in this README.
 
+### Using module group defaults
+
+In your playbooks, you can set [module defaults](https://github.com/ansible/ansible/blob/v2.12.3/docs/docsite/rst/user_guide/playbooks_module_defaults.rst#module-defaults-groups) for the `community.grafana.grafana` group to avoid repeating the same parameters (e.g., `grafana_url`, `grafana_user`, `grafana_password`) in your tasks: 
+
+
+```yaml
+- hosts: localhost
+  gather_facts: false
+  connection: local
+
+  collections:
+    - community.grafana
+  
+  module_defaults:
+    group/community.grafana.grafana:
+      grafana_url: "https://grafana.company.com"
+      grafana_user: "admin"
+      grafana_password: "xxxxxx"
+
+  tasks:
+    - name: Ensure Influxdb datasource exists.
+      grafana_datasource:
+        name: "datasource-influxdb"
+        org_id: "1"
+        ds_type: "influxdb"
+        ds_url: "https://influx.company.com:8086"
+        database: "telegraf"
+        time_interval: ">10s"
+        tls_ca_cert: "/etc/ssl/certs/ca.pem"
+    
+    - name: Create or update a Grafana user
+      grafana_user:
+        name: "Bruce Wayne"
+        email: "batman@gotham.city"
+        login: "batman"
+        password: "robin"
+        is_admin: true
+```
+
 ## Testing and Development
 
 If you want to develop new content for this collection or improve what's already here, the easiest way to work on the collection is to clone it into one of the configured [`COLLECTIONS_PATHS`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths), and work on it there.
@@ -97,22 +141,15 @@ You can run the collection's test suites with the commands:
 
 ## Publishing New Versions
 
-The current process for publishing new versions of the Grafana Collection is manual, and requires a user who has access to the `community.grafana` namespace on Ansible Galaxy to publish the build artifact.
+The collection is automatically released on [Galaxy](//galaxy.ansible.com/community/grafana) when a tag is created on the repository.
+The release pipeline is managed by the Ansible Team as the collection is part of the `community` namespace.
 
-  1. Ensure `CHANGELOG.md` contains all the latest changes.
-  2. Update `galaxy.yml` and this README's `requirements.yml` example with the new `version` for the collection.
-  3. Tag the version in Git and push to GitHub.
-  4. Run the following commands to build and release the new version on Galaxy:
-
-     ```
-     ansible-galaxy collection build
-     ansible-galaxy collection publish ./community-grafana-$VERSION_HERE.tar.gz
-     ```
-
-After the version is published, verify it exists on the [Grafana Collection Galaxy page](https://galaxy.ansible.com/community/grafana).
+The current process for creating a tag is manual.
 
 ## Changelogs
 
+Abstract from Ansible requirements for Collections:
+```
 * Every change that does not only affect docs or tests must have a changelog fragment.
   * Exception: fixing/extending a feature that already has a changelog fragment and has not yet been released. Such PRs must always link to the original PR(s) they update.
   * Use your common sense!
@@ -124,12 +161,16 @@ After the version is published, verify it exists on the [Grafana Collection Gala
 Since everything adding to the minor/patch changelogs are backports, the same changelog fragments of these minor/patch releases will be in the next major release's changelog. (This is the same behavior as in ansible/ansible.)
 * Changelogs do not contain previous major releases, and only use the ancestor feature (in changelogs/changelog.yaml) to point to the previous major release.
 * Changelog fragments are removed after a release is made.
+```
 
-See [antsibull-changelog documentation](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelogs.rst#changelog-fragment-categories)
+See [antsibull-changelog documentation](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelogs.rst#changelog-fragment-categories) for fragments format.
 
-## More Information
-
-For more information about Ansible's Grafana integration, join the `#ansible-community` channel on [irc.libera.chat](https://libera.chat/), and browse the resources in the [Grafana Working Group](https://github.com/ansible/community/wiki/Grafana) Community wiki page.
+Generate a new changelog:
+1. Update the collection version in `galaxy.yml` if required.
+2. Generate the changelog:
+```
+$ antsibull-changelog release
+```
 
 ## License
 
@@ -141,6 +182,7 @@ See LICENCE to see the full text.
 
 Any contribution is welcome and we only ask contributors to:
 * Provide *at least* integration tests for any contribution.
+* The Pull Request *MUST* contain a changelog fragment. See [Ansible documentation](https://docs.ansible.com/ansible/latest/community/development_process.html#creating-a-changelog-fragment) about fragments.
 * Create an issue for any significant contribution that would change a large portion of the code base.
 
 ## Contributors ✨

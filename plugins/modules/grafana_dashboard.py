@@ -67,7 +67,7 @@ options:
   dashboard_revision:
     description:
       - Revision of the public grafana dashboard to import
-    default: 1
+    default: '1'
     version_added: "1.0.0"
     type: str
   commit_message:
@@ -169,7 +169,7 @@ def grafana_headers(module, data):
         headers['Authorization'] = "Bearer %s" % data['grafana_api_key']
     else:
         module.params['force_basic_auth'] = True
-        grafana_switch_organisation(module, data['grafana_url'], data['org_id'], headers)
+        grafana_switch_organisation(module, data['url'], data['org_id'], headers)
 
     return headers
 
@@ -267,15 +267,15 @@ def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
 def grafana_dashboard_changed(payload, dashboard):
     # you don't need to set the version, but '0' is incremented to '1' by Grafana's API
     if 'version' in payload['dashboard']:
-        del(payload['dashboard']['version'])
+        del payload['dashboard']['version']
     if 'version' in dashboard['dashboard']:
-        del(dashboard['dashboard']['version'])
+        del dashboard['dashboard']['version']
 
     # remove meta key if exists for compare
     if 'meta' in dashboard:
-        del(dashboard['meta'])
+        del dashboard['meta']
     if 'meta' in payload:
-        del(payload['meta'])
+        del payload['meta']
 
     # if folderId is not provided in dashboard, set default folderId
     if 'folderId' not in dashboard:
@@ -283,9 +283,9 @@ def grafana_dashboard_changed(payload, dashboard):
 
     # Ignore dashboard ids since real identifier is uuid
     if 'id' in dashboard['dashboard']:
-        del(dashboard['dashboard']['id'])
+        del dashboard['dashboard']['id']
     if 'id' in payload['dashboard']:
-        del(payload['dashboard']['id'])
+        del payload['dashboard']['id']
 
     if payload == dashboard:
         return False
@@ -305,7 +305,7 @@ def grafana_create_dashboard(module, data):
         payload = json.loads(r.read())
     else:
         try:
-            with open(data['path'], 'r') as json_file:
+            with open(data['path'], 'r', encoding="utf-8") as json_file:
                 payload = json.load(json_file)
         except Exception as e:
             raise GrafanaAPIException("Can't load json file %s" % to_native(e))
@@ -317,7 +317,7 @@ def grafana_create_dashboard(module, data):
     # define http header
     headers = grafana_headers(module, data)
 
-    grafana_version = get_grafana_version(module, data['grafana_url'], headers)
+    grafana_version = get_grafana_version(module, data['url'], headers)
     if grafana_version < 5:
         if data.get('slug'):
             uid = data['slug']
@@ -338,7 +338,7 @@ def grafana_create_dashboard(module, data):
     # test if the folder exists
     folder_exists = False
     if grafana_version >= 5:
-        folder_exists, folder_id = grafana_folder_exists(module, data['grafana_url'], data['folder'], headers)
+        folder_exists, folder_id = grafana_folder_exists(module, data['url'], data['folder'], headers)
         if folder_exists is False:
             raise GrafanaAPIException("Dashboard folder '%s' does not exist." % data['folder'])
 
@@ -347,10 +347,10 @@ def grafana_create_dashboard(module, data):
     # test if dashboard already exists
     if uid:
         dashboard_exists, dashboard = grafana_dashboard_exists(
-            module, data['grafana_url'], uid, headers=headers)
+            module, data['url'], uid, headers=headers)
     else:
         dashboard_exists, dashboard = grafana_dashboard_search(
-            module, data['grafana_url'], folder_id, payload['dashboard']['title'], headers=headers)
+            module, data['url'], folder_id, payload['dashboard']['title'], headers=headers)
 
     if dashboard_exists is True:
         if grafana_dashboard_changed(payload, dashboard):
@@ -360,7 +360,7 @@ def grafana_create_dashboard(module, data):
             if 'commit_message' in data and data['commit_message']:
                 payload['message'] = data['commit_message']
 
-            r, info = fetch_url(module, '%s/api/dashboards/db' % data['grafana_url'],
+            r, info = fetch_url(module, '%s/api/dashboards/db' % data['url'],
                                 data=json.dumps(payload), headers=headers, method='POST')
             if info['status'] == 200:
                 if grafana_version >= 5:
@@ -386,7 +386,7 @@ def grafana_create_dashboard(module, data):
         if 'id' in payload['dashboard']:
             del payload['dashboard']['id']
 
-        r, info = fetch_url(module, '%s/api/dashboards/db' % data['grafana_url'],
+        r, info = fetch_url(module, '%s/api/dashboards/db' % data['url'],
                             data=json.dumps(payload), headers=headers, method='POST')
         if info['status'] == 200:
             result['msg'] = "Dashboard %s created" % payload['dashboard']['title']
@@ -410,7 +410,7 @@ def grafana_delete_dashboard(module, data):
     # define http headers
     headers = grafana_headers(module, data)
 
-    grafana_version = get_grafana_version(module, data['grafana_url'], headers)
+    grafana_version = get_grafana_version(module, data['url'], headers)
     if grafana_version < 5:
         if data.get('slug'):
             uid = data['slug']
@@ -423,15 +423,15 @@ def grafana_delete_dashboard(module, data):
             raise GrafanaDeleteException('No uid specified %s')
 
     # test if dashboard already exists
-    dashboard_exists, dashboard = grafana_dashboard_exists(module, data['grafana_url'], uid, headers=headers)
+    dashboard_exists, dashboard = grafana_dashboard_exists(module, data['url'], uid, headers=headers)
 
     result = {}
     if dashboard_exists is True:
         # delete
         if grafana_version < 5:
-            r, info = fetch_url(module, '%s/api/dashboards/db/%s' % (data['grafana_url'], uid), headers=headers, method='DELETE')
+            r, info = fetch_url(module, '%s/api/dashboards/db/%s' % (data['url'], uid), headers=headers, method='DELETE')
         else:
-            r, info = fetch_url(module, '%s/api/dashboards/uid/%s' % (data['grafana_url'], uid), headers=headers, method='DELETE')
+            r, info = fetch_url(module, '%s/api/dashboards/uid/%s' % (data['url'], uid), headers=headers, method='DELETE')
         if info['status'] == 200:
             result['msg'] = "Dashboard %s deleted" % uid
             result['changed'] = True
@@ -452,7 +452,7 @@ def grafana_export_dashboard(module, data):
     # define http headers
     headers = grafana_headers(module, data)
 
-    grafana_version = get_grafana_version(module, data['grafana_url'], headers)
+    grafana_version = get_grafana_version(module, data['url'], headers)
     if grafana_version < 5:
         if data.get('slug'):
             uid = data['slug']
@@ -465,12 +465,12 @@ def grafana_export_dashboard(module, data):
             raise GrafanaExportException('No uid specified')
 
     # test if dashboard already exists
-    dashboard_exists, dashboard = grafana_dashboard_exists(module, data['grafana_url'], uid, headers=headers)
+    dashboard_exists, dashboard = grafana_dashboard_exists(module, data['url'], uid, headers=headers)
 
     if dashboard_exists is True:
         try:
-            with open(data['path'], 'w') as f:
-                f.write(json.dumps(dashboard))
+            with open(data['path'], 'w', encoding="utf-8") as f:
+                f.write(json.dumps(dashboard, indent=2))
         except Exception as e:
             raise GrafanaExportException("Can't write json file : %s" % to_native(e))
         result = {'msg': "Dashboard %s exported to %s" % (uid, data['path']),
@@ -511,7 +511,7 @@ def main():
         mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
     )
 
-    module.params["grafana_url"] = clean_url(module.params["grafana_url"])
+    module.params["url"] = clean_url(module.params["url"])
 
     if 'message' in module.params:
         module.fail_json(msg="'message' is reserved keyword, please change this parameter to 'commit_message'")

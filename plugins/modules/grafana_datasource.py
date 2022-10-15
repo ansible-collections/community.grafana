@@ -31,7 +31,7 @@ options:
   ds_type:
     description:
     - The type of the datasource.
-    required: true
+    - Required when C(state=present).
     choices:
     - graphite
     - prometheus
@@ -51,7 +51,7 @@ options:
   ds_url:
     description:
     - The URL of the datasource.
-    required: true
+    - Required when C(state=present).
     type: str
   access:
     description:

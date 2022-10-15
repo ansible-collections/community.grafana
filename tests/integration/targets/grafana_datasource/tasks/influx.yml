@@ -49,7 +49,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert
     - result.datasource.name == 'datasource-influxdb'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'influxdb'
     - result.datasource.url == 'https://influx.company.com:8086'
     - result.datasource.user == ''
@@ -62,12 +62,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: '1'
-    ds_type: influxdb
-    ds_url: https://influx.company.com:8086
-    database: telegraf
-    time_interval: '>10s'
-    tls_ca_cert: /etc/ssl/certs/ca.pem
     state: absent
 
 - debug:
@@ -84,12 +78,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    org_id: '1'
-    ds_type: influxdb
-    ds_url: https://influx.company.com:8086
-    database: telegraf
-    time_interval: '>10s'
-    tls_ca_cert: /etc/ssl/certs/ca.pem
     state: absent
 
 - debug:

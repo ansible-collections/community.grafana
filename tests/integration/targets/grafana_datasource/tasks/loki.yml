@@ -42,7 +42,7 @@
     - result.datasource.jsonData.tlsAuthWithCACert == false
     - result.datasource.name == 'datasource-loki'
     - result.datasource.orgId == 1
-    - result.datasource.password == ''
+    - ('password' not in result.datasource) or (result.datasource.password == '')
     - result.datasource.type == 'loki'
     - result.datasource.url == 'https://loki.company.com:3100'
     - result.datasource.user == ''
@@ -55,9 +55,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password}}"
-    org_id: '1'
-    ds_type: loki
-    ds_url: https://loki.company.com:3100
     state: absent
 
 - debug:
@@ -75,9 +72,6 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password}}"
-    org_id: '1'
-    ds_type: loki
-    ds_url: https://loki.company.com:3100
     state: absent
 
 - debug:

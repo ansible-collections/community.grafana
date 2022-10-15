@@ -5,6 +5,54 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.5.3
+======
+
+Bugfixes
+--------
+
+- Add support for more elasticsearch version as datasource (#263)
+
+v1.5.2
+======
+
+Bugfixes
+--------
+
+- Ensure user email/login is url encoded when searching for the user (#264)
+
+v1.5.1
+======
+
+Minor Changes
+-------------
+
+- Export dashboard with pretty printed JSON so that it becomes easier to compare changes with the previous version (#257)
+
+v1.5.0
+======
+
+Minor Changes
+-------------
+
+- community.grafana.grafana_datasource supports grafana-azure-monitor-datasource.
+
+Bugfixes
+--------
+
+- Fix a bug that causes a fatal error when using `url` parameter in `grafana_dashboard` and `grafana_notification_channel` modules.
+- Fix a bug that causes an update error when using the `grafana_datasource` module on Grafana >=9.0.0 (https://github.com/ansible-collections/community.grafana/issues/248).
+
+v1.4.0
+======
+
+Minor Changes
+-------------
+
+- Remove requirement for `ds_type` and `ds_url` parameters when deleting a datasource
+- add `grafana` action group in `meta/runtime.yml` to support for module group defaults
+- refactor grafana_notification_channel module
+
 v1.3.3
 ======
 

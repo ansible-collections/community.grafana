@@ -137,3 +137,57 @@ releases:
     fragments:
     - datasource-issue-204.yml
     release_date: '2022-02-27'
+  1.4.0:
+    changes:
+      minor_changes:
+      - Remove requirement for `ds_type` and `ds_url` parameters when deleting a datasource
+      - add `grafana` action group in `meta/runtime.yml` to support for module group
+        defaults
+      - refactor grafana_notification_channel module
+    fragments:
+    - 136_add_grafana_action_groups.yml
+    - 170_remove_requirement_ds_type_ds_url.yml
+    - grafana_users_note.yaml
+    - notifi_channel_refacto.yml
+    release_date: '2022-04-18'
+  1.5.0:
+    changes:
+      bugfixes:
+      - Fix a bug that causes a fatal error when using `url` parameter in `grafana_dashboard`
+        and `grafana_notification_channel` modules.
+      - Fix a bug that causes an update error when using the `grafana_datasource`
+        module on Grafana >=9.0.0 (https://github.com/ansible-collections/community.grafana/issues/248).
+      minor_changes:
+      - community.grafana.grafana_datasource supports grafana-azure-monitor-datasource.
+    fragments:
+    - 172_support_azure_datasource.yml
+    - 186_check_fragments.yml
+    - 239_keyerror_grafana_url.yml
+    - 248_ds_update_error_grafana_9.yml
+    release_date: '2022-06-25'
+  1.5.1:
+    changes:
+      minor_changes:
+      - Export dashboard with pretty printed JSON so that it becomes easier to compare
+        changes with the previous version (#257)
+    fragments:
+    - 00_drop_eol_ansible.yml
+    - 01_grafana_bump.yml
+    - 257_pretty_printed_dashboard_export.yml
+    release_date: '2022-07-17'
+  1.5.2:
+    changes:
+      bugfixes:
+      - Ensure user email/login is url encoded when searching for the user (#264)
+    fragments:
+    - 265-url-encode-user.yml
+    release_date: '2022-08-19'
+  1.5.3:
+    changes:
+      bugfixes:
+      - Add support for more elasticsearch version as datasource (#263)
+    fragments:
+    - add-units-datasource.yml
+    - ci.yml
+    - fix-263.yaml
+    release_date: '2022-10-06'

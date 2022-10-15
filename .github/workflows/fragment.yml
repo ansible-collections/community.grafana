@@ -1,0 +1,18 @@
+---
+on: 
+  pull_request:
+
+name: Check changelog fragment
+jobs:
+  check_fragment:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Check that changelog fragment exists
+      run: ./hacking/check_fragment.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_NUMBER: ${{ github.event.number }}
