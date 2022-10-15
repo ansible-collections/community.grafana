@@ -62,6 +62,7 @@ class GrafanaDatasource(TestCase):
                 'tlsSkipVerify': True
             },
             'name': 'openshift_prometheus',
+            'uid': 'xyz123',
             'orgId': 1,
             'secureJsonData': {},
             'type': 'prometheus',
@@ -74,6 +75,7 @@ class GrafanaDatasource(TestCase):
             'url_username': 'admin',
             'url_password': 'admin',
             'name': 'openshift_prometheus',
+            'uid': 'xyz123',
             'ds_type': 'prometheus',
             'ds_url': 'https://openshift-monitoring.company.com',
             'access': 'proxy',
@@ -96,6 +98,7 @@ class GrafanaDatasource(TestCase):
                 'tlsSkipVerify': True
             },
             'name': 'openshift_prometheus',
+            'uid': 'xyz123',
             'orgId': 1,
             'secureJsonData': {'basicAuthPassword': 'admin'},
             'type': 'prometheus',
@@ -108,6 +111,7 @@ class GrafanaDatasource(TestCase):
             'url_username': 'admin',
             'url_password': 'admin',
             'name': 'openshift_prometheus',
+            'uid': 'xyz123',
             'ds_type': 'prometheus',
             'ds_url': 'https://openshift-monitoring.company.com',
             'access': 'proxy',
@@ -131,6 +135,7 @@ class GrafanaDatasource(TestCase):
                 'tlsAuthWithCACert': True
             },
             'name': 'datasource-influxdb',
+            'uid': 'xyz123',
             'orgId': 1,
             'secureJsonData': {
                 'tlsCACert': '/etc/ssl/certs/ca.pem'
@@ -145,6 +150,7 @@ class GrafanaDatasource(TestCase):
             'url_username': 'admin',
             'url_password': 'admin',
             'name': 'datasource-influxdb',
+            'uid': 'xyz123',
             'ds_type': 'influxdb',
             'ds_url': 'https://influx.company.com:8086',
             'database': 'telegraf',
@@ -172,6 +178,7 @@ class GrafanaDatasource(TestCase):
                 'tlsAuthWithCACert': True
             },
             'name': 'datasource-elastic',
+            'uid': 'xyz123',
             'orgId': 1,
             'secureJsonData': {
                 'basicAuthPassword': 'grafana',
@@ -187,6 +194,7 @@ class GrafanaDatasource(TestCase):
             'url_username': 'admin',
             'url_password': 'admin',
             'name': 'datasource-elastic',
+            'uid': 'xyz123',
             'ds_type': 'elasticsearch',
             'ds_url': 'https://elastic.company.com:9200',
             'database': '[logstash_]YYYY.MM.DD',
