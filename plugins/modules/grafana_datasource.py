@@ -42,6 +42,7 @@ options:
     - postgres
     - cloudwatch
     - alexanderzobnin-zabbix-datasource
+    - grafana-azure-monitor-datasource
     - sni-thruk-datasource
     - camptocamp-prometheus-alertmanager-datasource
     - loki
@@ -142,13 +143,16 @@ options:
     - Version 56 is for elasticsearch 5.6+ where you can specify the C(max_concurrent_shard_requests)
       option.
     choices:
-    - 2
-    - 5
-    - 56
-    - 60
-    - 70
-    default: 5
-    type: int
+    - "2"
+    - "5"
+    - "56"
+    - "60"
+    - "70"
+    - "7.7+"
+    - "7.10+"
+    - "8.0+"
+    default: "7.10+"
+    type: str
   max_concurrent_shard_requests:
     description:
     - Starting with elasticsearch 5.6, you can specify the max concurrent shard per
@@ -278,6 +282,32 @@ options:
     description:
     - Namespaces of Custom Metrics for CloudWatch datasource type
     default: ''
+    required: false
+    type: str
+  azure_cloud:
+    description:
+    - The national cloud for your Azure account
+    default: 'azuremonitor'
+    required: false
+    type: str
+    choices:
+    - azuremonitor
+    - chinaazuremonitor
+    - govazuremonitor
+    - germanyazuremonitor
+  azure_tenant:
+    description:
+    - The directory/tenant ID for the Azure AD app registration to use for authentication
+    required: false
+    type: str
+  azure_client:
+    description:
+    - The application/client ID for the Azure AD app registration to use for authentication.
+    required: false
+    type: str
+  azure_secret:
+    description:
+    - The application client secret for the Azure AD app registration to use for auth
     required: false
     type: str
   zabbix_user:
@@ -469,16 +499,17 @@ from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_h
 from ansible_collections.community.grafana.plugins.module_utils import base
 
 
-def compare_datasources(new, current, compareSecureData=True, version=0):
-    if version >= 8 and new['uid'] is None:
-        del new['uid']
+ES_VERSION_MAPPING = {
+    "7.7+": "7.7.0",
+    "7.10+": "7.10.0",
+    "8.0+": "8.0.0",
+}
+
+
+def compare_datasources(new, current, compareSecureData=True):
+    if new['uid'] is None:
         del current['uid']
-
-    if version < 8:
         del new['uid']
-        if 'uid' in current:
-            del current['uid']
-
     del current['typeLogoUrl']
     del current['id']
     if 'version' in current:
@@ -487,8 +518,10 @@ def compare_datasources(new, current, compareSecureData=True, version=0):
         del current['readOnly']
     if current['basicAuth'] is False:
         del current['basicAuthUser']
-    del current['password']
-    del current['basicAuthPassword']
+    if 'password' in current:
+        del current['password']
+    if 'basicAuthPassword' in current:
+        del current['basicAuthPassword']
 
     # check if secureJsonData should be compared
     if not compareSecureData:
@@ -566,12 +599,22 @@ def get_datasource_payload(data):
 
     # datasource type related parameters
     if data['ds_type'] == 'elasticsearch':
-        json_data['esVersion'] = data['es_version']
+
+        json_data['maxConcurrentShardRequests'] = data['max_concurrent_shard_requests']
         json_data['timeField'] = data['time_field']
         if data.get('interval'):
             json_data['interval'] = data['interval']
-        if data['es_version'] >= 56:
-            json_data['maxConcurrentShardRequests'] = data['max_concurrent_shard_requests']
+
+        # Handle changes in es_version format in Grafana < 8.x which used to
+        # be integers and is now semver format
+        try:
+            es_version = int(data['es_version'])
+            if es_version < 56:
+                json_data.pop('maxConcurrentShardRequests')
+        except ValueError:
+            # Retrieve the Semver format expected by API
+            es_version = ES_VERSION_MAPPING.get(data['es_version'])
+        json_data['esVersion'] = es_version
 
     if data['ds_type'] == 'elasticsearch' or data['ds_type'] == 'influxdb':
         if data.get('time_interval'):
@@ -592,6 +635,14 @@ def get_datasource_payload(data):
             json_data['trends'] = True
         json_data['username'] = data['zabbix_user']
         json_data['password'] = data['zabbix_password']
+
+    if data['ds_type'] == 'grafana-azure-monitor-datasource':
+        json_data['tenantId'] = data['azure_tenant']
+        json_data['clientId'] = data['azure_client']
+        json_data['cloudName'] = data['azure_cloud']
+        json_data['clientsecret'] = 'clientsecret'
+        if data.get('azure_secret'):
+            secure_json_data['clientSecret'] = data['azure_secret']
 
     if data['ds_type'] == 'cloudwatch':
         if data.get('aws_credentials_profile'):
@@ -668,18 +719,8 @@ class GrafanaInterface(object):
         url = "/api/datasources"
         self._send_request(url, data=data, headers=self.headers, method='POST')
 
-    def get_version(self):
-        url = "/api/health"
-        response = self._send_request(url, data=None, headers=self.headers, method="GET")
-        version = response.get("version")
-        if version is not None:
-            major, minor, rev = version.split(".")
-            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
-        self._module.fail_json(failed=True, msg="Failed to retrieve version from '%s'" % url)
 
-
-def main():
-    # use the predefined argument spec for url
+def setup_module_object():
     argument_spec = base.grafana_argument_spec()
 
     argument_spec.update(
@@ -694,11 +735,12 @@ def main():
                               'postgres',
                               'cloudwatch',
                               'alexanderzobnin-zabbix-datasource',
+                              'grafana-azure-monitor-datasource',
                               'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
                               'redis-datasource',
-                              'loki'], required=True),
-        ds_url=dict(required=True, type='str'),
+                              'loki']),
+        ds_url=dict(type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         database=dict(type='str', default=""),
         user=dict(default='', type='str'),
@@ -712,7 +754,9 @@ def main():
         tls_skip_verify=dict(type='bool', default=False),
         is_default=dict(default=False, type='bool'),
         org_id=dict(default=1, type='int'),
-        es_version=dict(type='int', default=5, choices=[2, 5, 56, 60, 70]),
+        es_version=dict(type='str', default="7.10+", choices=["2", "5", "56", "60",
+                                                              "70", "7.7+", "7.10+",
+                                                              "8.0+"]),
         max_concurrent_shard_requests=dict(type='int', default=256),
         time_field=dict(default='@timestamp', type='str'),
         time_interval=dict(type='str'),
@@ -733,6 +777,10 @@ def main():
         aws_credentials_profile=dict(default='', type='str'),
         aws_assume_role_arn=dict(default='', type='str'),
         aws_custom_metrics_namespaces=dict(type='str'),
+        azure_cloud=dict(type='str', default='azuremonitor', choices=['azuremonitor', 'chinaazuremonitor', 'govazuremonitor', 'germanyazuremonitor']),
+        azure_tenant=dict(type='str'),
+        azure_client=dict(type='str'),
+        azure_secret=dict(type='str', no_log=True),
         zabbix_user=dict(type='str'),
         zabbix_password=dict(type='str', no_log=True),
         additional_json_data=dict(type='dict', default={}, required=False),
@@ -746,17 +794,23 @@ def main():
         required_together=[['url_username', 'url_password', 'org_id'], ['tls_client_cert', 'tls_client_key']],
         mutually_exclusive=[['url_username', 'grafana_api_key'], ['tls_ca_cert', 'tls_skip_verify']],
         required_if=[
+            ['state', 'present', ['ds_type', 'ds_url']],
             ['ds_type', 'opentsdb', ['tsdb_version', 'tsdb_resolution']],
             ['ds_type', 'influxdb', ['database']],
             ['ds_type', 'elasticsearch', ['database', 'es_version', 'time_field', 'interval']],
             ['ds_type', 'mysql', ['database']],
             ['ds_type', 'postgres', ['database', 'sslmode']],
             ['ds_type', 'cloudwatch', ['aws_auth_type', 'aws_default_region']],
-            ['es_version', 56, ['max_concurrent_shard_requests']],
-            ['es_version', 60, ['max_concurrent_shard_requests']],
-            ['es_version', 70, ['max_concurrent_shard_requests']]
+            ['es_version', "56", ['max_concurrent_shard_requests']],
+            ['es_version', "60", ['max_concurrent_shard_requests']],
+            ['es_version', "70", ['max_concurrent_shard_requests']]
         ],
     )
+    return module
+
+
+def main():
+    module = setup_module_object()
 
     state = module.params['state']
     name = module.params['name']
@@ -772,8 +826,7 @@ def main():
             ds = grafana_iface.datasource_by_name(name)
             module.exit_json(changed=True, datasource=ds, msg='Datasource %s created' % name)
         else:
-            version = grafana_iface.get_version()
-            diff = compare_datasources(payload.copy(), ds.copy(), enforce_secure_data, version["major"])
+            diff = compare_datasources(payload.copy(), ds.copy(), enforce_secure_data)
             if diff.get('before') == diff.get('after'):
                 module.exit_json(changed=False, datasource=ds, msg='Datasource %s unchanged' % name)
             grafana_iface.update_datasource(ds.get('id'), payload)
