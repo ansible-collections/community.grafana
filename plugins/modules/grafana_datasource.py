@@ -49,6 +49,7 @@ options:
     - redis-datasource
     - tempo
     - quickwit-quickwit-datasource
+    - alertmanager
     type: str
   ds_url:
     description:
@@ -233,6 +234,17 @@ options:
     - Use trends or not for zabbix datasource type.
     type: bool
     default: false
+  alertmanager_implementation:
+    description:
+    - The implementation to set for the alertmanager datasource type.
+    choices:
+    - mimir
+    - cortex
+    - prometheus
+    type: str
+  alertmanager_handle_grafana_alerts:
+    description:
+    - Whether Grafana should sent alerts to this alertmanager.
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
@@ -644,6 +656,12 @@ def get_datasource_payload(data, org_id=None):
         json_data["tlsSkipVerify"] = True
 
     # datasource type related parameters
+    if data["ds_type"] == "alertmanager":
+        json_data["implementation"] = data["alertmanager_implementation"]
+        json_data["handleGrafanaManagedAlerts"] = data[
+            "alertmanager_handle_grafana_alerts"
+        ]
+
     if data["ds_type"] == "elasticsearch":
         json_data["maxConcurrentShardRequests"] = data["max_concurrent_shard_requests"]
         json_data["timeField"] = data["time_field"]
@@ -818,6 +836,8 @@ def setup_module_object():
                 "loki",
                 "tempo",
                 "quickwit-quickwit-datasource",
+                "loki",
+                "alertmanager",
             ]
         ),
         ds_url=dict(type="str"),
@@ -858,6 +878,8 @@ def setup_module_object():
             choices=["disable", "require", "verify-ca", "verify-full"],
         ),
         trends=dict(default=False, type="bool"),
+        alertmanager_implementation=dict(choices=["mimir", "cortex", "prometheus"]),
+        alertmanager_handle_grafana_alerts=dict(default=False, type="bool"),
         aws_auth_type=dict(
             default="keys", choices=["keys", "credentials", "arn", "default"]
         ),
