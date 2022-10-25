@@ -41,6 +41,7 @@ options:
     - camptocamp-prometheus-alertmanager-datasource
     - loki
     - redis-datasource
+    - alertmanager
     type: str
   ds_url:
     description:
@@ -209,6 +210,17 @@ options:
     - Use trends or not for zabbix datasource type.
     type: bool
     default: False
+  alertmanager_implementation:
+    description:
+    - The implementation to set for the alertmanager datasource type.
+    choices:
+    - mimir
+    - cortex
+    - prometheus
+    type: str
+  alertmanager_handle_grafana_alerts:
+    description:
+    - Whether Grafana should sent alerts to this alertmanager.
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
@@ -590,6 +602,10 @@ def get_datasource_payload(data):
         json_data['tlsSkipVerify'] = True
 
     # datasource type related parameters
+    if data['ds_type'] == 'alertmanager':
+        json_data['implementation'] = data['alertmanager_implementation']
+        json_data['handleGrafanaManagedAlerts'] = data['alertmanager_handle_grafana_alerts']
+
     if data['ds_type'] == 'elasticsearch':
 
         json_data['maxConcurrentShardRequests'] = data['max_concurrent_shard_requests']
@@ -730,7 +746,8 @@ def setup_module_object():
                               'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
                               'redis-datasource',
-                              'loki']),
+                              'loki',
+                              'alertmanager']),
         ds_url=dict(type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         database=dict(type='str', default=""),
@@ -756,6 +773,8 @@ def setup_module_object():
         tsdb_resolution=dict(type='str', default='second', choices=['second', 'millisecond']),
         sslmode=dict(default='disable', choices=['disable', 'require', 'verify-ca', 'verify-full']),
         trends=dict(default=False, type='bool'),
+        alertmanager_implementation=dict(choices=['mimir', 'cortex', 'prometheus']),
+        alertmanager_handle_grafana_alerts=dict(default=False, type='bool'),
         aws_auth_type=dict(default='keys', choices=['keys', 'credentials', 'arn', 'default']),
         aws_default_region=dict(default='us-east-1', choices=['ap-northeast-1', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-south-1',
                                                               'ca-central-1',
