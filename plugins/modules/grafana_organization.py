@@ -101,6 +101,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
+from ansible.module_utils.six.moves.urllib.parse import quote
 
 __metaclass__ = type
 
@@ -139,7 +140,7 @@ class GrafanaOrgInterface(object):
 
     def get_actual_org(self, name):
         # https://grafana.com/docs/grafana/latest/http_api/org/#get-organization-by-name
-        url = "/api/orgs/name/{name}".format(name=name)
+        url = "/api/orgs/name/{name}".format(name=quote(name))
         return self._send_request(url, headers=self.headers, method="GET")
 
     def create_org(self, name):
