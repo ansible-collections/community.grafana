@@ -168,6 +168,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "miksonx",
+      "name": "MiksonX",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5308184?v=4",
+      "profile": "https://github.com/miksonx",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -175,5 +184,6 @@
   "projectOwner": "ansible-collections",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
