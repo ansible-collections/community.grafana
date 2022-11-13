@@ -36,7 +36,7 @@ Click on the name of a plugin or module to view that content's documentation:
 We aim at keeping the last 3 Major versions of Grafana tested.
 This collection is currently testing the modules against following versions of Grafana:
 ```
-grafana_version: ["9.1.7", "8.5.13", "7.5.16"]
+grafana_version: ["9.2.4", "8.5.15", "7.5.16"]
 ```
 
 ## Installation and Usage
