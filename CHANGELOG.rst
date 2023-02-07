@@ -5,6 +5,21 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.5.4
+======
+
+Minor Changes
+-------------
+
+- able to set `uid` for datasources in grafana via module grafana_datasource
+
+Bugfixes
+--------
+
+- Fixed validate_certs missing parameter for --insecure option in grafana plugins
+- URL encode issue in grafana_organization.py (method get_actual_org ) fixed.
+- grafana_dashboard, now opens json files with utf-8 encoding (#191)
+
 v1.5.3
 ======
 

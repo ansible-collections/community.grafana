@@ -191,3 +191,19 @@ releases:
     - ci.yml
     - fix-263.yaml
     release_date: '2022-10-06'
+  1.5.4:
+    changes:
+      bugfixes:
+      - Fixed validate_certs missing parameter for --insecure option in grafana plugins
+      - URL encode issue in grafana_organization.py (method get_actual_org ) fixed.
+      - grafana_dashboard, now opens json files with utf-8 encoding (#191)
+      minor_changes:
+      - able to set `uid` for datasources in grafana via module grafana_datasource
+    fragments:
+    - 1.5.3.yml
+    - 191.yml
+    - 230-uid-datasource.yml
+    - 270-gha--ansible-test--integration.yml
+    - 277-gha-ansible-test-versions.yml
+    - 288_get_actual_org_encode.yml
+    release_date: '2023-02-07'
