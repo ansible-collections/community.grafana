@@ -47,6 +47,11 @@ options:
     - absent
     default: present
     type: str
+  validate_certs:
+    description:
+    - Boolean variable to include --insecure while installing pluging
+    default: False
+    type: bool
 '''
 
 EXAMPLES = '''
@@ -232,6 +237,7 @@ def main():
             grafana_plugins_dir=dict(type='str'),
             grafana_repo=dict(type='str'),
             grafana_plugin_url=dict(type='str'),
+            validate_certs=dict(type='bool', default=False),
             state=dict(choices=['present', 'absent'],
                        default='present')
         ),

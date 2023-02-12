@@ -22,6 +22,11 @@ options:
     - The name of the datasource.
     required: true
     type: str
+  uid:
+    description:
+    - The uid of the datasource.
+    required: false
+    type: str
   ds_type:
     description:
     - The type of the datasource.
@@ -501,8 +506,9 @@ ES_VERSION_MAPPING = {
 
 
 def compare_datasources(new, current, compareSecureData=True):
-    if 'uid' in current:
+    if new['uid'] is None:
         del current['uid']
+        del new['uid']
     del current['typeLogoUrl']
     del current['id']
     if 'version' in current:
@@ -542,6 +548,7 @@ def get_datasource_payload(data):
     payload = {
         'orgId': data['org_id'],
         'name': data['name'],
+        'uid': data['uid'],
         'type': data['ds_type'],
         'access': data['access'],
         'url': data['ds_url'],
@@ -717,6 +724,7 @@ def setup_module_object():
 
     argument_spec.update(
         name=dict(required=True, type='str'),
+        uid=dict(type='str'),
         ds_type=dict(choices=['graphite',
                               'prometheus',
                               'elasticsearch',

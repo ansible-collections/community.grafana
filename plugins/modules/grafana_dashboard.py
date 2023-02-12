@@ -305,7 +305,7 @@ def grafana_create_dashboard(module, data):
         payload = json.loads(r.read())
     else:
         try:
-            with open(data['path'], 'r') as json_file:
+            with open(data['path'], 'r', encoding="utf-8") as json_file:
                 payload = json.load(json_file)
         except Exception as e:
             raise GrafanaAPIException("Can't load json file %s" % to_native(e))
@@ -469,7 +469,7 @@ def grafana_export_dashboard(module, data):
 
     if dashboard_exists is True:
         try:
-            with open(data['path'], 'w') as f:
+            with open(data['path'], 'w', encoding="utf-8") as f:
                 f.write(json.dumps(dashboard, indent=2))
         except Exception as e:
             raise GrafanaExportException("Can't write json file : %s" % to_native(e))

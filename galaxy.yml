@@ -1,6 +1,6 @@
 namespace: community
 name: grafana
-version: 1.5.3
+version: 1.5.4
 readme: README.md
 authors:
   - Rémi REY (@rrey)
@@ -11,7 +11,7 @@ tags:
   - monitoring
   - grafana
 dependencies: {}
-repository: https://github.com/ansible-collections/grafana.git
-documentation: https://github.com/ansible-collections/grafana.git
+repository: https://github.com/ansible-collections/community.grafana.git
+documentation: https://docs.ansible.com/ansible/latest/collections/community/grafana/
 homepage: https://github.com/ansible-collections/grafana
-issues: https://github.com/ansible-collections/grafana/issues
+issues: https://github.com/ansible-collections/community.grafana/issues
