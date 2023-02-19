@@ -207,3 +207,14 @@ releases:
     - 277-gha-ansible-test-versions.yml
     - 288_get_actual_org_encode.yml
     release_date: '2023-02-07'
+  1.6.0:
+    changes:
+      minor_changes:
+      - Add `grafana_organization_user` module
+    fragments:
+    - 242_add_grafana_organization_user_module.yml
+    modules:
+    - description: Manage Grafana Organization Users.
+      name: grafana_organization_user
+      namespace: ''
+    release_date: '2023-02-19'

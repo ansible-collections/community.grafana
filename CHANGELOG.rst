@@ -5,6 +5,19 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.6.0
+======
+
+Minor Changes
+-------------
+
+- Add `grafana_organization_user` module
+
+New Modules
+-----------
+
+- community.grafana.grafana_organization_user - Manage Grafana Organization Users.
+
 v1.5.4
 ======
 
