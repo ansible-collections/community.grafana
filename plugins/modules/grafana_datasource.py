@@ -615,7 +615,7 @@ def get_datasource_payload(data):
             es_version = ES_VERSION_MAPPING.get(data['es_version'])
         json_data['esVersion'] = es_version
 
-    if data['ds_type'] == 'elasticsearch' or data['ds_type'] == 'influxdb':
+    if data['ds_type'] in ['elasticsearch', 'influxdb', 'prometheus']:
         if data.get('time_interval'):
             json_data['timeInterval'] = data['time_interval']
 
