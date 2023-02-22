@@ -166,7 +166,7 @@ options:
     default: '@timestamp'
   time_interval:
     description:
-    - Minimum group by interval for C(influxdb) or C(elasticsearch) datasources.
+    - Minimum group by interval for C(influxdb), C(elasticsearch) or C(prometheus) datasources.
     - for example C(>10s).
     type: str
   interval:
