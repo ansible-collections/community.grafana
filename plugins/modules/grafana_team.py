@@ -61,6 +61,12 @@ options:
       - list of members found on the Team.
     default: False
     type: bool
+  org_id:
+    description:
+      - The Grafana Organisation ID where the team belongs.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation..
+    default: 1
+    type: int
   skip_version_check:
     description:
       - Skip Grafana version check and try to reach api endpoint anyway.
@@ -186,14 +192,11 @@ class GrafanaTeamInterface(object):
 
     def __init__(self, module):
         self._module = module
+        self.grafana_url = base.clean_url(module.params.get("url"))
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        if module.params.get('grafana_api_key', None):
-            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
-        else:
-            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+        self.grafana_headers()
         # }}}
-        self.grafana_url = base.clean_url(module.params.get("url"))
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()
@@ -201,6 +204,33 @@ class GrafanaTeamInterface(object):
                 self._module.fail_json(failed=True, msg=to_text(e))
             if grafana_version["major"] < 5:
                 self._module.fail_json(failed=True, msg="Teams API is available starting Grafana v5")
+
+    def grafana_switch_organisation(self):
+        r, info = fetch_url(
+            self._module,
+            '%s/api/user/using/%s' % (self.grafana_url,
+                                      self._module.params['org_id']),
+            headers=self.headers,
+            method='POST'
+        )
+
+        if info['status'] != 200:
+            raise GrafanaError(
+                'Unable to switch to organization %s : %s' % (
+                    self._module.params['org_id'], info
+                )
+            )
+
+    def grafana_headers(self):
+        if 'grafana_api_key' in self._module.params and self._module.params['grafana_api_key']:
+            self.headers['Authorization'] = "Bearer %s" % self._module.params['grafana_api_key']
+        else:
+            self.headers["Authorization"] = basic_auth_header(
+                self._module.params['url_username'],
+                self._module.params['url_password']
+            )
+
+            self.grafana_switch_organisation()
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -299,6 +329,7 @@ argument_spec.update(
     email=dict(type='str', required=True),
     members=dict(type='list', elements='str', required=False),
     enforce_members=dict(type='bool', default=False),
+    org_id=dict(default=1, type='int'),
     skip_version_check=dict(type='bool', default=False),
 )
 

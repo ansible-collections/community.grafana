@@ -1,0 +1,3 @@
+minor_changes:
+  - Enable option `org_id` for grafana_folder
+  - Enable option `org_id` for grafana_team
