@@ -1,0 +1,2 @@
+bugfixes:
+  - grafana_folder: fix grafana server empty response content
