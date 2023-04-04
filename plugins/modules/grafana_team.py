@@ -215,7 +215,8 @@ class GrafanaTeamInterface(object):
         )
 
         if info['status'] != 200:
-            raise GrafanaError(
+            self._module.fail_json(
+                failed=True, msg=
                 'Unable to switch to organization %s : %s' % (
                     self._module.params['org_id'], info
                 )

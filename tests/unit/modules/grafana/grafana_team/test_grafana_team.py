@@ -64,6 +64,10 @@ def get_low_version_resp():
     return {"major": 4, "minor": 6, "rev": 0}
 
 
+def cant_switch_org_resp():
+    return (None, {"status": 500})
+
+
 def team_exists_resp():
     server_response = json.dumps({"totalCount": 1, "teams": [{"name": "MyTestTeam", "email": "email@test.com"}]}, sort_keys=True)
     return (MockedReponse(server_response), {"status": 200})
@@ -235,6 +239,22 @@ class GrafanaTeamsTest(TestCase):
         with self.assertRaises(AnsibleFailJson) as result:
             grafana_team.main()
         self.assertTrue(result.exception.args[0]['msg'].startswith('Permission Denied'))
+
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
+    def test_module_failure_with_permission_denied_resp(self, mock_fetch_url, mock_get_version):
+        set_module_args({
+            'name': 'MyTestTeam',
+            'email': 'email@test.com',
+            'url': 'http://grafana.example.com',
+        })
+        module = grafana_team.setup_module_object()
+        mock_fetch_url.return_value = cant_switch_org_resp()
+        mock_get_version.return_value = get_version_resp()
+
+        with self.assertRaises(AnsibleFailJson) as result:
+            grafana_team.main()
+        self.assertTrue(result.exception.args[0]['msg'].startswith('Unable to switch to organization'))
 
     @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
     @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
