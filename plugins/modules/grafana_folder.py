@@ -209,11 +209,13 @@ class GrafanaFolderInterface(object):
         )
 
         if info['status'] != 200:
-            raise GrafanaError(
-                'Unable to switch to organization %s : %s' % (
+            self._module.fail_json(
+                failed=True,
+                msg='Unable to switch to organization %s : %s' % (
                     self._module.params['org_id'], info
                 )
             )
+
 
     def grafana_headers(self):
         if 'grafana_api_key' in self._module.params and self._module.params['grafana_api_key']:
