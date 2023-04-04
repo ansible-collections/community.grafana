@@ -194,6 +194,11 @@ class GrafanaTeamInterface(object):
         self._module = module
         self.grafana_url = base.clean_url(module.params.get("url"))
 
+        # {{{ Authentication header
+        self.headers = {"Content-Type": "application/json"}
+        self.grafana_headers()
+        # }}}
+
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()
@@ -201,11 +206,6 @@ class GrafanaTeamInterface(object):
                 self._module.fail_json(failed=True, msg=to_text(e))
             if grafana_version["major"] < 5:
                 self._module.fail_json(failed=True, msg="Teams API is available starting Grafana v5")
-
-        # {{{ Authentication header
-        self.headers = {"Content-Type": "application/json"}
-        self.grafana_headers()
-        # }}}
 
     def grafana_switch_organisation(self):
         r, info = fetch_url(

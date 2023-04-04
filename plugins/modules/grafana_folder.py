@@ -216,7 +216,6 @@ class GrafanaFolderInterface(object):
                 )
             )
 
-
     def grafana_headers(self):
         if 'grafana_api_key' in self._module.params and self._module.params['grafana_api_key']:
             self.headers['Authorization'] = "Bearer %s" % self._module.params['grafana_api_key']

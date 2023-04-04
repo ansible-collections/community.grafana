@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from ansible_collections.community.grafana.plugins.modules import grafana_team
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils import basic
@@ -48,6 +48,14 @@ def set_module_args(args):
     basic._ANSIBLE_ARGS = to_bytes(args)
 
 
+def cant_switch_org_resp():
+    return (None, {"status": 500})
+
+
+def switch_org_resp():
+    return (None, {"status": 200})
+
+
 def unauthorized_resp(module, full_url, **kwargs):
     if '/api/user/using/' in full_url:
         # switch organization succeeds
@@ -70,10 +78,6 @@ def get_version_resp():
 
 def get_low_version_resp():
     return {"major": 4, "minor": 6, "rev": 0}
-
-
-def cant_switch_org_resp():
-    return (None, {"status": 500})
 
 
 def team_exists_resp():
@@ -200,7 +204,8 @@ class GrafanaTeamsTest(TestCase):
         self.assertEqual(result.exception.args[0]['msg'], 'parameters are mutually exclusive: url_username|grafana_api_key')
 
     @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version')
-    def test_module_fails_with_low_grafana_version(self, mock_get_version):
+    @patch('ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url')
+    def test_module_fails_with_low_grafana_version(self, mock_fetch_url, mock_get_version):
         set_module_args({
             'name': 'MyTestTeam',
             'email': 'email@test.com',
@@ -210,6 +215,7 @@ class GrafanaTeamsTest(TestCase):
         })
 
         module = grafana_team.setup_module_object()
+        mock_fetch_url.return_value = switch_org_resp()
         mock_get_version.return_value = get_low_version_resp()
 
         with self.assertRaises(AnsibleFailJson) as result:
