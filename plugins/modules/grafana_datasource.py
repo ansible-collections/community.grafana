@@ -45,7 +45,7 @@ options:
     - sni-thruk-datasource
     - camptocamp-prometheus-alertmanager-datasource
     - loki
-    - mssqlx
+    - mssql
     - redis-datasource
     type: str
   ds_url:
