@@ -167,7 +167,7 @@ options:
     default: '@timestamp'
   time_interval:
     description:
-    - Minimum group by interval for C(influxdb), C(elasticsearch) or C(prometheus) datasources.
+    - Minimum group by interval for C(influxdb), C(elasticsearch), C(prometheus), or C(mssql) datasources.
     - for example C(>10s).
     type: str
   interval:
@@ -471,10 +471,9 @@ EXAMPLES = '''
     org_id: "1"
     ds_type: "mssql"
     ds_url: "mssql.company.com"
+    time_interval: 5s
     database: "SQLWATCH"
     user: sqlwatch
-    additional_json_data:
-      timeInterval: 5s
     additional_secure_json_data:
       password: "xxxxxx"
   delegate_to: localhost
@@ -633,7 +632,7 @@ def get_datasource_payload(data):
             es_version = ES_VERSION_MAPPING.get(data['es_version'])
         json_data['esVersion'] = es_version
 
-    if data['ds_type'] in ['elasticsearch', 'influxdb', 'prometheus']:
+    if data['ds_type'] in ['elasticsearch', 'influxdb', 'prometheus', 'mssql']:
         if data.get('time_interval'):
             json_data['timeInterval'] = data['time_interval']
 
