@@ -1,5 +1,4 @@
----
-name: Publish to Ansible Galaxy
+name: Publish collection to Ansible Galaxy
 
 on:
   release:
@@ -7,11 +6,7 @@ on:
       - published
 
 jobs:
-  release:
-    name: ansible galaxy
-    runs-on: ubuntu-latest
-    steps:
-      - name: galaxy
-        uses: robertdebock/galaxy-action@1.2.1
-        with:
-          galaxy_api_key: ${{ secrets.GALAXY_API_KEY }}
+  deploy:
+    uses: telekom-mms/.github/.github/workflows/ansible-galaxy-publish.yml@main
+    secrets:
+      GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}

@@ -1,24 +1,12 @@
 ---
-# https://github.com/creyD/prettier_action
-name: Prettier markdown files
+name: Prettify markdown
 
 on:
   push:
-    paths:
-      - '**.md'
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  prettier-md:
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
-
-      - name: Prettify code
-        uses: creyD/prettier_action@v4.2
-        with:
-          prettier_options: --write {**/*,*}.md
+  codespell:
+    uses: "telekom-mms/.github/.github/workflows/prettier-md.yml@main"
