@@ -1,25 +1,89 @@
 ---
-- name: grafana user configuration
-  include_tasks: grafana_user.yml
-  when: grafana_users is defined
-  tags: user
+- name: Manage dashboard
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "{{ dashboard.0.org_id | default(omit) }}"
+    folder: "{{ dashboard.0.folder | default(omit) }}"
+    state: "{{ dashboard.0.state | default(omit) }}"
+    slug: "{{ dashboard.0.slug | default(omit) }}"
+    uid: "{{ dashboard.0.uid | default(omit) }}"
+    path: "{{ dashboard.0.path | default(omit) }}"
+    overwrite: "{{ dashboard.0.overwrite | default(omit) }}"
+    dashboard_id: "{{ dashboard.0.dashboard_id | default(omit) }}"
+    dashboard_revision: "{{ dashboard.0.dashboard_revision | default(omit) }}"
+    commit_message: "{{ dashboard.0.commit_message | default(omit) }}"
+  loop: "{{ grafana_dashboards | subelements('dashboard_object') }}"
+  loop_control:
+    loop_var: dashboard
+  tags: dashboard
 
-- name: grafana team configuration
-  include_tasks: grafana_team.yml
-  when: grafana_teams is defined
-  tags: team
-
-- name: grafana datasource configuration
-  include_tasks: grafana_datasource.yml
-  when: grafana_datasources is defined
+# datasource.0 = grafana_datasource attribute
+- name: Manage datasource
+  community.grafana.grafana_datasource:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    tls_skip_verify: "{{ datasource.0.tls_skip_verify | default(omit) }}"
+    org_id: "{{ datasource.0.org_id | default(omit) }}"
+    name: "{{ datasource.0.name }}"
+    ds_type: "{{ datasource.0.ds_type | default(omit) }}"
+    access: "{{ datasource.0.access | default(omit) }}"
+    ds_url: "{{ datasource.0.ds_url | default(omit) }}"
+    database: "{{ datasource.0.database | default(omit) }}"
+    with_credentials: "{{ datasource.0.with_credentials | default(omit) }}"
+    is_default: "{{ datasource.0.is_default | default(omit) }}"
+    user: "{{ datasource.0.user | default(omit) }}"
+    password: "{{ datasource.0.password | default(omit) }}"
+    additional_json_data: "{{ datasource.0.additional_json_data | default(omit) }}"
+    additional_secure_json_data: "{{ datasource.0.additional_secure_json_data | default(omit) }}"
+  loop: "{{ grafana_datasources | subelements('datasource_object') }}"
+  loop_control:
+    loop_var: datasource
   tags: datasource
 
-- name: grafana folder configuration
-  include_tasks: grafana_folder.yml
-  when: grafana_folders is defined
+- name: Manage folder
+  community.grafana.grafana_folder:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: "{{ folder.1 }}"
+    state: "{{ folder.0.state | default(omit) }}"
+    skip_version_check: "{{ folder.0.skip_version_check | default(omit) }}"
+  loop: "{{ grafana_folders | subelements('folder_object') }}"
+  loop_control:
+    loop_var: folder
   tags: folder
 
-- name: grafana dashboard configuration
-  include_tasks: grafana_dashboard.yml
-  when: grafana_dashboards is defined
-  tags: dashboard
+- name: Manage team
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: "{{ team.1 }}"
+    email: "{{ team.0.email }}"
+    members: "{{ team.0.members | default(omit) }}"
+    state: "{{ team.0.state | default(omit) }}"
+    enforce_members: "{{ team.0.enforce_members | default(omit) }}"
+    skip_version_check: "{{ team.0.skip_version_check | default(omit) }}"
+  loop: "{{ grafana_teams | subelements('team_object') }}"
+  loop_control:
+    loop_var: team
+  tags: team
+
+- name: Manage user
+  community.grafana.grafana_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: "{{ user }}"
+    email: "{{ user.email | default(omit) }}"
+    login: "{{ user.login }}"
+    password: "{{ user.password | default(omit) }}"
+    is_admin: "{{ user.is_admin | default(omit) }}"
+    state: "{{ user.state | default(omit) }}"
+  loop: "{{ grafana_users }}"
+  loop_control:
+    loop_var: user
+  tags: user
