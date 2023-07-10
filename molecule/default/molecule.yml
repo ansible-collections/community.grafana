@@ -8,9 +8,6 @@ platforms:
     image: rndmh3ro/docker-debian11-ansible:latest
     command: ${MOLECULE_DOCKER_COMMAND:-/lib/systemd/systemd}
     env:
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      no_proxy: ${no_proxy}
       container: docker
     pre_build_image: true
 provisioner:
