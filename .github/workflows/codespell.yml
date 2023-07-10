@@ -1,0 +1,12 @@
+---
+name: Codespell - Spellcheck
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  codespell:
+    uses: "telekom-mms/.github/.github/workflows/codespell.yml@main"
