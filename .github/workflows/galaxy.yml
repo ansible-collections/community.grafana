@@ -1,4 +1,4 @@
-name: Publish collection to Ansible Galaxy
+name: Publish role to Ansible Galaxy
 
 on:
   release:
@@ -7,6 +7,6 @@ on:
 
 jobs:
   deploy:
-    uses: telekom-mms/.github/.github/workflows/ansible-galaxy-publish.yml@main
+    uses: telekom-mms/.github/.github/workflows/ansible-galaxy-role-publish.yml@main
     secrets:
       GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
