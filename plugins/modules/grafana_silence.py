@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright: (c) 2023, Rémi REY (@rrey)
+# Copyright: (c) 2023, flkhndlr (@flkhndlr)
 
 from __future__ import absolute_import, division, print_function
 
@@ -23,7 +23,7 @@ DOCUMENTATION = '''
 ---
 module: grafana_silence
 author:
-  - Falk (@flkhndlr)
+  - flkhndlr (@flkhndlr)
 version_added: "1.5.5"
 short_description: Manage Grafana Silences
 description:
@@ -169,7 +169,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible.module_utils._text import to_text
 from ansible_collections.community.grafana.plugins.module_utils import base
-from ansible.module_utils.six.moves.urllib.parse import quote
 
 __metaclass__ = type
 
@@ -231,20 +230,20 @@ class GrafanaSilenceInterface(object):
             return {"major": int(major), "minor": int(minor), "rev": int(rev)}
         raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
-    def create_silence(self, comment, createdBy, startsAt ,endsAt, matchers):
+    def create_silence(self, comment, created_by, starts_at, ends_at, matchers):
         url = "/api/alertmanager/grafana/api/v2/silences"
-        silence = dict(comment=comment, createdBy=createdBy, startsAt=startsAt, endsAt=endsAt, matchers=matchers)
+        silence = dict(comment=comment, createdBy=created_by, startsAt=starts_at, endsAt=ends_at, matchers=matchers)
         response = self._send_request(url, data=silence, headers=self.headers, method="POST")
         return response
 
-    def get_silence(self, comment, createdBy, startsAt ,endsAt, matchers):
+    def get_silence(self, comment, created_by, starts_at, ends_at, matchers):
         url = "/api/alertmanager/grafana/api/v2/silences"
 
         responses = self._send_request(url, headers=self.headers, method="GET")
 
         for response in responses:
-            if response["comment"] == comment and response["createdBy"] == createdBy and \
-                    response["startsAt"] == startsAt and response["endsAt"] == endsAt and \
+            if response["comment"] == comment and response["createdBy"] == created_by and \
+                    response["startsAt"] == starts_at and response["endsAt"] == ends_at and \
                     response["matchers"] == matchers:
                 return response
             else:
@@ -265,7 +264,6 @@ class GrafanaSilenceInterface(object):
         url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(SilenceId=silence_id)
         response = self._send_request(url, headers=self.headers, method="DELETE")
         return response
-
 
 
 def setup_module_object():
