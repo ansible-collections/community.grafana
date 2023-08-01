@@ -87,4 +87,3 @@
       - "result.changed == false"
       - "result.failed == true"
       - "result.msg == 'No Silence with the same parameters found! Deletion not possible'"
-

@@ -19,12 +19,12 @@
 
 from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: grafana_silence
 author:
   - flkhndlr (@flkhndlr)
-version_added: "1.5.5"
+version_added: "1.6.0"
 short_description: Manage Grafana Silences
 description:
   - Create/delete Grafana Silences through the Alertmanager Silence API.
@@ -45,15 +45,18 @@ options:
     description:
       - ISO 8601 Timestamp with milliseconds  e.g. "2029-07-29T08:45:45.000Z" when the silence starts.
     type: str
+    required: true
   ends_at:
     description:
       - ISO 8601 Timestamp with milliseconds  e.g. "2029-07-29T08:45:45.000Z" when the silence will end.
     type: str
+    required: true
   matchers:
     description:
       - List of matchers to select which alerts are affected by the silence.
     type: list
-    elements: str
+    elements: dict
+    required: true
   state:
     description:
       - Delete the first occurrence of a silence with the same settings.
@@ -67,13 +70,12 @@ options:
     required: False
     type: bool
     default: False
-    version_added: "1.2.0"
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 ---
 - name: Create a silence
   community.grafana.grafana_silence:
@@ -104,9 +106,9 @@ EXAMPLES = '''
           name: environment
           value: test
       state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = """
 ---
 silence:
     description: Information about the Silence
@@ -152,7 +154,7 @@ silence:
         status:
             description: The status of the Silence
             returned: success
-            type: object
+            type: dict
             sample:
                 - {"state": "pending"}
         updatedAt:
@@ -161,7 +163,7 @@ silence:
             type: str
             sample:
                 - "2023-07-27T13:27:33.042Z"
-'''
+"""
 
 import json
 
@@ -178,16 +180,19 @@ class GrafanaError(Exception):
 
 
 class GrafanaSilenceInterface(object):
-
     def __init__(self, module):
         self._module = module
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        module.params['force_basic_auth'] = True
-        if module.params.get('grafana_api_key', None):
-            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
+        module.params["force_basic_auth"] = True
+        if module.params.get("grafana_api_key", None):
+            self.headers["Authorization"] = (
+                "Bearer %s" % module.params["grafana_api_key"]
+            )
         else:
-            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+            self.headers["Authorization"] = basic_auth_header(
+                module.params["url_username"], module.params["url_password"]
+            )
         # }}}
         self.grafana_url = base.clean_url(module.params.get("url"))
         if module.params.get("skip_version_check") is False:
@@ -195,8 +200,11 @@ class GrafanaSilenceInterface(object):
                 grafana_version = self.get_version()
             except GrafanaError as e:
                 self._module.fail_json(failed=True, msg=to_text(e))
-            if grafana_version["major"] < 5:
-                self._module.fail_json(failed=True, msg="Silences API is available starting Grafana v8")
+            if grafana_version["major"] < 8:
+                self._module.fail_json(
+                    failed=True,
+                    msg="Silences API is available starting with Grafana v8",
+                )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -205,12 +213,17 @@ class GrafanaSilenceInterface(object):
             headers = []
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+        resp, info = fetch_url(
+            self._module, full_url, data=data, headers=headers, method=method
+        )
         status_code = info["status"]
         if status_code == 404:
             return None
         elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
+            self._module.fail_json(
+                failed=True,
+                msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url),
+            )
         elif status_code == 403:
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 202:
@@ -219,11 +232,15 @@ class GrafanaSilenceInterface(object):
             return self._module.from_json(resp.read())
         elif status_code == 400:
             self._module.fail_json(failed=True, msg=info)
-        self._module.fail_json(failed=True, msg="Grafana Silences API answered with HTTP %d" % status_code)
+        self._module.fail_json(
+            failed=True, msg="Grafana Silences API answered with HTTP %d" % status_code
+        )
 
     def get_version(self):
         url = "/api/health"
-        response = self._send_request(url, data=None, headers=self.headers, method="GET")
+        response = self._send_request(
+            url, data=None, headers=self.headers, method="GET"
+        )
         version = response.get("version")
         if version is not None:
             major, minor, rev = version.split(".")
@@ -232,8 +249,16 @@ class GrafanaSilenceInterface(object):
 
     def create_silence(self, comment, created_by, starts_at, ends_at, matchers):
         url = "/api/alertmanager/grafana/api/v2/silences"
-        silence = dict(comment=comment, createdBy=created_by, startsAt=starts_at, endsAt=ends_at, matchers=matchers)
-        response = self._send_request(url, data=silence, headers=self.headers, method="POST")
+        silence = dict(
+            comment=comment,
+            createdBy=created_by,
+            startsAt=starts_at,
+            endsAt=ends_at,
+            matchers=matchers,
+        )
+        response = self._send_request(
+            url, data=silence, headers=self.headers, method="POST"
+        )
         return response
 
     def get_silence(self, comment, created_by, starts_at, ends_at, matchers):
@@ -242,16 +267,22 @@ class GrafanaSilenceInterface(object):
         responses = self._send_request(url, headers=self.headers, method="GET")
 
         for response in responses:
-            if response["comment"] == comment and response["createdBy"] == created_by and \
-                    response["startsAt"] == starts_at and response["endsAt"] == ends_at and \
-                    response["matchers"] == matchers:
+            if (
+                response["comment"] == comment
+                and response["createdBy"] == created_by
+                and response["startsAt"] == starts_at
+                and response["endsAt"] == ends_at
+                and response["matchers"] == matchers
+            ):
                 return response
             else:
                 return None
         return None
 
     def get_silence_by_id(self, silence_id):
-        url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(SilenceId=silence_id)
+        url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
+            SilenceId=silence_id
+        )
         response = self._send_request(url, headers=self.headers, method="GET")
         return response
 
@@ -261,7 +292,9 @@ class GrafanaSilenceInterface(object):
         return response
 
     def delete_silence(self, silence_id):
-        url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(SilenceId=silence_id)
+        url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
+            SilenceId=silence_id
+        )
         response = self._send_request(url, headers=self.headers, method="DELETE")
         return response
 
@@ -278,50 +311,61 @@ def setup_module_object():
 
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
-    comment=dict(type='str', required=True),
-    state=dict(type='str', required=True),
-    created_by=dict(type='str', required=True),
-    starts_at=dict(type='str', required=True),
-    ends_at=dict(type='str', required=True),
-    matchers=dict(type='list', elements='dict', required=True),
+    comment=dict(type="str", required=True),
+    state=dict(type="str", choices=["present", "absent"], default="present"),
+    created_by=dict(type="str", required=True),
+    starts_at=dict(type="str", required=True),
+    ends_at=dict(type="str", required=True),
+    matchers=dict(type="list", elements="dict", required=True),
+    skip_version_check=dict(type="bool", default=False),
 )
 
 
 def main():
 
     module = setup_module_object()
-    comment = module.params['comment']
-    created_by = module.params['created_by']
-    starts_at = module.params['starts_at']
-    ends_at = module.params['ends_at']
-    matchers = module.params['matchers']
-    state = module.params['state']
+    comment = module.params["comment"]
+    created_by = module.params["created_by"]
+    starts_at = module.params["starts_at"]
+    ends_at = module.params["ends_at"]
+    matchers = module.params["matchers"]
+    state = module.params["state"]
 
     changed = False
     failed = False
-    silence = ""
     grafana_iface = GrafanaSilenceInterface(module)
 
-    if state == 'present':
-        silence = grafana_iface.get_silence(comment, created_by, starts_at, ends_at, matchers)
-        if silence is None:
-            silence = grafana_iface.create_silence(comment, created_by, starts_at, ends_at, matchers)
+    silence = grafana_iface.get_silence(
+        comment, created_by, starts_at, ends_at, matchers
+    )
+
+    if state == "present":
+
+        if not silence:
+            silence = grafana_iface.create_silence(
+                comment, created_by, starts_at, ends_at, matchers
+            )
             silence = grafana_iface.get_silence_by_id(silence["silenceID"])
             changed = True
         else:
-            module.exit_json(failed=failed, changed=changed,
-                             msg="Silence with same parameters already exists! eg. '%s'" % silence["id"])
-    elif state == 'absent':
-        silence = grafana_iface.get_silence(comment, created_by, starts_at, ends_at, matchers)
-        if silence is not None:
+            module.exit_json(
+                failed=failed,
+                changed=changed,
+                msg="Silence with same parameters already exists! eg. '%s'"
+                % silence["id"],
+            )
+    elif state == "absent":
+        if silence:
             grafana_iface.delete_silence(silence["id"])
             changed = True
         else:
-            failed = True
-            module.exit_json(failed=failed, changed=changed,
-                             msg="No Silence with the same parameters found! Deletion not possible")
+            module.exit_json(
+                failed=failed,
+                changed=changed,
+                msg="No Silence with the same parameters found! Deletion not possible",
+            )
     module.exit_json(failed=failed, changed=changed, silence=silence)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

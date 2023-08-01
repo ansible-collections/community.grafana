@@ -1,4 +1,4 @@
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
@@ -21,30 +21,32 @@ class MockedReponse(object):
 
 def exit_json(*args, **kwargs):
     """function to patch over exit_json; package return data into an exception"""
-    if 'changed' not in kwargs:
-        kwargs['changed'] = False
+    if "changed" not in kwargs:
+        kwargs["changed"] = False
     raise AnsibleExitJson(kwargs)
 
 
 def fail_json(*args, **kwargs):
     """function to patch over fail_json; package return data into an exception"""
-    kwargs['failed'] = True
+    kwargs["failed"] = True
     raise AnsibleFailJson(kwargs)
 
 
 class AnsibleExitJson(Exception):
     """Exception class to be raised by module.exit_json and caught by the test case"""
+
     pass
 
 
 class AnsibleFailJson(Exception):
     """Exception class to be raised by module.fail_json and caught by the test case"""
+
     pass
 
 
 def set_module_args(args):
     """prepare arguments so that they will be picked up during module creation"""
-    args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
+    args = json.dumps({"ANSIBLE_MODULE_ARGS": args})
     basic._ANSIBLE_ARGS = to_bytes(args)
 
 
@@ -52,102 +54,118 @@ def silence_deleted_resp():
     server_response = json.dumps({"message": "silence deleted"})
     return (MockedReponse(server_response), {"status": 200})
 
+
 def silence_created_resp():
-    server_response = json.dumps({
-    "silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"
-    }, sort_keys=True)
+    server_response = json.dumps(
+        {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"}, sort_keys=True
+    )
     return (MockedReponse(server_response), {"status": 200})
 
 
 class GrafanaSilenceTest(TestCase):
-
     def setUp(self):
         self.authorization = basic_auth_header("admin", "changeme")
-        self.mock_module_helper = patch.multiple(basic.AnsibleModule,
-                                                 exit_json=exit_json,
-                                                 fail_json=fail_json)
+        self.mock_module_helper = patch.multiple(
+            basic.AnsibleModule, exit_json=exit_json, fail_json=fail_json
+        )
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
 
     # create a new silence
-    @patch('ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url')
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
+    )
     def test_create_silence_new_silence(self, mock_fetch_url):
-        set_module_args({
-            'url': 'https://grafana.example.com',
-            'url_username': 'admin',
-            'url_password': 'changeme',
-            'comment': 'a testcomment',
-            'created_by': 'me',
-            'starts_at': '2029-07-29T08:45:45.000Z',
-            'ends_at': '2029-07-29T08:55:45.000Z',
-            'matchers': [
-                {
-                    'isEqual': True,
-                    'isRegex': True,
-                    'name': 'environment',
-                    'value': 'test'
-                }
-            ],
-            'state': 'present'
-        })
+        set_module_args(
+            {
+                "url": "https://grafana.example.com",
+                "url_username": "admin",
+                "url_password": "changeme",
+                "comment": "a testcomment",
+                "created_by": "me",
+                "starts_at": "2029-07-29T08:45:45.000Z",
+                "ends_at": "2029-07-29T08:55:45.000Z",
+                "matchers": [
+                    {
+                        "isEqual": True,
+                        "isRegex": True,
+                        "name": "environment",
+                        "value": "test",
+                    }
+                ],
+                "state": "present",
+            }
+        )
         module = grafana_silence.setup_module_object()
         mock_fetch_url.return_value = silence_created_resp()
 
         grafana_iface = grafana_silence.GrafanaSilenceInterface(module)
-        result = grafana_iface.create_silence('a testcomment',
-            'me',
-            '2029-07-29T08:45:45.000Z',
-            '2029-07-29T08:55:45.000Z',
+        result = grafana_iface.create_silence(
+            "a testcomment",
+            "me",
+            "2029-07-29T08:45:45.000Z",
+            "2029-07-29T08:55:45.000Z",
             [
                 {
-                    'isEqual': True,
-                    'isRegex': True,
-                    'name': 'environment',
-                    'value': 'test'
-                }
-            ])
-        mock_fetch_url.assert_called_once_with(
-            module,
-            'https://grafana.example.com/api/alertmanager/grafana/api/v2/silences',
-            data=json.dumps({'comment': 'a testcomment',
-            'created_by': 'me',
-            'starts_at': '2029-07-29T08:45:45.000Z',
-            'ends_at': '2029-07-29T08:55:45.000Z',
-            'matchers': [
-                {
-                    'isEqual': True,
-                    'isRegex': True,
-                    'name': 'environment',
-                    'value': 'test'
-                }
-            ]}, sort_keys=True),
-            headers={'Content-Type': 'application/json',
-                     'Authorization': self.authorization},
-            method='POST')
-        self.assertEquals(result, {
-                "silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"
-        })
-
-    @patch('ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url')
-    def test_delete_silence(self, mock_fetch_url):
-        set_module_args({
-            'url': 'https://grafana.example.com',
-            'url_username': 'admin',
-            'url_password': 'changeme',
-            'comment': 'a testcomment',
-            'created_by': 'me',
-            'starts_at': '2029-07-29T08:45:45.000Z',
-            'ends_at': '2029-07-29T08:55:45.000Z',
-            'matchers': [
-                {
-                    'isEqual': True,
-                    'isRegex': True,
-                    'name': 'environment',
-                    'value': 'test'
+                    "isEqual": True,
+                    "isRegex": True,
+                    "name": "environment",
+                    "value": "test",
                 }
             ],
-            'state': 'present'
-        })
+        )
+        mock_fetch_url.assert_called_once_with(
+            module,
+            "https://grafana.example.com/api/alertmanager/grafana/api/v2/silences",
+            data=json.dumps(
+                {
+                    "comment": "a testcomment",
+                    "created_by": "me",
+                    "starts_at": "2029-07-29T08:45:45.000Z",
+                    "ends_at": "2029-07-29T08:55:45.000Z",
+                    "matchers": [
+                        {
+                            "isEqual": True,
+                            "isRegex": True,
+                            "name": "environment",
+                            "value": "test",
+                        }
+                    ],
+                },
+                sort_keys=True,
+            ),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": self.authorization,
+            },
+            method="POST",
+        )
+        self.assertEquals(result, {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"})
+
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
+    )
+    def test_delete_silence(self, mock_fetch_url):
+        set_module_args(
+            {
+                "url": "https://grafana.example.com",
+                "url_username": "admin",
+                "url_password": "changeme",
+                "comment": "a testcomment",
+                "created_by": "me",
+                "starts_at": "2029-07-29T08:45:45.000Z",
+                "ends_at": "2029-07-29T08:55:45.000Z",
+                "matchers": [
+                    {
+                        "isEqual": True,
+                        "isRegex": True,
+                        "name": "environment",
+                        "value": "test",
+                    }
+                ],
+                "state": "present",
+            }
+        )
         module = grafana_silence.setup_module_object()
         mock_fetch_url.return_value = silence_deleted_resp()
 
@@ -156,9 +174,12 @@ class GrafanaSilenceTest(TestCase):
         result = grafana_iface.delete_silence(silence_id)
         mock_fetch_url.assert_called_once_with(
             module,
-            'https://grafana.example.com/api/alertmanager/grafana/api/v2/silence/470b7116-8f06-4bb6-9e6c-6258aa92218e',
+            "https://grafana.example.com/api/alertmanager/grafana/api/v2/silence/470b7116-8f06-4bb6-9e6c-6258aa92218e",
             data=None,
-            headers={'Content-Type': 'application/json',
-                     'Authorization': self.authorization},
-            method='DELETE')
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": self.authorization,
+            },
+            method="DELETE",
+        )
         self.assertEquals(result, {"message": "silence deleted"})
