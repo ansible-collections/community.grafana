@@ -178,7 +178,7 @@ class GrafanaOrganizationUserInterface(object):
 
     def _organization_user_by_login(self, org_id, login):
         for user in self._organization_users(org_id):
-            if user['name'] == login or user['email'] == login:
+            if user['login'] == login or user['name'] == login or user['email'] == login:
                 return user
 
     def create_or_update_user(self, org_id, login, role):
