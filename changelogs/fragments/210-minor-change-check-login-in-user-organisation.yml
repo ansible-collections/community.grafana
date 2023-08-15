@@ -1,0 +1,2 @@
+minor_changes:
+  - check the login value of the user in user exists in organisation check (https://github.com/ansible-collections/community.grafana/pull/310).
