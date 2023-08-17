@@ -264,7 +264,7 @@ def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
 
 
 # for comparison, we sometimes need to ignore a few keys
-def grafana_dashboard_changed(payload, dashboard):
+def is_grafana_dashboard_changed(payload, dashboard):
     # you don't need to set the version, but '0' is incremented to '1' by Grafana's API
     if 'version' in payload['dashboard']:
         del payload['dashboard']['version']
@@ -353,7 +353,13 @@ def grafana_create_dashboard(module, data):
             module, data['url'], folder_id, payload['dashboard']['title'], headers=headers)
 
     if dashboard_exists is True:
-        if grafana_dashboard_changed(payload, dashboard):
+        grafana_dashboard_changed = is_grafana_dashboard_changed(payload, dashboard)
+
+        if grafana_dashboard_changed:
+            if module.check_mode:
+                module.exit_json(failed=False,
+                                 changed=True,
+                                 msg="Dashboard %s will be updated" % payload['dashboard']['title'])
             # update
             if 'overwrite' in data and data['overwrite']:
                 payload['overwrite'] = True
@@ -382,6 +388,11 @@ def grafana_create_dashboard(module, data):
             result['msg'] = "Dashboard %s unchanged." % payload['dashboard']['title']
             result['changed'] = False
     else:
+        if module.check_mode:
+            module.exit_json(failed=False,
+                             changed=True,
+                             msg="Dashboard %s will be created" % payload['dashboard']['title'])
+
         # Ensure there is no id in payload
         if 'id' in payload['dashboard']:
             del payload['dashboard']['id']
@@ -427,6 +438,11 @@ def grafana_delete_dashboard(module, data):
 
     result = {}
     if dashboard_exists is True:
+        if module.check_mode:
+            module.exit_json(failed=False,
+                             changed=True,
+                             msg="Dashboard %s will be deleted" % uid)
+
         # delete
         if grafana_version < 5:
             r, info = fetch_url(module, '%s/api/dashboards/db/%s' % (data['url'], uid), headers=headers, method='DELETE')
@@ -468,6 +484,10 @@ def grafana_export_dashboard(module, data):
     dashboard_exists, dashboard = grafana_dashboard_exists(module, data['url'], uid, headers=headers)
 
     if dashboard_exists is True:
+        if module.check_mode:
+            module.exit_json(failed=False,
+                             changed=True,
+                             msg="Dashboard %s will be exported to %s" % (uid, data['path']))
         try:
             with open(data['path'], 'w', encoding="utf-8") as f:
                 f.write(json.dumps(dashboard, indent=2))
@@ -503,7 +523,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_if=[
             ['state', 'export', ['path']],
         ],
