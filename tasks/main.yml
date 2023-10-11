@@ -6,7 +6,7 @@
     url_password: "{{ grafana_password }}"
 
 - name: Manage organization
-  community.grafana.grafana_organizations:
+  community.grafana.grafana_organization:
     <<: *grafana_connection
     name: "{{ organization.name }}"
     state: "{{ organization.state | default(omit) }}"
