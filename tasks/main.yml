@@ -9,7 +9,7 @@
   community.grafana.grafana_organizations:
     <<: *grafana_connection
     name: "{{ organization.name }}"
-    name: "{{ organization.state | default(omit) }}"
+    state: "{{ organization.state | default(omit) }}"
   loop: "{{ grafana_organizations }}"
   loop_control: {loop_var: organization}
   tags: organization
