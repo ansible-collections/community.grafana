@@ -5,6 +5,15 @@
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
 
+- name: Manage organization
+  community.grafana.grafana_organizations:
+    <<: *grafana_connection
+    name: "{{ organization.name }}"
+    name: "{{ organization.state | default(omit) }}"
+  loop: "{{ grafana_organizations }}"
+  loop_control: {loop_var: organization}
+  tags: organization
+
 # datasource.0 = grafana_datasource attribute
 - name: Manage datasource
   community.grafana.grafana_datasource:
