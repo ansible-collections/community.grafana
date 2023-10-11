@@ -9,77 +9,72 @@
 - name: Manage datasource
   community.grafana.grafana_datasource:
     <<: *grafana_connection
-    tls_skip_verify: "{{ datasource.0.tls_skip_verify | default(omit) }}"
-    org_id: "{{ datasource.0.org_id | default(omit) }}"
-    name: "{{ datasource.0.name }}"
-    ds_type: "{{ datasource.0.ds_type | default(omit) }}"
-    access: "{{ datasource.0.access | default(omit) }}"
-    ds_url: "{{ datasource.0.ds_url | default(omit) }}"
-    database: "{{ datasource.0.database | default(omit) }}"
-    with_credentials: "{{ datasource.0.with_credentials | default(omit) }}"
-    is_default: "{{ datasource.0.is_default | default(omit) }}"
-    user: "{{ datasource.0.user | default(omit) }}"
-    password: "{{ datasource.0.password | default(omit) }}"
-    additional_json_data: "{{ datasource.0.additional_json_data | default(omit) }}"
-    additional_secure_json_data: "{{ datasource.0.additional_secure_json_data | default(omit) }}"
-  loop: "{{ grafana_datasources | subelements('datasource_object') }}"
-  loop_control:
-    loop_var: datasource
+    tls_skip_verify: "{{ datasource.tls_skip_verify | default(omit) }}"
+    org_id: "{{ datasource.org_id | default(omit) }}"
+    name: "{{ datasource.name }}"
+    ds_type: "{{ datasource.ds_type | default(omit) }}"
+    access: "{{ datasource.access | default(omit) }}"
+    ds_url: "{{ datasource.ds_url | default(omit) }}"
+    database: "{{ datasource.database | default(omit) }}"
+    with_credentials: "{{ datasource.with_credentials | default(omit) }}"
+    is_default: "{{ datasource.is_default | default(omit) }}"
+    user: "{{ datasource.user | default(omit) }}"
+    password: "{{ datasource.password | default(omit) }}"
+    additional_json_data: "{{ datasource.additional_json_data | default(omit) }}"
+    additional_secure_json_data: "{{ datasource.additional_secure_json_data | default(omit) }}"
+  loop: "{{ grafana_datasources }}"
+  loop_control: {loop_var: datasource}
   tags: datasource
 
 - name: Manage folder
   community.grafana.grafana_folder:
     <<: *grafana_connection
-    name: "{{ folder.1 }}"
-    state: "{{ folder.0.state | default(omit) }}"
-    skip_version_check: "{{ folder.0.skip_version_check | default(omit) }}"
-  loop: "{{ grafana_folders | subelements('folder_object') }}"
-  loop_control:
-    loop_var: folder
+    name: "{{ folder.name }}"
+    state: "{{ folder.state | default(omit) }}"
+    skip_version_check: "{{ folder.skip_version_check | default(omit) }}"
+  loop: "{{ grafana_folders }}"
+  loop_control: {loop_var: folder}
   tags: folder
 
 - name: Manage team
   community.grafana.grafana_team:
     <<: *grafana_connection
-    name: "{{ team.1 }}"
-    email: "{{ team.0.email }}"
-    members: "{{ team.0.members | default(omit) }}"
-    state: "{{ team.0.state | default(omit) }}"
-    enforce_members: "{{ team.0.enforce_members | default(omit) }}"
-    skip_version_check: "{{ team.0.skip_version_check | default(omit) }}"
-  loop: "{{ grafana_teams | subelements('team_object') }}"
-  loop_control:
-    loop_var: team
+    name: "{{ team.name }}"
+    email: "{{ team.email }}"
+    members: "{{ team.members | default(omit) }}"
+    state: "{{ team.state | default(omit) }}"
+    enforce_members: "{{ team.enforce_members | default(omit) }}"
+    skip_version_check: "{{ team.skip_version_check | default(omit) }}"
+  loop: "{{ grafana_teams }}"
+  loop_control: {loop_var: team}
   tags: team
 
 - name: Manage user
   community.grafana.grafana_user:
     <<: *grafana_connection
-    name: "{{ user }}"
+    name: "{{ user.name }}"
     email: "{{ user.email | default(omit) }}"
     login: "{{ user.login }}"
     password: "{{ user.password | default(omit) }}"
     is_admin: "{{ user.is_admin | default(omit) }}"
     state: "{{ user.state | default(omit) }}"
   loop: "{{ grafana_users }}"
-  loop_control:
-    loop_var: user
+  loop_control: {loop_var: user}
   tags: user
 
 - name: Manage dashboard
   community.grafana.grafana_dashboard:
     <<: *grafana_connection
-    org_id: "{{ dashboard.0.org_id | default(omit) }}"
-    folder: "{{ dashboard.0.folder | default(omit) }}"
-    state: "{{ dashboard.0.state | default(omit) }}"
-    slug: "{{ dashboard.0.slug | default(omit) }}"
-    uid: "{{ dashboard.0.uid | default(omit) }}"
-    path: "{{ dashboard.0.path | default(omit) }}"
-    overwrite: "{{ dashboard.0.overwrite | default(omit) }}"
-    dashboard_id: "{{ dashboard.0.dashboard_id | default(omit) }}"
-    dashboard_revision: "{{ dashboard.0.dashboard_revision | default(omit) }}"
-    commit_message: "{{ dashboard.0.commit_message | default(omit) }}"
-  loop: "{{ grafana_dashboards | subelements('dashboard_object') }}"
-  loop_control:
-    loop_var: dashboard
+    org_id: "{{ dashboard.org_id | default(omit) }}"
+    folder: "{{ dashboard.folder | default(omit) }}"
+    state: "{{ dashboard.state | default(omit) }}"
+    slug: "{{ dashboard.slug | default(omit) }}"
+    uid: "{{ dashboard.uid | default(omit) }}"
+    path: "{{ dashboard.path | default(omit) }}"
+    overwrite: "{{ dashboard.overwrite | default(omit) }}"
+    dashboard_id: "{{ dashboard.dashboard_id | default(omit) }}"
+    dashboard_revision: "{{ dashboard.dashboard_revision | default(omit) }}"
+    commit_message: "{{ dashboard.commit_message | default(omit) }}"
+  loop: "{{ grafana_dashboards }}"
+  loop_control: {loop_var: dashboard}
   tags: dashboard
