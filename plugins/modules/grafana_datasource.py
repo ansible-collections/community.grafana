@@ -519,7 +519,8 @@ def compare_datasources(new, current, compareSecureData=True):
     if 'readOnly' in current:
         del current['readOnly']
     if current['basicAuth'] is False:
-        del current['basicAuthUser']
+        if 'basicAuthUser' in current:
+          del current['basicAuthUser']
     if 'password' in current:
         del current['password']
     if 'basicAuthPassword' in current:
