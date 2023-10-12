@@ -46,6 +46,7 @@ options:
     - camptocamp-prometheus-alertmanager-datasource
     - loki
     - redis-datasource
+    - tempo
     type: str
   ds_url:
     description:
@@ -738,7 +739,8 @@ def setup_module_object():
                               'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
                               'redis-datasource',
-                              'loki']),
+                              'loki',
+                              'tempo']),
         ds_url=dict(type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         database=dict(type='str', default=""),
