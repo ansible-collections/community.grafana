@@ -71,6 +71,18 @@
   loop_control: {loop_var: user}
   tags: user
 
+### community.grafana 1.6.0 release required
+# - name: Manage organization user
+#   community.grafana.grafana_organization_user:
+#     <<: *grafana_connection
+#     login: "{{ organization_user.login }}"
+#     role: "{{ organization_user.role | default(omit) }}"
+#     state: "{{ organization_user.state | default(omit) }}"
+#     org_id: "{{ organization_user.org_id | default(omit) }}"
+#   loop: "{{ grafana_organization_users }}"
+#   loop_control: {loop_var: organization_user}
+#   tags: organization_user
+
 - name: Manage dashboard
   community.grafana.grafana_dashboard:
     <<: *grafana_connection
