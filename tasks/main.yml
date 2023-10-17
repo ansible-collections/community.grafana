@@ -1,13 +1,9 @@
 ---
-- name: Grafana connection anchor
-  ansible.builtin.set_fact: &grafana_connection
+- name: Manage organization
+  community.grafana.grafana_organization:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-
-- name: Manage organization
-  community.grafana.grafana_organization:
-    <<: *grafana_connection
     name: "{{ organization.name }}"
     state: "{{ organization.state | default(omit) }}"
   loop: "{{ grafana_organizations }}"
@@ -17,7 +13,9 @@
 # datasource.0 = grafana_datasource attribute
 - name: Manage datasource
   community.grafana.grafana_datasource:
-    <<: *grafana_connection
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     tls_skip_verify: "{{ datasource.tls_skip_verify | default(omit) }}"
     org_id: "{{ datasource.org_id | default(omit) }}"
     name: "{{ datasource.name }}"
@@ -37,7 +35,9 @@
 
 - name: Manage folder
   community.grafana.grafana_folder:
-    <<: *grafana_connection
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     name: "{{ folder.name }}"
     state: "{{ folder.state | default(omit) }}"
     skip_version_check: "{{ folder.skip_version_check | default(omit) }}"
@@ -47,7 +47,9 @@
 
 - name: Manage team
   community.grafana.grafana_team:
-    <<: *grafana_connection
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     name: "{{ team.name }}"
     email: "{{ team.email }}"
     members: "{{ team.members | default(omit) }}"
@@ -60,7 +62,9 @@
 
 - name: Manage user
   community.grafana.grafana_user:
-    <<: *grafana_connection
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     name: "{{ user.name }}"
     email: "{{ user.email | default(omit) }}"
     login: "{{ user.login }}"
@@ -74,7 +78,9 @@
 ### community.grafana 1.6.0 release required
 # - name: Manage organization user
 #   community.grafana.grafana_organization_user:
-#     <<: *grafana_connection
+#     url: "{{ grafana_url }}"
+#     url_username: "{{ grafana_username }}"
+#     url_password: "{{ grafana_password }}"
 #     login: "{{ organization_user.login }}"
 #     role: "{{ organization_user.role | default(omit) }}"
 #     state: "{{ organization_user.state | default(omit) }}"
@@ -85,7 +91,9 @@
 
 - name: Manage dashboard
   community.grafana.grafana_dashboard:
-    <<: *grafana_connection
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
     org_id: "{{ dashboard.org_id | default(omit) }}"
     folder: "{{ dashboard.folder | default(omit) }}"
     state: "{{ dashboard.state | default(omit) }}"
