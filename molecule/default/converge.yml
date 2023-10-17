@@ -15,21 +15,16 @@
     grafana_password: admin
 
     grafana_datasources:
-      - datasource_object:
-          - loki
-        name: Loki
+      - name: Loki
         ds_type: loki
         ds_url: http://127.0.0.1:3100
         tls_skip_verify: true
 
     grafana_folders:
-      - folder_object:
-          - my_service
-          - other_service
+      - name: my_service
+      - name: other_service
 
     grafana_dashboards:
-      - dashboard_object:
-          - dashboard
-        folder: my_service
-        dashboard_uid: ES5apb27k
+      - folder: my_service
+        uid: ES5apb27k
         path: test_dashboard.json
