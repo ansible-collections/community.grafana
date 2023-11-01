@@ -28,4 +28,3 @@
       - folder: my_service
         uid: ES5apb27k
         path: test_dashboard.json
-        overwrite: true
