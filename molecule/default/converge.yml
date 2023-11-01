@@ -26,5 +26,4 @@
 
     grafana_dashboards:
       - folder: my_service
-        uid: ES5apb27k
         path: test_dashboard.json
