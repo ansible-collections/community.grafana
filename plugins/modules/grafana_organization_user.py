@@ -57,6 +57,12 @@ options:
     default: 1
     description:
       - Organization ID.
+      - Mutually exclusive with `org_name`.
+  org_name:
+    type: str
+    description:
+      - Organization name.
+      - Mutually exclusive with `org_id`.
 
 extends_documentation_fragment:
   - community.grafana.basic_auth
