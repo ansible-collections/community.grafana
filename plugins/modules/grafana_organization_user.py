@@ -264,8 +264,8 @@ def main():
     iface = GrafanaOrganizationUserInterface(module)
     if module.params['org_name']:
         org_name = module.params['org_name']
-        result = iface._organization_by_name(org_name)
-        module.exit_json(failed=False, **result)
+        organization = iface._organization_by_name(org_name)
+        org_id = organization['id']
     if module.params['state'] == 'present':
         role = module.params['role'].capitalize()
         result = iface.create_or_update_user(org_id, login, role)
