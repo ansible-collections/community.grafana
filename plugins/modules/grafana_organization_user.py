@@ -244,7 +244,7 @@ def main():
     argument_spec.pop('grafana_api_key')
     argument_spec.update(
         org_id=dict(type='int', default=1),
-        org_name=dict(type='str', required=False),
+        org_name=dict(type='str'),
         login=dict(type='str', required=True),
         role=dict(type='str', choices=['viewer', 'editor', 'admin'], default='viewer'),
     )
