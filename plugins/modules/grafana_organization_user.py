@@ -162,6 +162,12 @@ class GrafanaOrganizationUserInterface(object):
             data = json.dumps(payload)
         return fetch_url(self._module, self.grafana_url + '/api/' + path, headers=self.headers, method=method, data=data)
 
+    def _organization_by_name(self, org_name):
+        r, info = self._api_call('GET', 'orgs/name/%s' % org_name, None)
+        if info['status'] != 200:
+            raise GrafanaAPIException("Unable to retrieve organization: %s" % info)
+        return json.loads(to_text(r.read()))
+
     def _organization_users(self, org_id):
         r, info = self._api_call('GET', 'orgs/%d/users' % org_id, None)
         if info['status'] != 200:
@@ -238,12 +244,16 @@ def main():
     argument_spec.pop('grafana_api_key')
     argument_spec.update(
         org_id=dict(type='int', default=1),
+        org_name=dict(type='str', required=False),
         login=dict(type='str', required=True),
         role=dict(type='str', choices=['viewer', 'editor', 'admin'], default='viewer'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
+        mutually_exclusive=[
+            ('org_id', 'org_name'),
+        ],
         required_if=[
             ['state', 'present', ['role']],
         ]
@@ -252,6 +262,10 @@ def main():
     org_id = module.params['org_id']
     login = module.params['login']
     iface = GrafanaOrganizationUserInterface(module)
+    if module.params['org_name']:
+        org_name = module.params['org_name']
+        result = iface._organization_by_name(org_name)
+        module.exit_json(failed=False, **result)
     if module.params['state'] == 'present':
         role = module.params['role'].capitalize()
         result = iface.create_or_update_user(org_id, login, role)
