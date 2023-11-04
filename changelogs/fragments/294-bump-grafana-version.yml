@@ -1,0 +1,2 @@
+minor_changes:
+  - Bump version of Python used in tests to 3.10
