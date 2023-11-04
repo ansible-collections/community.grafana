@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from unittest import TestCase
-from unittest.mock import call, patch, MagicMock
+from unittest.mock import call, patch
 from ansible_collections.community.grafana.plugins.modules import grafana_user
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils import basic
