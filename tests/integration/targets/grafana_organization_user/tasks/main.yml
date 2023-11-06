@@ -92,7 +92,7 @@
     state: present
   register: org
 
-- name: Add user to the organization
+- name: Add user to the new organization by org_id
   community.grafana.grafana_organization_user:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
@@ -108,3 +108,48 @@
       - "result.changed == true"
       - "result.user.orgId == org.org.id"
       - "result.user.role == 'Admin'"
+
+- name: Remove user from new organization by org_id
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    org_id: "{{ org.org.id }}"
+    login: orgtest
+    state: absent
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == true"
+
+- name: Add user to the new organization by org_name
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    org_name: "{{ org.org.name }}"
+    login: orgtest
+    role: admin
+    state: present
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == true"
+      - "result.user.orgId == org.org.id"
+      - "result.user.role == 'Admin'"
+
+- name: Remove user from new organization by org_name
+  community.grafana.grafana_organization_user:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    org_name: "{{ org.org.name }}"
+    login: orgtest
+    state: absent
+  register: result
+- assert:
+    that:
+      - "result.failed == false"
+      - "result.changed == true"
