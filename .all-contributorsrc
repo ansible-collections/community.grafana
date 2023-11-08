@@ -187,6 +187,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "Nemental",
+      "name": "Moritz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15136847?v=4",
+      "profile": "https://nemental.de",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -195,5 +204,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
