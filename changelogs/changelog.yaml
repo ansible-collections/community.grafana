@@ -218,3 +218,19 @@ releases:
       name: grafana_organization_user
       namespace: ''
     release_date: '2023-02-19'
+  1.6.1:
+    changes:
+      bugfixes:
+      - Fix error with datasources configured without basicAuth
+      - grafana_folder, fix an issue during delete (starting Grafana 9.3)
+      minor_changes:
+      - Bump version of Python used in tests to 3.10
+      - Enable datasource option `time_interval` for prometheus
+      - Fix documentation url for Ansible doc website
+      - Now testing against Grafana 9.5.13, 8.5.27, 10.2.0
+    fragments:
+    - 285_fix_doc.yml
+    - 294-bump-grafana-version.yml
+    - 300_datasource_prometheus_time_interval.yml
+    - fix-316.yml
+    release_date: '2023-11-05'

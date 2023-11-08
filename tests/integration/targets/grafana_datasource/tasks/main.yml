@@ -1,16 +1,16 @@
 ---
 
 - block:
-  - include: errors.yml
-  - include: elastic.yml
-  - include: influx.yml
-  - include: postgres.yml
-  - include: cloudwatch.yml
-  - include: thruk.yml
-  - include: loki.yml
-  - include: zabbix.yml
-  - include: redis.yml
-  - include: azure.yml
-  - include: uid.yml
+  - include_tasks: errors.yml
+  - include_tasks: elastic.yml
+  - include_tasks: influx.yml
+  - include_tasks: postgres.yml
+  - include_tasks: cloudwatch.yml
+  - include_tasks: thruk.yml
+  - include_tasks: loki.yml
+  - include_tasks: zabbix.yml
+  - include_tasks: redis.yml
+  - include_tasks: azure.yml
+  - include_tasks: uid.yml
 
 ...

@@ -101,7 +101,7 @@ EXAMPLES = '''
         grafana_api_key: "{{ grafana_api_key }}"
         folder: zabbix
         dashboard_id: 6098
-        dashbord_revision: 1
+        dashboard_revision: 1
 
     - name: Import Grafana dashboard zabbix
       community.grafana.grafana_dashboard:

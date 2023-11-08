@@ -1,13 +1,9 @@
 .github 
 
 # Repo maintainers, and goverance team (like Anisble's @ansible-commit-external)
-* @rrey @seuf @gundalow-collections/community-goverance-team
+* @rrey @seuf
 
 # or possibly, we may want to define teams at the org level.
-# * @gundalow-collections/grafana-maintainers
 
 # Example of maintainer of just a single plugin
 #grafana/plugins/modules/grafana_plugin.py @someone-else
-
-
-.github/ @gundalow
