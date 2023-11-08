@@ -3,7 +3,7 @@
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.grafana)](https://codecov.io/gh/ansible-collections/community.grafana)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This repo hosts the `community.grafana` Ansible Collection.
@@ -219,6 +219,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/prndrbr"><img src="https://avatars.githubusercontent.com/u/96344856?v=4?s=100" width="100px;" alt="Pierre"/><br /><sub><b>Pierre</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/issues?q=author%3Aprndrbr" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/miksonx"><img src="https://avatars.githubusercontent.com/u/5308184?v=4?s=100" width="100px;" alt="MiksonX"/><br /><sub><b>MiksonX</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/issues?q=author%3Amiksonx" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/amenzhinsky"><img src="https://avatars.githubusercontent.com/u/1308953?v=4?s=100" width="100px;" alt="Aliaksandr Mianzhynski"/><br /><sub><b>Aliaksandr Mianzhynski</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=amenzhinsky" title="Code">💻</a> <a href="https://github.com/ansible-collections/community.grafana/commits?author=amenzhinsky" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://nemental.de"><img src="https://avatars.githubusercontent.com/u/15136847?v=4?s=100" width="100px;" alt="Moritz"/><br /><sub><b>Moritz</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/issues?q=author%3ANemental" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
