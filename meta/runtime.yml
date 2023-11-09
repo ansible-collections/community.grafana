@@ -2,11 +2,12 @@
 requires_ansible: '>=2.9.0'
 action_groups:
   grafana:
-  - grafana_dashboard
-  - grafana_datasource
-  - grafana_folder
-  - grafana_notification_channel
-  - grafana_organization
-  - grafana_plugin
-  - grafana_team
-  - grafana_user
+    - grafana_dashboard
+    - grafana_datasource
+    - grafana_folder
+    - grafana_notification_channel
+    - grafana_organization
+    - grafana_organization_user
+    - grafana_plugin
+    - grafana_team
+    - grafana_user

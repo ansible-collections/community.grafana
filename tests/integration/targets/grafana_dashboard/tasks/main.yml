@@ -1,7 +1,7 @@
 - block:
-  - include: dashboard-from-url.yml
-  - include: delete-dashboard.yml
-  - include: dashboard-from-id.yml
-  - include: dashboard-from-file.yml
-  - include: dashboard-export.yml
-  - include: dashboard-folder-destination.yml
+  - include_tasks: dashboard-from-url.yml
+  - include_tasks: delete-dashboard.yml
+  - include_tasks: dashboard-from-id.yml
+  - include_tasks: dashboard-from-file.yml
+  - include_tasks: dashboard-export.yml
+  - include_tasks: dashboard-folder-destination.yml

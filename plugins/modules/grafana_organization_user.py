@@ -57,6 +57,12 @@ options:
     default: 1
     description:
       - Organization ID.
+      - Mutually exclusive with `org_name`.
+  org_name:
+    type: str
+    description:
+      - Organization name.
+      - Mutually exclusive with `org_id`.
 
 extends_documentation_fragment:
   - community.grafana.basic_auth
@@ -156,6 +162,12 @@ class GrafanaOrganizationUserInterface(object):
             data = json.dumps(payload)
         return fetch_url(self._module, self.grafana_url + '/api/' + path, headers=self.headers, method=method, data=data)
 
+    def _organization_by_name(self, org_name):
+        r, info = self._api_call('GET', 'orgs/name/%s' % org_name, None)
+        if info['status'] != 200:
+            raise GrafanaAPIException("Unable to retrieve organization: %s" % info)
+        return json.loads(to_text(r.read()))
+
     def _organization_users(self, org_id):
         r, info = self._api_call('GET', 'orgs/%d/users' % org_id, None)
         if info['status'] != 200:
@@ -178,7 +190,7 @@ class GrafanaOrganizationUserInterface(object):
 
     def _organization_user_by_login(self, org_id, login):
         for user in self._organization_users(org_id):
-            if user['name'] == login or user['email'] == login:
+            if login in (user['login'], user['email']):
                 return user
 
     def create_or_update_user(self, org_id, login, role):
@@ -232,12 +244,16 @@ def main():
     argument_spec.pop('grafana_api_key')
     argument_spec.update(
         org_id=dict(type='int', default=1),
+        org_name=dict(type='str'),
         login=dict(type='str', required=True),
         role=dict(type='str', choices=['viewer', 'editor', 'admin'], default='viewer'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
+        mutually_exclusive=[
+            ('org_id', 'org_name'),
+        ],
         required_if=[
             ['state', 'present', ['role']],
         ]
@@ -246,6 +262,10 @@ def main():
     org_id = module.params['org_id']
     login = module.params['login']
     iface = GrafanaOrganizationUserInterface(module)
+    if module.params['org_name']:
+        org_name = module.params['org_name']
+        organization = iface._organization_by_name(org_name)
+        org_id = organization['id']
     if module.params['state'] == 'present':
         role = module.params['role'].capitalize()
         result = iface.create_or_update_user(org_id, login, role)

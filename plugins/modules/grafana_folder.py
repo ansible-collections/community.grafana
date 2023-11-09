@@ -215,7 +215,10 @@ class GrafanaFolderInterface(object):
             error_msg = resp.read()['message']
             self._module.fail_json(failed=True, msg=error_msg)
         elif status_code == 200:
-            return self._module.from_json(resp.read())
+            # XXX: Grafana folders endpoint stopped sending back json in response for delete operations
+            # see https://github.com/grafana/grafana/issues/77673
+            response = resp.read() or "{}"
+            return self._module.from_json(response)
         self._module.fail_json(failed=True, msg="Grafana Folders API answered with HTTP %d" % status_code)
 
     def get_version(self):

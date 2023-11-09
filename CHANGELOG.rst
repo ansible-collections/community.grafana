@@ -5,6 +5,23 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.6.1
+======
+
+Minor Changes
+-------------
+
+- Bump version of Python used in tests to 3.10
+- Enable datasource option `time_interval` for prometheus
+- Fix documentation url for Ansible doc website
+- Now testing against Grafana 9.5.13, 8.5.27, 10.2.0
+
+Bugfixes
+--------
+
+- Fix error with datasources configured without basicAuth
+- grafana_folder, fix an issue during delete (starting Grafana 9.3)
+
 v1.6.0
 ======
 

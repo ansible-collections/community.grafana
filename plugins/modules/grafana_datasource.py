@@ -68,15 +68,18 @@ options:
       (index name), C(mysql) or C(postgres).
     required: false
     type: str
+    default: ''
   user:
     description:
     - The datasource login user for influxdb datasources.
     type: str
+    default: ''
   password:
     description:
     - The datasource password.
     - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
+    default: ''
   basic_auth_user:
     description:
     - The datasource basic auth user.
@@ -181,6 +184,7 @@ options:
     - Monthly
     - Yearly
     type: str
+    default: ''
   tsdb_version:
     description:
     - The opentsdb version.
@@ -281,7 +285,6 @@ options:
   aws_custom_metrics_namespaces:
     description:
     - Namespaces of Custom Metrics for CloudWatch datasource type
-    default: ''
     required: false
     type: str
   azure_cloud:
@@ -511,7 +514,7 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
-from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
+from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
 
 
@@ -533,7 +536,8 @@ def compare_datasources(new, current, compareSecureData=True):
     if 'readOnly' in current:
         del current['readOnly']
     if current['basicAuth'] is False:
-        del current['basicAuthUser']
+        if 'basicAuthUser' in current:
+            del current['basicAuthUser']
     if 'password' in current:
         del current['password']
     if 'basicAuthPassword' in current:
