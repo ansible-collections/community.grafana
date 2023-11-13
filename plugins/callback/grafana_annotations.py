@@ -29,7 +29,7 @@ DOCUMENTATION = '''
     options:
       grafana_url:
         description: Grafana annotations api URL
-        required: True
+        required: true
         env:
           - name: GRAFANA_URL
         ini:
@@ -45,7 +45,7 @@ DOCUMENTATION = '''
             key: validate_grafana_certs
           - section: callback_grafana_annotations
             key: validate_certs
-        default: True
+        default: true
         type: bool
         aliases: [ validate_grafana_certs ]
       http_agent:

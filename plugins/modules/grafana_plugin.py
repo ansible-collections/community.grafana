@@ -50,7 +50,7 @@ options:
   validate_certs:
     description:
     - Boolean variable to include --insecure while installing pluging
-    default: False
+    default: false
     type: bool
 '''
 

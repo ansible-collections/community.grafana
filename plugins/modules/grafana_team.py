@@ -59,7 +59,7 @@ options:
     description:
       - Delete the members not found in the C(members) parameters from the
       - list of members found on the Team.
-    default: False
+    default: false
     type: bool
   skip_version_check:
     description:
@@ -67,7 +67,7 @@ options:
       - This parameter can be useful if you enabled `hide_version` in grafana.ini
     required: False
     type: bool
-    default: False
+    default: false
     version_added: "1.2.0"
 extends_documentation_fragment:
 - community.grafana.basic_auth
@@ -104,7 +104,7 @@ EXAMPLES = '''
       members:
           - john.doe@example.com
           - jane.doe@example.com
-      enforce_members: yes
+      enforce_members: true
       state: present
 
 - name: Delete a team

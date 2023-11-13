@@ -58,7 +58,7 @@ options:
     description:
       - Override existing dashboard when state is present.
     type: bool
-    default: 'no'
+    default: false
   dashboard_id:
     description:
       - Public Grafana.com dashboard id to import
@@ -92,7 +92,7 @@ EXAMPLES = '''
         grafana_api_key: "{{ grafana_api_key }}"
         state: present
         commit_message: Updated by ansible
-        overwrite: yes
+        overwrite: true
         path: /path/to/dashboards/foo.json
 
     - name: Import Grafana dashboard Zabbix

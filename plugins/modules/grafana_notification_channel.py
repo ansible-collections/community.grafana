@@ -82,17 +82,17 @@ options:
       - Required when I(state) is C(present).
   is_default:
     type: bool
-    default: 'no'
+    default: false
     description:
       - Use this channel for all alerts.
   include_image:
     type: bool
-    default: 'no'
+    default: false
     description:
       - Capture a visualization image and attach it to notifications.
   disable_resolve_message:
     type: bool
-    default: 'no'
+    default: false
     description:
       - Disable the resolve message.
   reminder_frequency:

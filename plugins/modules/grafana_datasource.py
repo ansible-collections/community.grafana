@@ -86,7 +86,7 @@ options:
     type: str
   basic_auth_password:
     description:
-    - The datasource basic auth password, when C(basic auth) is C(yes).
+    - The datasource basic auth password, when C(basic auth) is C(true).
     - Stored as secure data, see C(enforce_secure_data) and notes!
     type: str
   with_credentials:
@@ -94,7 +94,7 @@ options:
     - Whether credentials such as cookies or auth headers should be sent with cross-site
       requests.
     type: bool
-    default: 'no'
+    default: false
   tls_client_cert:
     description:
     - The client TLS certificate.
@@ -123,7 +123,7 @@ options:
     description:
     - Make this datasource the default one.
     type: bool
-    default: 'no'
+    default: false
   org_id:
     description:
     - Grafana Organisation ID in which the datasource should be created.
@@ -217,7 +217,7 @@ options:
     description:
     - Use trends or not for zabbix datasource type.
     type: bool
-    default: False
+    default: false
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
