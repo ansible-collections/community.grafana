@@ -50,7 +50,7 @@ options:
       - This parameter can be useful if you enabled `hide_version` in grafana.ini
     required: False
     type: bool
-    default: False
+    default: false
     version_added: "1.2.0"
 extends_documentation_fragment:
 - community.grafana.basic_auth
