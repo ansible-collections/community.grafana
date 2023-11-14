@@ -1,0 +1,6 @@
+---
+- name: Run tests for grafana_notification_channel
+  hosts: localhost
+  tasks:
+    - ansible.builtin.include_role:
+        name: ../../grafana_notification_channel

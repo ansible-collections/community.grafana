@@ -1,0 +1,6 @@
+---
+- name: Run tests for grafana_folder
+  hosts: localhost
+  tasks:
+    - ansible.builtin.include_role:
+        name: ../../grafana_folder
