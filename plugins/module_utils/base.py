@@ -17,7 +17,10 @@
 # Copyright: (c) 2019, Rémi REY (@rrey)
 
 from __future__ import absolute_import, division, print_function
-from ansible.module_utils.urls import url_argument_spec
+from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils._text import to_text
+
+import json
 
 __metaclass__ = type
 
@@ -52,3 +55,28 @@ def grafana_required_together():
 
 def grafana_mutually_exclusive():
     return [["url_username", "grafana_api_key"]]
+
+
+class BaseInterface:
+    def check_required_version(self, minimum_version):
+        if not self._module.params.get("skip_version_check"):
+            try:
+                response, info = fetch_url(
+                    self._module,
+                    "%s/api/health" % (self.grafana_url),
+                    headers=self.headers,
+                    method="GET",
+                )
+                content = json.loads(response.read())
+                version = content.get("version")
+                major_version = int(version.split(".")[0])
+
+            except GrafanaError as e:
+                self._module.fail_json(failed=True, msg=to_text(e))
+
+            if major_version < int(minimum_version):
+                self._module.fail_json(
+                    failed=True,
+                    msg="Need at least Grafana version %s to use this feature."
+                    % minimum_version,
+                )
