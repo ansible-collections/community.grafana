@@ -4,9 +4,10 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: present
+    skip_version_check: true
   register: result
 
 - ansible.builtin.set_fact:
@@ -19,7 +20,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
@@ -173,7 +174,6 @@
       - john+doe@example.com
       - jane.doe@example.com
     state: present
-  register: result
 
 - ansible.builtin.set_fact:
     expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com'])

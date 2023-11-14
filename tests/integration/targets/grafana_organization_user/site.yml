@@ -1,0 +1,6 @@
+---
+- name: Run tests for grafana_organization_user
+  hosts: localhost
+  tasks:
+    - ansible.builtin.include_role:
+        name: ../../grafana_organization_user

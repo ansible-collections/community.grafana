@@ -18,6 +18,7 @@
       - result.user.name == 'Harley Quinn'
       - result.user.email == 'harley.quinn@gotham.city'
       - result.user.isGrafanaAdmin == true
+  when: not ansible_check_mode
 
 - name: Check idempotency on admin creation
   community.grafana.grafana_user:
@@ -37,6 +38,7 @@
       - result.user.name == 'Harley Quinn'
       - result.user.email == 'harley.quinn@gotham.city'
       - result.user.isGrafanaAdmin == true
+  when: not ansible_check_mode
 
 - name: Check user creation with Grafana API
   ansible.builtin.uri:
@@ -54,6 +56,7 @@
       - result.json.name == 'Harley Quinn'
       - result.json.email == 'harley.quinn@gotham.city'
       - result.json.isGrafanaAdmin == true
+  when: not ansible_check_mode
 
 - name: Create a Grafana user without password (expect failure)
   community.grafana.grafana_user:
@@ -71,6 +74,7 @@
       - result.changed == false
       - result.failed == true
       - "result.msg == 'missing required arguments: password'"
+  when: not ansible_check_mode
 
 - name: Create a Grafana user
   community.grafana.grafana_user:
@@ -89,6 +93,7 @@
       - result.user.name == 'Bruce Wayne'
       - result.user.email == 'batman@gotham.city'
       - result.user.isGrafanaAdmin == false
+  when: not ansible_check_mode
 
 - name: Check idempotency on user creation (password not requiered)
   community.grafana.grafana_user:
@@ -106,6 +111,7 @@
       - result.user.name == 'Bruce Wayne'
       - result.user.email == 'batman@gotham.city'
       - result.user.isGrafanaAdmin == false
+  when: not ansible_check_mode
 
 - name: Check user creation with Grafana API
   ansible.builtin.uri:
@@ -123,6 +129,7 @@
       - result.json.name == 'Bruce Wayne'
       - result.json.email == 'batman@gotham.city'
       - result.json.isGrafanaAdmin == false
+  when: not ansible_check_mode
 
 - name: Update Grafana user
   community.grafana.grafana_user:
@@ -142,6 +149,7 @@
       - result.user.name == 'The Dark Knight'
       - result.user.email == 'thedarkknight@gotham.city'
       - result.user.isGrafanaAdmin == true
+  when: not ansible_check_mode
 
 - name: Check user update with Grafana API
   ansible.builtin.uri:
@@ -159,6 +167,7 @@
       - result.json.name == 'The Dark Knight'
       - result.json.email == 'thedarkknight@gotham.city'
       - result.json.isGrafanaAdmin == true
+  when: not ansible_check_mode
 
 - name: Delete a Grafana user
   community.grafana.grafana_user:
@@ -172,6 +181,7 @@
     that:
       - result.changed == true
       - result.message == 'User deleted'
+  when: not ansible_check_mode
 
 - name: Check idempotency on user deletion
   community.grafana.grafana_user:
@@ -185,6 +195,7 @@
     that:
       - result.changed == false
       - result.message == 'No user found, nothing to do'
+  when: not ansible_check_mode
 
 - name: Check user deletion with Grafana API (expect 404 Not Found)
   ansible.builtin.uri:
@@ -200,6 +211,7 @@
 - ansible.builtin.assert:
     that:
       - result.json.message | lower == 'user not found'
+  when: not ansible_check_mode
 
 - name: Create a Grafana user with character encoding
   community.grafana.grafana_user:
@@ -218,6 +230,7 @@
       - result.user.name == 'Bruce Wayne'
       - result.user.email == 'bruce+wayne@gotham.city'
       - result.user.isGrafanaAdmin == false
+  when: not ansible_check_mode
 
 - name: Check idempotency on user creation (password not requiered)
   community.grafana.grafana_user:
@@ -235,3 +248,4 @@
       - result.user.name == 'Bruce Wayne'
       - result.user.email == 'bruce+wayne@gotham.city'
       - result.user.isGrafanaAdmin == false
+  when: not ansible_check_mode

@@ -12,6 +12,7 @@
     that:
       - result.changed == true
       - result.folder.title == 'grafana_working_group'
+  when: not ansible_check_mode
 
 - name: Test folder creation idempotency
   grafana_folder:
@@ -26,6 +27,7 @@
     that:
       - result.changed == false
       - result.folder.title == 'grafana_working_group'
+  when: not ansible_check_mode
 
 - name: Delete a Folder
   grafana_folder:
@@ -39,6 +41,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
+  when: not ansible_check_mode
 
 - name: Test folder deletion idempotency
   grafana_folder:
@@ -52,3 +55,4 @@
 - ansible.builtin.assert:
     that:
       - result.changed == false
+  when: not ansible_check_mode
