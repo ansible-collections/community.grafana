@@ -1,12 +1,5 @@
 {
   "extends": [
-    "config:base",
-    ":dependencyDashboard"
-  ],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["patch"],
-      "automerge": true
-    }
+    "github>telekom-mms/.github:renovate-preset.json5"
   ]
 }
