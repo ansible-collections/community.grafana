@@ -520,7 +520,7 @@ def main():
         required_if=[
             ['state', 'export', ['path']],
         ],
-        required_together=[['url_username', 'url_password', 'org_id'], ['url_username', 'url_password', 'org_name']],
+        required_together=[['url_username', 'url_password', 'org_id']],
         mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id'], ['org_id', 'org_name']],
     )
 
