@@ -18,10 +18,17 @@ description:
 options:
   org_id:
     description:
-      - The Grafana Organisation ID where the dashboard will be imported / exported.
-      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation..
+      - The Grafana Organisation ID where the dashboard will be imported / exported / deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation.
+      - Mutually exclusive with `org_name`.
     default: 1
     type: int
+  org_name:
+    description:
+      - The Grafana Organisation name where the dashboard will be imported / exported / deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation.
+      - Mutually exclusive with `org_id`.
+    type: str
   folder:
     description:
       - The Grafana folder where this dashboard will be imported to.
