@@ -138,6 +138,7 @@ uid:
 '''
 
 import json
+import urllib.parse
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -164,8 +165,9 @@ class GrafanaDeleteException(Exception):
     pass
 
 
-def grafana_organization_id_by_name(module, org_name):
-    r, info = fetch_url(module, '%s/orgs/name/%s' % (grafana_url, org_name), headers=headers, method='GET')
+def grafana_organization_id_by_name(module, grafana_url, org_name, headers):
+    org_name = urllib.parse.quote(org_name)
+    r, info = fetch_url(module, '%s/api/orgs/name/%s' % (grafana_url, org_name), headers=headers, method='GET')
     if info['status'] != 200:
         raise GrafanaAPIException("Unable to retrieve organization: %s" % info)
 
@@ -186,7 +188,7 @@ def grafana_headers(module, data):
         module.params['force_basic_auth'] = True
         if module.params['org_name']:
             org_name = module.params['org_name']
-            organization = grafana_organization_id_by_name(module, org_name)
+            organization = grafana_organization_id_by_name(module, data['url'], org_name, headers)
             data['org_id'] = organization['id']
         grafana_switch_organisation(module, data['url'], data['org_id'], headers)
 
