@@ -157,6 +157,14 @@ class GrafanaDeleteException(Exception):
     pass
 
 
+def grafana_organization_id_by_name(module, org_name):
+    r, info = fetch_url(module, '%s/orgs/name/%s' % (grafana_url, org_name), headers=headers, method='GET')
+    if info['status'] != 200:
+        raise GrafanaAPIException("Unable to retrieve organization: %s" % info)
+
+    return json.loads(to_text(r.read()))
+
+
 def grafana_switch_organisation(module, grafana_url, org_id, headers):
     r, info = fetch_url(module, '%s/api/user/using/%s' % (grafana_url, org_id), headers=headers, method='POST')
     if info['status'] != 200:
@@ -169,6 +177,10 @@ def grafana_headers(module, data):
         headers['Authorization'] = "Bearer %s" % data['grafana_api_key']
     else:
         module.params['force_basic_auth'] = True
+        if module.params['org_name']:
+            org_name = module.params['org_name']
+            organization = grafana_organization_id_by_name(module, org_name)
+            data['org_id'] = organization['id']
         grafana_switch_organisation(module, data['url'], data['org_id'], headers)
 
     return headers
@@ -186,7 +198,7 @@ def get_grafana_version(module, grafana_url, headers):
         except Exception as e:
             raise GrafanaAPIException(e)
     else:
-        raise GrafanaAPIException('Unable to get grafana version : %s' % info)
+        raise GrafanaAPIException('Unable to get grafana version: %s' % info)
 
     return int(grafana_version)
 
@@ -490,6 +502,7 @@ def main():
     argument_spec.update(
         state=dict(choices=['present', 'absent', 'export'], default='present'),
         org_id=dict(default=1, type='int'),
+        org_name=dict(type='str'),
         folder=dict(type='str', default='General'),
         uid=dict(type='str'),
         slug=dict(type='str'),
@@ -507,8 +520,8 @@ def main():
         required_if=[
             ['state', 'export', ['path']],
         ],
-        required_together=[['url_username', 'url_password', 'org_id']],
-        mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id']],
+        required_together=[['url_username', 'url_password', 'org_id'], ['url_username', 'url_password', 'org_name']],
+        mutually_exclusive=[['url_username', 'grafana_api_key'], ['uid', 'slug'], ['path', 'dashboard_id'], ['org_id', 'org_name']],
     )
 
     module.params["url"] = clean_url(module.params["url"])
