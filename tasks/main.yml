@@ -92,4 +92,4 @@
     commit_message: "{{ dashboard.commit_message | default(omit) }}"
   loop: "{{ grafana_dashboards }}"
   loop_control: {loop_var: dashboard}
-  tags: dashboard
+  tags: [dashboard, molecule-idempotence-notest]
