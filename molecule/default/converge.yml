@@ -12,7 +12,7 @@
     grafana_password: admin
 
     grafana_organizations:
-      - name: my_orga
+      - name: my_org
 
     grafana_datasources:
       - name: Loki
@@ -39,5 +39,7 @@
         path: test_dashboard.json
         overwrite: true
 
-  roles:
-    - name: ansible-role-grafana
+  tasks:
+    - name: Include ansible-role-grafana
+      ansible.builtin.include_role:
+        name: ansible-role-grafana
