@@ -1,12 +1,12 @@
 ---
 - name: Create dashboard from url and delete it
- ansible.builtin.include_tasks: dashboard-from-url.yml
+  ansible.builtin.include_tasks: dashboard-from-url.yml
 
 - name: Create dashboard from id and delete it
- ansible.builtin.include_tasks: dashboard-from-id.yml
+  ansible.builtin.include_tasks: dashboard-from-id.yml
 
 - name: Create dashboard from file, export and delete it
- ansible.builtin.include_tasks: dashboard-from-file.yml
+  ansible.builtin.include_tasks: dashboard-from-file.yml
 
 - name: Create dashboard in non existing folder
- ansible.builtin.include_tasks: dashboard-folder-destination.yml
+  ansible.builtin.include_tasks: dashboard-folder-destination.yml
