@@ -18,15 +18,15 @@ description:
 options:
   org_id:
     description:
-      - The Grafana Organisation ID where the dashboard will be imported / exported / deleted.
-      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation.
+      - The Grafana organization ID where the dashboard will be imported / exported / deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
       - Mutually exclusive with `org_name`.
     default: 1
     type: int
   org_name:
     description:
-      - The Grafana Organisation name where the dashboard will be imported / exported / deleted.
-      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation.
+      - The Grafana organization name where the dashboard will be imported / exported / deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
       - Mutually exclusive with `org_id`.
     type: str
   folder:
@@ -166,15 +166,18 @@ class GrafanaDeleteException(Exception):
 
 
 def grafana_organization_id_by_name(module, grafana_url, org_name, headers):
-    org_name = urllib.parse.quote(org_name)
-    r, info = fetch_url(module, '%s/api/orgs/name/%s' % (grafana_url, org_name), headers=headers, method='GET')
+    r, info = fetch_url(module, '%s/api/user/orgs' % grafana_url, headers=headers, method='GET')
     if info['status'] != 200:
         raise GrafanaAPIException("Unable to retrieve organization: %s" % info)
+    organizations = json.loads(to_text(r.read()))
+    for org in organizations:
+        if org['name'] == org_name:
+            return org['orgId']
 
-    return json.loads(to_text(r.read()))
+    raise GrafanaAPIException("Current user isn't member of organization: %s" % org_name)
 
 
-def grafana_switch_organisation(module, grafana_url, org_id, headers):
+def grafana_switch_organization(module, grafana_url, org_id, headers):
     r, info = fetch_url(module, '%s/api/user/using/%s' % (grafana_url, org_id), headers=headers, method='POST')
     if info['status'] != 200:
         raise GrafanaAPIException('Unable to switch to organization %s : %s' % (org_id, info))
@@ -188,9 +191,8 @@ def grafana_headers(module, data):
         module.params['force_basic_auth'] = True
         if module.params['org_name']:
             org_name = module.params['org_name']
-            organization = grafana_organization_id_by_name(module, data['url'], org_name, headers)
-            data['org_id'] = organization['id']
-        grafana_switch_organisation(module, data['url'], data['org_id'], headers)
+            data['org_id'] = grafana_organization_id_by_name(module, data['url'], org_name, headers)
+        grafana_switch_organization(module, data['url'], data['org_id'], headers)
 
     return headers
 
