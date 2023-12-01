@@ -128,9 +128,9 @@ options:
     default: false
   org_id:
     description:
-    - Grafana Organisation ID in which the datasource should be created.
+    - Grafana organization ID in which the datasource should be created.
     - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
-      belong to one organisation.
+      belong to one organization.
     default: 1
     type: int
   state:
@@ -687,10 +687,10 @@ class GrafanaInterface(object):
                 "Bearer %s" % module.params["grafana_api_key"]
             )
         else:
-            self.headers["Authorization"] = basic_auth_header(
-                module.params["url_username"], module.params["url_password"]
-            )
-            self.switch_organisation(module.params["org_id"])
+            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+            if module.params['org_name']:
+                module.params['org_id'] = organization_by_name(module.params['org_name'])
+            self.switch_organization(module.params['org_id'])
         # }}}
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
@@ -721,9 +721,18 @@ class GrafanaInterface(object):
             % (status_code, url, data),
         )
 
-    def switch_organisation(self, org_id):
+    def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
         response = self._send_request(url, headers=self.headers, method="POST")
+
+    def organization_by_name(self, org_name):
+        url = "/api/user/orgs"
+        organizations = self._send_request(url, headers=self.headers, method='GET')
+        for org in organizations:
+            if org['name'] == org_name:
+              return org['orgId']
+
+        return self._module.fail_json(failed=True, msg="Current user isn't member of organization: %s" % org_name)
 
     def datasource_by_name(self, name):
         datasource_exists = False
@@ -748,125 +757,76 @@ def setup_module_object():
     argument_spec = base.grafana_argument_spec()
 
     argument_spec.update(
-        name=dict(required=True, type="str"),
-        uid=dict(type="str"),
-        ds_type=dict(
-            choices=[
-                "graphite",
-                "prometheus",
-                "elasticsearch",
-                "influxdb",
-                "opentsdb",
-                "mysql",
-                "postgres",
-                "cloudwatch",
-                "alexanderzobnin-zabbix-datasource",
-                "grafana-azure-monitor-datasource",
-                "camptocamp-prometheus-alertmanager-datasource",
-                "sni-thruk-datasource",
-                "redis-datasource",
-                "loki",
-                "tempo",
-            ]
-        ),
-        ds_url=dict(type="str"),
-        access=dict(default="proxy", choices=["proxy", "direct"]),
-        database=dict(type="str", default=""),
-        user=dict(default="", type="str"),
-        password=dict(default="", no_log=True, type="str"),
-        basic_auth_user=dict(type="str"),
-        basic_auth_password=dict(type="str", no_log=True),
-        with_credentials=dict(default=False, type="bool"),
-        tls_client_cert=dict(type="str", no_log=True),
-        tls_client_key=dict(type="str", no_log=True),
-        tls_ca_cert=dict(type="str", no_log=True),
-        tls_skip_verify=dict(type="bool", default=False),
-        is_default=dict(default=False, type="bool"),
-        org_id=dict(default=1, type="int"),
-        es_version=dict(
-            type="str",
-            default="7.10+",
-            choices=["2", "5", "56", "60", "70", "7.7+", "7.10+", "8.0+"],
-        ),
-        max_concurrent_shard_requests=dict(type="int", default=256),
-        time_field=dict(default="@timestamp", type="str"),
-        time_interval=dict(type="str"),
-        interval=dict(
-            type="str",
-            choices=["", "Hourly", "Daily", "Weekly", "Monthly", "Yearly"],
-            default="",
-        ),
-        tsdb_version=dict(type="int", default=1, choices=[1, 2, 3]),
-        tsdb_resolution=dict(
-            type="str", default="second", choices=["second", "millisecond"]
-        ),
-        sslmode=dict(
-            default="disable",
-            choices=["disable", "require", "verify-ca", "verify-full"],
-        ),
-        trends=dict(default=False, type="bool"),
-        aws_auth_type=dict(
-            default="keys", choices=["keys", "credentials", "arn", "default"]
-        ),
-        aws_default_region=dict(
-            default="us-east-1",
-            choices=[
-                "ap-northeast-1",
-                "ap-northeast-2",
-                "ap-southeast-1",
-                "ap-southeast-2",
-                "ap-south-1",
-                "ca-central-1",
-                "cn-north-1",
-                "cn-northwest-1",
-                "eu-central-1",
-                "eu-west-1",
-                "eu-west-2",
-                "eu-west-3",
-                "sa-east-1",
-                "us-east-1",
-                "us-east-2",
-                "us-gov-west-1",
-                "us-west-1",
-                "us-west-2",
-            ],
-        ),
-        aws_access_key=dict(default="", no_log=True, type="str"),
-        aws_secret_key=dict(default="", no_log=True, type="str"),
-        aws_credentials_profile=dict(default="", type="str"),
-        aws_assume_role_arn=dict(default="", type="str"),
-        aws_custom_metrics_namespaces=dict(type="str"),
-        azure_cloud=dict(
-            type="str",
-            default="azuremonitor",
-            choices=[
-                "azuremonitor",
-                "chinaazuremonitor",
-                "govazuremonitor",
-                "germanyazuremonitor",
-            ],
-        ),
-        azure_tenant=dict(type="str"),
-        azure_client=dict(type="str"),
-        azure_secret=dict(type="str", no_log=True),
-        zabbix_user=dict(type="str"),
-        zabbix_password=dict(type="str", no_log=True),
-        additional_json_data=dict(type="dict", default={}, required=False),
-        additional_secure_json_data=dict(type="dict", default={}, required=False),
-        enforce_secure_data=dict(type="bool", default=False, required=False),
+        name=dict(required=True, type='str'),
+        uid=dict(type='str'),
+        ds_type=dict(choices=['graphite',
+                              'prometheus',
+                              'elasticsearch',
+                              'influxdb',
+                              'opentsdb',
+                              'mysql',
+                              'postgres',
+                              'cloudwatch',
+                              'alexanderzobnin-zabbix-datasource',
+                              'grafana-azure-monitor-datasource',
+                              'camptocamp-prometheus-alertmanager-datasource',
+                              'sni-thruk-datasource',
+                              'redis-datasource',
+                              'loki']),
+        ds_url=dict(type='str'),
+        access=dict(default='proxy', choices=['proxy', 'direct']),
+        database=dict(type='str', default=""),
+        user=dict(default='', type='str'),
+        password=dict(default='', no_log=True, type='str'),
+        basic_auth_user=dict(type='str'),
+        basic_auth_password=dict(type='str', no_log=True),
+        with_credentials=dict(default=False, type='bool'),
+        tls_client_cert=dict(type='str', no_log=True),
+        tls_client_key=dict(type='str', no_log=True),
+        tls_ca_cert=dict(type='str', no_log=True),
+        tls_skip_verify=dict(type='bool', default=False),
+        is_default=dict(default=False, type='bool'),
+        org_id=dict(default=1, type='int'),
+        org_name=dict(type='str'),
+        es_version=dict(type='str', default="7.10+", choices=["2", "5", "56", "60",
+                                                              "70", "7.7+", "7.10+",
+                                                              "8.0+"]),
+        max_concurrent_shard_requests=dict(type='int', default=256),
+        time_field=dict(default='@timestamp', type='str'),
+        time_interval=dict(type='str'),
+        interval=dict(type='str', choices=['', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'Yearly'], default=''),
+        tsdb_version=dict(type='int', default=1, choices=[1, 2, 3]),
+        tsdb_resolution=dict(type='str', default='second', choices=['second', 'millisecond']),
+        sslmode=dict(default='disable', choices=['disable', 'require', 'verify-ca', 'verify-full']),
+        trends=dict(default=False, type='bool'),
+        aws_auth_type=dict(default='keys', choices=['keys', 'credentials', 'arn', 'default']),
+        aws_default_region=dict(default='us-east-1', choices=['ap-northeast-1', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-south-1',
+                                                              'ca-central-1',
+                                                              'cn-north-1', 'cn-northwest-1',
+                                                              'eu-central-1', 'eu-west-1', 'eu-west-2', 'eu-west-3',
+                                                              'sa-east-1',
+                                                              'us-east-1', 'us-east-2', 'us-gov-west-1', 'us-west-1', 'us-west-2']),
+        aws_access_key=dict(default='', no_log=True, type='str'),
+        aws_secret_key=dict(default='', no_log=True, type='str'),
+        aws_credentials_profile=dict(default='', type='str'),
+        aws_assume_role_arn=dict(default='', type='str'),
+        aws_custom_metrics_namespaces=dict(type='str'),
+        azure_cloud=dict(type='str', default='azuremonitor', choices=['azuremonitor', 'chinaazuremonitor', 'govazuremonitor', 'germanyazuremonitor']),
+        azure_tenant=dict(type='str'),
+        azure_client=dict(type='str'),
+        azure_secret=dict(type='str', no_log=True),
+        zabbix_user=dict(type='str'),
+        zabbix_password=dict(type='str', no_log=True),
+        additional_json_data=dict(type='dict', default={}, required=False),
+        additional_secure_json_data=dict(type='dict', default={}, required=False),
+        enforce_secure_data=dict(type='bool', default=False, required=False)
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=[
-            ["url_username", "url_password", "org_id"],
-            ["tls_client_cert", "tls_client_key"],
-        ],
-        mutually_exclusive=[
-            ["url_username", "grafana_api_key"],
-            ["tls_ca_cert", "tls_skip_verify"],
-        ],
+        required_together=[['url_username', 'url_password', 'org_id'], ['tls_client_cert', 'tls_client_key']],
+        mutually_exclusive=[['url_username', 'grafana_api_key'], ['tls_ca_cert', 'tls_skip_verify'], ['org_id', 'org_name']],
         required_if=[
             ["state", "present", ["ds_type", "ds_url"]],
             ["ds_type", "opentsdb", ["tsdb_version", "tsdb_resolution"]],
