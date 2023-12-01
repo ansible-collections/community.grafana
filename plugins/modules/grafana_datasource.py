@@ -689,7 +689,7 @@ class GrafanaInterface(object):
         else:
             self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
             if module.params['org_name']:
-                module.params['org_id'] = organization_by_name(module.params['org_name'])
+                module.params['org_id'] = self.organization_by_name(module.params['org_name'])
             self.switch_organization(module.params['org_id'])
         # }}}
 
