@@ -738,7 +738,7 @@ class GrafanaInterface(object):
         organizations = self._send_request(url, headers=self.headers, method='GET')
         for org in organizations:
             if org['name'] == org_name:
-              return org['orgId']
+                return org['orgId']
 
         return self._module.fail_json(failed=True, msg="Current user isn't member of organization: %s" % org_name)
 
