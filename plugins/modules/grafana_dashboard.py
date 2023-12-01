@@ -168,7 +168,7 @@ class GrafanaDeleteException(Exception):
 def grafana_organization_id_by_name(module, grafana_url, org_name, headers):
     r, info = fetch_url(module, '%s/api/user/orgs' % grafana_url, headers=headers, method='GET')
     if info['status'] != 200:
-        raise GrafanaAPIException("Unable to retrieve organization: %s" % info)
+        raise GrafanaAPIException("Unable to retrieve users organizations: %s" % info)
     organizations = json.loads(to_text(r.read()))
     for org in organizations:
         if org['name'] == org_name:
