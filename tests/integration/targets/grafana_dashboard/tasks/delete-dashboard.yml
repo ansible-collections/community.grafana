@@ -13,4 +13,4 @@
 - assert:
     that:
       - "result.changed == true"
-      - "result.msg == 'Dashboard {{ result.uid }} deleted'"
+      - "result.msg | split == ['Dashboard', result.uid, 'deleted']"

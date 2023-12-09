@@ -19,7 +19,7 @@
 - assert:
     that:
       - "result.changed == true"
-      - "result.msg == 'Dashboard {{ dashboard_uid }} exported to /tmp/dashboard.json'"
+      - "result.msg | split == ['Dashboard', dashboard_uid', 'exported', 'to', '/tmp/dashboard.json']"
 
 - name: Load /tmp/dashboard.json or fail if missing
   set_fact:
