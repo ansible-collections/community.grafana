@@ -28,6 +28,93 @@
       - "result.changed == false"
       - "result.folder.title == 'grafana_working_group'"
 
+
+- name: Change folder permissions
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: "admin"
+        - role: "Viewer"
+          permission: "view"
+  register: result
+
+- assert:
+    that:
+      - "result.changed == true"
+      - "result.folder.title == 'grafana_working_group'"
+
+- name: Test folder permission idempotency
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: "admin"
+        - role: "Viewer"
+          permission: "view"
+  register: result
+
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.folder.title == 'grafana_working_group'"
+
+- name: Test folder permission user lookup
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - role: "Editor"
+          permission: "admin"
+        - role: "Viewer"
+          permission: "view"
+        - username: "unknown"
+          permission: "edit"
+  register: result
+  ignore_errors: true
+
+- set_fact:
+    expected_error: "User 'unknown' does not exists"
+
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.failed == true"
+      - "result.msg == expected_error"
+
+- name: Test folder permission team lookup
+  grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      title: "grafana_working_group"
+      state: present
+      permissions:
+        - team: "unknown"
+          permission: "edit"
+  register: result
+  ignore_errors: true
+
+- set_fact:
+    expected_error: "Team 'unknown' does not exists"
+
+- assert:
+    that:
+      - "result.changed == false"
+      - "result.failed == true"
+      - "result.msg == expected_error"
+
 - name: Delete a Folder
   grafana_folder:
       url: "{{ grafana_url }}"
