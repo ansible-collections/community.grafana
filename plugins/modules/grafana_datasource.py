@@ -740,6 +740,7 @@ def setup_module_object():
                               'alexanderzobnin-zabbix-datasource',
                               'grafana-azure-monitor-datasource',
                               'camptocamp-prometheus-alertmanager-datasource',
+                              'vertamedia-clickhouse-datasource',
                               'sni-thruk-datasource',
                               'redis-datasource',
                               'loki']),
