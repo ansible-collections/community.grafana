@@ -13,6 +13,7 @@
     that:
       - "result.failed == false"
       - "result.changed == true"
+      - "result.msg == 'Dashboard ' ~ dashboard_uid ~ ' exported to /tmp/dashboard.json'"
 
 - name: Load /tmp/dashboard_export.json or fail if missing
   ansible.builtin.set_fact:
