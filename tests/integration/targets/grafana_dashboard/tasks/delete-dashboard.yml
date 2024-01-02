@@ -11,3 +11,4 @@
     that:
       - "result.failed == false"
       - "result.changed == true"
+      - "result.msg == 'Dashboard {{ result.uid }} deleted'"

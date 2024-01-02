@@ -14,6 +14,7 @@
     that:
       - "result.failed == false"
       - "result.changed == true"
+      - "result.msg == 'Dashboard Zabbix Host Status created'"
 
 - name: Check import grafana dashboard from id idempotency
   community.grafana.grafana_dashboard:
@@ -30,5 +31,6 @@
     that:
       - "result.failed == false"
       - "result.changed == false"
+      - "result.msg == 'Dashboard Zabbix Host Status unchanged.'"
 
 - ansible.builtin.include_tasks: delete-dashboard.yml

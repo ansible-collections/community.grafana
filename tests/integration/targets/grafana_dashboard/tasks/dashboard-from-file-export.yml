@@ -18,6 +18,7 @@
     that:
       - "result.failed == false"
       - "result.changed == true"
+      - "result.msg == 'Dashboard test created'"
 
 - name: Check import grafana dashboard from file idempotency
   community.grafana.grafana_dashboard:
@@ -33,6 +34,7 @@
     that:
       - "result.failed == false"
       - "result.changed == false"
+      - "result.msg == 'Dashboard test unchanged.'"
 
 - ansible.builtin.include_tasks: dashboard-export.yml
 
