@@ -37,7 +37,7 @@ Click on the name of a plugin or module to view that content's documentation:
 We aim at keeping the last 3 Major versions of Grafana tested.
 This collection is currently testing the modules against following versions of Grafana:
 ```
-grafana_version: ["9.5.13", "8.5.27", "10.2.0"]
+grafana_version: ["9.5.14", "8.5.27", "10.2.2"]
 ```
 
 ## Installation and Usage
@@ -67,12 +67,9 @@ You can either call modules by their Fully Qualified Collection Namespace (FQCN)
   gather_facts: false
   connection: local
 
-  collections:
-    - community.grafana
-
   tasks:
     - name: Ensure Influxdb datasource exists.
-      grafana_datasource:
+      community.grafana.grafana_datasource:
         name: "datasource-influxdb"
         grafana_url: "https://grafana.company.com"
         grafana_user: "admin"
@@ -93,13 +90,11 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
 
 
 ```yaml
+---
 - hosts: localhost
   gather_facts: false
   connection: local
 
-  collections:
-    - community.grafana
-  
   module_defaults:
     group/community.grafana.grafana:
       grafana_url: "https://grafana.company.com"
@@ -108,7 +103,7 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
 
   tasks:
     - name: Ensure Influxdb datasource exists.
-      grafana_datasource:
+      community.grafana.grafana_datasource:
         name: "datasource-influxdb"
         org_id: "1"
         ds_type: "influxdb"
@@ -118,12 +113,51 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
         tls_ca_cert: "/etc/ssl/certs/ca.pem"
     
     - name: Create or update a Grafana user
-      grafana_user:
+      community.grafana.grafana_user:
         name: "Bruce Wayne"
         email: "batman@gotham.city"
         login: "batman"
         password: "robin"
         is_admin: true
+```
+
+## Complementary Collection: [`telekom-mms.grafana`](https://github.com/telekom-mms/ansible-role-grafana)
+
+The `telekom-mms.grafana` collection is an Ansible Collection that simplifies the use of the `community.grafana` collection. It provides an Ansible Role for easy integration with `community.grafana`. With this collection, you only need to define the variables for your Grafana resources.
+
+### Requirements
+    ansible-galaxy collection install telekom-mms.grafana
+... or use a requirements.yml:  
+`ansible-galaxy collection install -r requirements.yml`
+```yaml
+---
+collections:
+  - name: telekom-mms.grafana
+```
+
+### Example Playbook
+```yaml
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+
+  vars:
+    grafana_url: "https://grafana.company.com"
+    grafana_user: "admin"
+    grafana_password: "xxxxxx"
+
+    grafana_datasources:
+      - name: "Loki"
+        ds_type: "loki"
+        ds_url: "http://127.0.0.1:3100"
+        tls_skip_verify: yes
+    grafana_folders:
+      - name: my_service
+      - name: other_service
+
+  roles:
+    - role: telekom-mms.grafana
 ```
 
 ## Testing and Development
