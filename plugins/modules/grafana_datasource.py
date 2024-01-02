@@ -45,6 +45,7 @@ options:
     - sni-thruk-datasource
     - camptocamp-prometheus-alertmanager-datasource
     - loki
+    - mssql
     - redis-datasource
     type: str
   ds_url:
@@ -169,7 +170,7 @@ options:
     default: '@timestamp'
   time_interval:
     description:
-    - Minimum group by interval for C(influxdb), C(elasticsearch) or C(prometheus) datasources.
+    - Minimum group by interval for C(influxdb), C(elasticsearch), C(prometheus), or C(mssql) datasources.
     - for example C(>10s).
     type: str
   interval:
@@ -463,6 +464,22 @@ EXAMPLES = '''
     additional_secure_json_data:
       httpHeaderValue1: "Bearer ihavenogroot"
     enforce_secure_data: true
+
+- name: Create Grafana data source
+  community.grafana.grafana_datasource:
+    name: "datasource-mssql"
+    grafana_url: "https://grafana.company.com"
+    grafana_user: "admin"
+    grafana_password: "xxxxxx"
+    org_id: "1"
+    ds_type: "mssql"
+    ds_url: "mssql.company.com"
+    time_interval: 5s
+    database: "SQLWATCH"
+    user: sqlwatch
+    additional_secure_json_data:
+      password: "xxxxxx"
+  delegate_to: localhost
 '''
 
 RETURN = '''
@@ -619,7 +636,7 @@ def get_datasource_payload(data):
             es_version = ES_VERSION_MAPPING.get(data['es_version'])
         json_data['esVersion'] = es_version
 
-    if data['ds_type'] in ['elasticsearch', 'influxdb', 'prometheus']:
+    if data['ds_type'] in ['elasticsearch', 'influxdb', 'prometheus', 'mssql']:
         if data.get('time_interval'):
             json_data['timeInterval'] = data['time_interval']
 
@@ -742,7 +759,8 @@ def setup_module_object():
                               'camptocamp-prometheus-alertmanager-datasource',
                               'sni-thruk-datasource',
                               'redis-datasource',
-                              'loki']),
+                              'loki',
+                              'mssql']),
         ds_url=dict(type='str'),
         access=dict(default='proxy', choices=['proxy', 'direct']),
         database=dict(type='str', default=""),
