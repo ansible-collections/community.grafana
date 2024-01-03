@@ -696,9 +696,8 @@ class GrafanaInterface(object):
             )
         else:
             self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
-            if module.params['org_name']:
-                module.params['org_id'] = self.organization_by_name(module.params['org_name'])
-            self.switch_organization(module.params['org_id'])
+            org_id = self.organization_by_name(module.params['org_name']) if module.params['org_name'] else module.params['org_id']
+            self.switch_organization(org_id)
         # }}}
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
