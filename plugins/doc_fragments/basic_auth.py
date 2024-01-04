@@ -2,14 +2,14 @@
 # Copyright: (c) 2019, Rémi REY (@rrey)
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
 
 class ModuleDocFragment(object):
 
-    DOCUMENTATION = r'''options:
+    DOCUMENTATION = r"""options:
   url:
     description:
       - The Grafana URL.
@@ -30,9 +30,9 @@ class ModuleDocFragment(object):
     aliases: [ grafana_password ]
   use_proxy:
     description:
-      - If C(no), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
+      - If C(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
     type: bool
-    default: yes
+    default: true
   client_cert:
     description:
       - PEM formatted certificate chain file to be used for SSL client authentication.
@@ -45,8 +45,8 @@ class ModuleDocFragment(object):
     type: path
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated.
-      - This should only set to C(no) used on personally controlled sites using self-signed certificates.
+      - If C(false), SSL certificates will not be validated.
+      - This should only set to C(false) used on personally controlled sites using self-signed certificates.
     type: bool
-    default: yes
-    '''
+    default: true
+    """

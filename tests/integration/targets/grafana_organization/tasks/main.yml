@@ -1,5 +1,4 @@
 ---
-
 - name: Create a Grafana organization
   community.grafana.grafana_organization:
     url: "{{ grafana_url }}"
@@ -8,13 +7,13 @@
     name: orgtest
     state: present
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.failed == false"
-      - "result.org.name == 'orgtest'"
+      - result.changed == true
+      - result.failed == false
+      - result.org.name == 'orgtest'
 
-- name: check idempotency Grafana organization
+- name: Check idempotency Grafana organization
   community.grafana.grafana_organization:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
@@ -22,11 +21,11 @@
     name: orgtest
     state: present
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == false"
-      - "result.failed == false"
-      - "result.org.name == 'orgtest'"
+      - result.changed == false
+      - result.failed == false
+      - result.org.name == 'orgtest'
 
 - name: Delete a Grafana organization
   community.grafana.grafana_organization:
@@ -36,13 +35,13 @@
     name: orgtest
     state: absent
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.failed == false"
-      - "result.msg |length > 0"
+      - result.changed == true
+      - result.failed == false
+      - result.msg |length > 0
 
-- name: check idempotency delete a Grafana organization
+- name: Check idempotency delete a Grafana organization
   community.grafana.grafana_organization:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
@@ -50,8 +49,8 @@
     name: orgtest
     state: absent
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == false"
-      - "result.failed == false"
-      - "result.msg == 'No org found, nothing to do'"
+      - result.changed == false
+      - result.failed == false
+      - result.msg == 'No org found, nothing to do'

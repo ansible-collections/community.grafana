@@ -1,0 +1,79 @@
+---
+- name: Create tempo datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-tempo
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "1"
+    ds_type: tempo
+    ds_url: tempo.company.com:3100
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg == 'Datasource datasource-tempo created'
+
+- name: Check tempo datasource creation idempotency
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-tempo
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "1"
+    ds_type: tempo
+    ds_url: tempo.company.com:3100
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.datasource.basicAuth == false
+      - result.datasource.isDefault == false
+      - result.datasource.jsonData.tlsAuth == false
+      - result.datasource.jsonData.tlsAuthWithCACert == false
+      - result.datasource.secureJsonFields.httpHeaderValue1 == true
+      - result.datasource.name == 'datasource-tempo'
+      - result.datasource.orgId == 1
+      - result.datasource.type == 'tempo'
+      - result.datasource.url == 'tempo.company.com:3100'
+      - result.datasource.withCredentials == false
+
+- name: Delete tempo datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-tempo
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+
+- name: Delete tempo datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-tempo
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed

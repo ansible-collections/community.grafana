@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: grafana_organization_user
 author:
@@ -57,12 +57,18 @@ options:
     default: 1
     description:
       - Organization ID.
+      - Mutually exclusive with `org_name`.
+  org_name:
+    type: str
+    description:
+      - Organization name.
+      - Mutually exclusive with `org_id`.
 
 extends_documentation_fragment:
   - community.grafana.basic_auth
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 ---
 - name: Add user to organization
   community.grafana.grafana_organization_user:
@@ -79,9 +85,9 @@ EXAMPLES = '''
     url_password: "{{ grafana_password }}"
     login: john
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = """
 ---
 user:
     description: Information about the organization user
@@ -122,7 +128,7 @@ user:
                 - Admin
             sample:
               - Viewer
-'''
+"""
 
 
 import json
@@ -130,7 +136,10 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, clean_url
+from ansible_collections.community.grafana.plugins.module_utils.base import (
+    grafana_argument_spec,
+    clean_url,
+)
 from ansible.module_utils.urls import basic_auth_header
 
 __metaclass__ = type
@@ -141,12 +150,13 @@ class GrafanaAPIException(Exception):
 
 
 class GrafanaOrganizationUserInterface(object):
-
     def __init__(self, module):
         self._module = module
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+        self.headers["Authorization"] = basic_auth_header(
+            module.params["url_username"], module.params["url_password"]
+        )
         # }}}
         self.grafana_url = clean_url(module.params.get("url"))
 
@@ -154,100 +164,125 @@ class GrafanaOrganizationUserInterface(object):
         data = None
         if payload:
             data = json.dumps(payload)
-        return fetch_url(self._module, self.grafana_url + '/api/' + path, headers=self.headers, method=method, data=data)
+        return fetch_url(
+            self._module,
+            self.grafana_url + "/api/" + path,
+            headers=self.headers,
+            method=method,
+            data=data,
+        )
+
+    def _organization_by_name(self, org_name):
+        r, info = self._api_call("GET", "orgs/name/%s" % org_name, None)
+        if info["status"] != 200:
+            raise GrafanaAPIException("Unable to retrieve organization: %s" % info)
+        return json.loads(to_text(r.read()))
 
     def _organization_users(self, org_id):
-        r, info = self._api_call('GET', 'orgs/%d/users' % org_id, None)
-        if info['status'] != 200:
-            raise GrafanaAPIException("Unable to retrieve organization users: %s" % info)
+        r, info = self._api_call("GET", "orgs/%d/users" % org_id, None)
+        if info["status"] != 200:
+            raise GrafanaAPIException(
+                "Unable to retrieve organization users: %s" % info
+            )
         return json.loads(to_text(r.read()))
 
     def _create_organization_user(self, org_id, login, role):
-        return self._api_call('POST', 'orgs/%d/users' % org_id, {
-            "loginOrEmail": login,
-            "role": role,
-        })
+        return self._api_call(
+            "POST",
+            "orgs/%d/users" % org_id,
+            {
+                "loginOrEmail": login,
+                "role": role,
+            },
+        )
 
     def _update_organization_user_role(self, org_id, user_id, role):
-        return self._api_call('PATCH', 'orgs/%d/users/%s' % (org_id, user_id), {
-            "role": role,
-        })
+        return self._api_call(
+            "PATCH",
+            "orgs/%d/users/%s" % (org_id, user_id),
+            {
+                "role": role,
+            },
+        )
 
     def _remove_organization_user(self, org_id, user_id):
-        return self._api_call('DELETE', 'orgs/%d/users/%s' % (org_id, user_id), None)
+        return self._api_call("DELETE", "orgs/%d/users/%s" % (org_id, user_id), None)
 
     def _organization_user_by_login(self, org_id, login):
         for user in self._organization_users(org_id):
-            if user['name'] == login or user['email'] == login:
+            if login in (user["login"], user["email"]):
                 return user
 
     def create_or_update_user(self, org_id, login, role):
         r, info = self._create_organization_user(org_id, login, role)
-        if info['status'] == 200:
+        if info["status"] == 200:
             return {
-                'state': 'present',
-                'changed': True,
-                'user': self._organization_user_by_login(org_id, login),
+                "state": "present",
+                "changed": True,
+                "user": self._organization_user_by_login(org_id, login),
             }
-        if info['status'] == 409:  # already member
+        if info["status"] == 409:  # already member
             user = self._organization_user_by_login(org_id, login)
             if not user:
                 raise Exception("[BUG] User not found in organization")
 
-            if user['role'] == role:
-                return {
-                    'changed': False
-                }
+            if user["role"] == role:
+                return {"changed": False}
 
-            r, info = self._update_organization_user_role(org_id, user['userId'], role)
-            if info['status'] == 200:
+            r, info = self._update_organization_user_role(org_id, user["userId"], role)
+            if info["status"] == 200:
                 return {
-                    'changed': True,
-                    'user': self._organization_user_by_login(org_id, login),
+                    "changed": True,
+                    "user": self._organization_user_by_login(org_id, login),
                 }
             else:
-                raise GrafanaAPIException("Unable to update organization user: %s" % info)
+                raise GrafanaAPIException(
+                    "Unable to update organization user: %s" % info
+                )
         else:
             raise GrafanaAPIException("Unable to add user to organization: %s" % info)
 
     def remove_user(self, org_id, login):
         user = self._organization_user_by_login(org_id, login)
         if not user:
-            return {
-                'changed': False
-            }
+            return {"changed": False}
 
-        r, info = self._remove_organization_user(org_id, user['userId'])
-        if info['status'] == 200:
-            return {
-                'state': 'absent',
-                'changed': True
-            }
+        r, info = self._remove_organization_user(org_id, user["userId"])
+        if info["status"] == 200:
+            return {"state": "absent", "changed": True}
         else:
             raise GrafanaAPIException("Unable to delete organization user: %s" % info)
 
 
 def main():
     argument_spec = grafana_argument_spec()
-    argument_spec.pop('grafana_api_key')
+    argument_spec.pop("grafana_api_key")
     argument_spec.update(
-        org_id=dict(type='int', default=1),
-        login=dict(type='str', required=True),
-        role=dict(type='str', choices=['viewer', 'editor', 'admin'], default='viewer'),
+        org_id=dict(type="int", default=1),
+        org_name=dict(type="str"),
+        login=dict(type="str", required=True),
+        role=dict(type="str", choices=["viewer", "editor", "admin"], default="viewer"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
+        mutually_exclusive=[
+            ("org_id", "org_name"),
+        ],
         required_if=[
-            ['state', 'present', ['role']],
-        ]
+            ["state", "present", ["role"]],
+        ],
     )
 
-    org_id = module.params['org_id']
-    login = module.params['login']
+    org_id = module.params["org_id"]
+    login = module.params["login"]
     iface = GrafanaOrganizationUserInterface(module)
-    if module.params['state'] == 'present':
-        role = module.params['role'].capitalize()
+    if module.params["org_name"]:
+        org_name = module.params["org_name"]
+        organization = iface._organization_by_name(org_name)
+        org_id = organization["id"]
+    if module.params["state"] == "present":
+        role = module.params["role"].capitalize()
         result = iface.create_or_update_user(org_id, login, role)
         module.exit_json(failed=False, **result)
     else:
@@ -255,5 +290,5 @@ def main():
         module.exit_json(failed=False, **result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

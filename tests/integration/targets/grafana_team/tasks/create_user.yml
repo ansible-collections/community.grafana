@@ -1,29 +1,30 @@
+---
 - name: Create John Doe for tests purpose through uri module
-  uri:
+  ansible.builtin.uri:
     url: "{{ grafana_url }}api/admin/users"
     method: POST
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     body:
-      name: "John"
-      email: "john+doe@example.com"
-      login: "john"
-      password: "userpassword"
+      name: John
+      email: john+doe@example.com
+      login: john
+      password: userpassword
     body_format: json
     status_code: 200
 
 - name: Create Jane Doe for tests purpose through uri module
-  uri:
+  ansible.builtin.uri:
     url: "{{ grafana_url }}api/admin/users"
     method: POST
     user: "{{ grafana_username }}"
     password: "{{ grafana_password }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     body:
-      name: "Jane"
-      email: "jane.doe@example.com"
-      login: "jane"
-      password: "userpassword"
+      name: Jane
+      email: jane.doe@example.com
+      login: jane
+      password: userpassword
     body_format: json
     status_code: 200

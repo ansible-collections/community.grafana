@@ -1,20 +1,34 @@
 ---
 - block:
-  - include: dingding.yml
-  - include: discord.yml
-  - include: email.yml
-  - include: googlechat.yml
-  - include: hipchat.yml
-  - include: kafka.yml
-#  - include: line.yml
-  - include: teams.yml
-  - include: opsgenie.yml
-  - include: pagerduty.yml
-  - include: prometheus.yml
-  - include: pushover.yml
-  - include: sensu.yml
-  - include: slack-and-beyond.yml
-  - include: telegram.yml
-#  - include: threema.yml
-  - include: victorops.yml
-  - include: webhook.yml
+    - ansible.builtin.include_tasks:
+        file: dingding.yml
+    - ansible.builtin.include_tasks:
+        file: discord.yml
+    - ansible.builtin.include_tasks:
+        file: email.yml
+    - ansible.builtin.include_tasks:
+        file: googlechat.yml
+    - ansible.builtin.include_tasks:
+        file: hipchat.yml
+    - ansible.builtin.include_tasks:
+        file: kafka.yml
+    - ansible.builtin.include_tasks:
+        file: teams.yml
+    - ansible.builtin.include_tasks:
+        file: opsgenie.yml
+    - ansible.builtin.include_tasks:
+        file: pagerduty.yml
+    - ansible.builtin.include_tasks:
+        file: prometheus.yml
+    - ansible.builtin.include_tasks:
+        file: pushover.yml
+    - ansible.builtin.include_tasks:
+        file: sensu.yml
+    - ansible.builtin.include_tasks:
+        file: slack-and-beyond.yml
+    - ansible.builtin.include_tasks:
+        file: telegram.yml
+    - ansible.builtin.include_tasks:
+        file: victorops.yml
+    - ansible.builtin.include_tasks:
+        file: webhook.yml

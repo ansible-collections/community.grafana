@@ -1,4 +1,4 @@
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
@@ -53,14 +53,13 @@ Error: ✗ plugin does not exist
 
 
 class GrafanaPlugin(TestCase):
-
-    @patch('ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin')
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin"
+    )
     def test_plugin_install_zip(self, mock_grafana_cli_bin):
         mock_grafana_cli_bin.return_value = "grafana-cli plugins"
 
-        params = {
-            "name": "alexanderzobnin-zabbix-app"
-        }
+        params = {"name": "alexanderzobnin-zabbix-app"}
 
         module = MagicMock()
         module.run_command.return_value = run_command_install_zip()
@@ -68,13 +67,13 @@ class GrafanaPlugin(TestCase):
         result = grafana_plugin.get_grafana_plugin_version(module, params)
         self.assertEqual(result, None)
 
-    @patch('ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin')
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin"
+    )
     def test_plugin_ls(self, mock_grafana_cli_bin):
         mock_grafana_cli_bin.return_value = "grafana-cli plugins"
 
-        params = {
-            "name": "alexanderzobnin-zabbix-app"
-        }
+        params = {"name": "alexanderzobnin-zabbix-app"}
 
         module = MagicMock()
         module.run_command.return_value = run_command_ls()
@@ -82,13 +81,13 @@ class GrafanaPlugin(TestCase):
         result = grafana_plugin.get_grafana_plugin_version(module, params)
         self.assertEqual(result, "3.10.5")
 
-    @patch('ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin')
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin"
+    )
     def test_plugin_uninstall(self, mock_grafana_cli_bin):
         mock_grafana_cli_bin.return_value = "grafana-cli plugins"
 
-        params = {
-            "name": "alexanderzobnin-zabbix-app"
-        }
+        params = {"name": "alexanderzobnin-zabbix-app"}
 
         module = MagicMock()
         module.run_command.return_value = run_command_uninstall()
@@ -96,13 +95,13 @@ class GrafanaPlugin(TestCase):
         result = grafana_plugin.get_grafana_plugin_version(module, params)
         self.assertEqual(result, None)
 
-    @patch('ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin')
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_plugin.grafana_cli_bin"
+    )
     def test_plugin_uninstall_again(self, mock_grafana_cli_bin):
         mock_grafana_cli_bin.return_value = "grafana-cli plugins"
 
-        params = {
-            "name": "alexanderzobnin-zabbix-app"
-        }
+        params = {"name": "alexanderzobnin-zabbix-app"}
 
         module = MagicMock()
         module.run_command.return_value = run_command_uninstall_again()

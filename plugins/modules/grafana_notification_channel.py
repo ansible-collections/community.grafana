@@ -16,9 +16,10 @@
 # along with Ansible. If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: grafana_notification_channel
 notes:
@@ -82,17 +83,17 @@ options:
       - Required when I(state) is C(present).
   is_default:
     type: bool
-    default: 'no'
+    default: false
     description:
       - Use this channel for all alerts.
   include_image:
     type: bool
-    default: 'no'
+    default: false
     description:
       - Capture a visualization image and attach it to notifications.
   disable_resolve_message:
     type: bool
-    default: 'no'
+    default: false
     description:
       - Disable the resolve message.
   reminder_frequency:
@@ -368,10 +369,10 @@ options:
 extends_documentation_fragment:
   - community.grafana.basic_auth
   - community.grafana.api_key
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = """
 - name: Create slack notification channel
   register: result
   grafana_notification_channel:
@@ -391,9 +392,9 @@ EXAMPLES = '''
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password}}"
-'''
+"""
 
-RETURN = '''
+RETURN = """
 notification_channel:
   description: Notification channel created or updated by the module.
   returned: changed
@@ -416,14 +417,17 @@ notification_channel:
       "uid": "slack-oops",
       "updated": "2020-11-10T21:10:19.675308112+03:00"
     }
-'''
+"""
 
 import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
-from ansible_collections.community.grafana.plugins.module_utils.base import grafana_argument_spec, clean_url
+from ansible_collections.community.grafana.plugins.module_utils.base import (
+    grafana_argument_spec,
+    clean_url,
+)
 from ansible.module_utils.urls import basic_auth_header
 
 
@@ -432,412 +436,448 @@ class GrafanaAPIException(Exception):
 
 
 def dingding_channel_payload(data, payload):
-    payload['settings']['url'] = data['dingding_url']
-    if data.get('dingding_message_type'):
-        payload['settings']['msgType'] = {
-            'link': 'link',
-            'action_card': 'actionCard',
-        }[data['dingding_message_type']]
+    payload["settings"]["url"] = data["dingding_url"]
+    if data.get("dingding_message_type"):
+        payload["settings"]["msgType"] = {
+            "link": "link",
+            "action_card": "actionCard",
+        }[data["dingding_message_type"]]
 
 
 def discord_channel_payload(data, payload):
-    payload['settings']['url'] = data['discord_url']
-    if data.get('discord_message_content'):
-        payload['settings']['content'] = data['discord_message_content']
+    payload["settings"]["url"] = data["discord_url"]
+    if data.get("discord_message_content"):
+        payload["settings"]["content"] = data["discord_message_content"]
 
 
 def email_channel_payload(data, payload):
-    payload['settings']['addresses'] = ';'.join(data['email_addresses'])
-    if data.get('email_single'):
-        payload['settings']['singleEmail'] = data['email_single']
+    payload["settings"]["addresses"] = ";".join(data["email_addresses"])
+    if data.get("email_single"):
+        payload["settings"]["singleEmail"] = data["email_single"]
 
 
 def hipchat_channel_payload(data, payload):
-    payload['settings']['url'] = data['hipchat_url']
-    if data.get('hipchat_api_key'):
-        payload['settings']['apiKey'] = data['hipchat_api_key']
-    if data.get('hipchat_room_id'):
-        payload['settings']['roomid'] = data['hipchat_room_id']
+    payload["settings"]["url"] = data["hipchat_url"]
+    if data.get("hipchat_api_key"):
+        payload["settings"]["apiKey"] = data["hipchat_api_key"]
+    if data.get("hipchat_room_id"):
+        payload["settings"]["roomid"] = data["hipchat_room_id"]
 
 
 def pagerduty_channel_payload(data, payload):
-    payload['settings']['integrationKey'] = data['pagerduty_integration_key']
-    if data.get('pagerduty_severity'):
-        payload['settings']['severity'] = data['pagerduty_severity']
-    if data.get('pagerduty_auto_resolve'):
-        payload['settings']['autoResolve'] = data['pagerduty_auto_resolve']
-    if data.get('pagerduty_message_in_details'):
-        payload['settings']['messageInDetails'] = data['pagerduty_message_in_details']
+    payload["settings"]["integrationKey"] = data["pagerduty_integration_key"]
+    if data.get("pagerduty_severity"):
+        payload["settings"]["severity"] = data["pagerduty_severity"]
+    if data.get("pagerduty_auto_resolve"):
+        payload["settings"]["autoResolve"] = data["pagerduty_auto_resolve"]
+    if data.get("pagerduty_message_in_details"):
+        payload["settings"]["messageInDetails"] = data["pagerduty_message_in_details"]
 
 
 def prometheus_channel_payload(data, payload):
-    payload['type'] = 'prometheus-alertmanager'
-    payload['settings']['url'] = data['prometheus_url']
-    if data.get('prometheus_username'):
-        payload['settings']['basicAuthUser'] = data['prometheus_username']
-    if data.get('prometheus_password'):
-        payload['settings']['basicAuthPassword'] = data['prometheus_password']
+    payload["type"] = "prometheus-alertmanager"
+    payload["settings"]["url"] = data["prometheus_url"]
+    if data.get("prometheus_username"):
+        payload["settings"]["basicAuthUser"] = data["prometheus_username"]
+    if data.get("prometheus_password"):
+        payload["settings"]["basicAuthPassword"] = data["prometheus_password"]
 
 
 def pushover_channel_payload(data, payload):
-    payload['settings']['apiToken'] = data['pushover_api_token']
-    payload['settings']['userKey'] = data['pushover_user_key']
-    if data.get('pushover_devices'):
-        payload['settings']['device'] = ';'.join(data['pushover_devices'])
-    if data.get('pushover_priority'):
-        payload['settings']['priority'] = {
-            'emergency': '2',
-            'high': '1',
-            'normal': '0',
-            'low': '-1',
-            'lowest': '-2'
-        }[data['pushover_priority']]
-    if data.get('pushover_retry'):
-        payload['settings']['retry'] = str(data['pushover_retry'])
-    if data.get('pushover_expire'):
-        payload['settings']['expire'] = str(data['pushover_expire'])
-    if data.get('pushover_alert_sound'):
-        payload['settings']['sound'] = data['pushover_alert_sound']
-    if data.get('pushover_ok_sound'):
-        payload['settings']['okSound'] = data['pushover_ok_sound']
+    payload["settings"]["apiToken"] = data["pushover_api_token"]
+    payload["settings"]["userKey"] = data["pushover_user_key"]
+    if data.get("pushover_devices"):
+        payload["settings"]["device"] = ";".join(data["pushover_devices"])
+    if data.get("pushover_priority"):
+        payload["settings"]["priority"] = {
+            "emergency": "2",
+            "high": "1",
+            "normal": "0",
+            "low": "-1",
+            "lowest": "-2",
+        }[data["pushover_priority"]]
+    if data.get("pushover_retry"):
+        payload["settings"]["retry"] = str(data["pushover_retry"])
+    if data.get("pushover_expire"):
+        payload["settings"]["expire"] = str(data["pushover_expire"])
+    if data.get("pushover_alert_sound"):
+        payload["settings"]["sound"] = data["pushover_alert_sound"]
+    if data.get("pushover_ok_sound"):
+        payload["settings"]["okSound"] = data["pushover_ok_sound"]
 
 
 def sensu_channel_payload(data, payload):
-    payload['settings']['url'] = data['sensu_url']
-    if data.get('sensu_source'):
-        payload['settings']['source'] = data['sensu_source']
-    if data.get('sensu_handler'):
-        payload['settings']['handler'] = data['sensu_handler']
-    if data.get('sensu_username'):
-        payload['settings']['username'] = data['sensu_username']
-    if data.get('sensu_password'):
-        payload['settings']['password'] = data['sensu_password']
+    payload["settings"]["url"] = data["sensu_url"]
+    if data.get("sensu_source"):
+        payload["settings"]["source"] = data["sensu_source"]
+    if data.get("sensu_handler"):
+        payload["settings"]["handler"] = data["sensu_handler"]
+    if data.get("sensu_username"):
+        payload["settings"]["username"] = data["sensu_username"]
+    if data.get("sensu_password"):
+        payload["settings"]["password"] = data["sensu_password"]
 
 
 def slack_channel_payload(data, payload):
-    payload['settings']['url'] = data['slack_url']
-    if data.get('slack_recipient'):
-        payload['settings']['recipient'] = data['slack_recipient']
-    if data.get('slack_username'):
-        payload['settings']['username'] = data['slack_username']
-    if data.get('slack_icon_emoji'):
-        payload['settings']['iconEmoji'] = data['slack_icon_emoji']
-    if data.get('slack_icon_url'):
-        payload['settings']['iconUrl'] = data['slack_icon_url']
-    if data.get('slack_mention_users'):
-        payload['settings']['mentionUsers'] = ','.join(data['slack_mention_users'])
-    if data.get('slack_mention_groups'):
-        payload['settings']['mentionGroups'] = ','.join(data['slack_mention_groups'])
-    if data.get('slack_mention_channel'):
-        payload['settings']['mentionChannel'] = data['slack_mention_channel']
-    if data.get('slack_token'):
-        payload['settings']['token'] = data['slack_token']
+    payload["settings"]["url"] = data["slack_url"]
+    if data.get("slack_recipient"):
+        payload["settings"]["recipient"] = data["slack_recipient"]
+    if data.get("slack_username"):
+        payload["settings"]["username"] = data["slack_username"]
+    if data.get("slack_icon_emoji"):
+        payload["settings"]["iconEmoji"] = data["slack_icon_emoji"]
+    if data.get("slack_icon_url"):
+        payload["settings"]["iconUrl"] = data["slack_icon_url"]
+    if data.get("slack_mention_users"):
+        payload["settings"]["mentionUsers"] = ",".join(data["slack_mention_users"])
+    if data.get("slack_mention_groups"):
+        payload["settings"]["mentionGroups"] = ",".join(data["slack_mention_groups"])
+    if data.get("slack_mention_channel"):
+        payload["settings"]["mentionChannel"] = data["slack_mention_channel"]
+    if data.get("slack_token"):
+        payload["settings"]["token"] = data["slack_token"]
 
 
 def webhook_channel_payload(data, payload):
-    payload['settings']['url'] = data['webhook_url']
-    if data.get('webhook_http_method'):
-        payload['settings']['httpMethod'] = data['webhook_http_method']
-    if data.get('webhook_username'):
-        payload['settings']['username'] = data['webhook_username']
-    if data.get('webhook_password'):
-        payload['settings']['password'] = data['webhook_password']
+    payload["settings"]["url"] = data["webhook_url"]
+    if data.get("webhook_http_method"):
+        payload["settings"]["httpMethod"] = data["webhook_http_method"]
+    if data.get("webhook_username"):
+        payload["settings"]["username"] = data["webhook_username"]
+    if data.get("webhook_password"):
+        payload["settings"]["password"] = data["webhook_password"]
 
 
 def grafana_notification_channel_payload(data):
     payload = {
-        'uid': data['uid'],
-        'name': data['name'],
-        'type': data['type'],
-        'isDefault': data['is_default'],
-        'disableResolveMessage': data['disable_resolve_message'],
-        'settings': {
-            'uploadImage': data['include_image']
-        }
+        "uid": data["uid"],
+        "name": data["name"],
+        "type": data["type"],
+        "isDefault": data["is_default"],
+        "disableResolveMessage": data["disable_resolve_message"],
+        "settings": {"uploadImage": data["include_image"]},
     }
 
-    if data.get('reminder_frequency'):
-        payload['sendReminder'] = True
-        payload['frequency'] = data['reminder_frequency']
+    if data.get("reminder_frequency"):
+        payload["sendReminder"] = True
+        payload["frequency"] = data["reminder_frequency"]
 
-    if data['type'] == 'dingding':
+    if data["type"] == "dingding":
         dingding_channel_payload(data, payload)
-    elif data['type'] == 'discord':
+    elif data["type"] == "discord":
         discord_channel_payload(data, payload)
-    elif data['type'] == 'email':
+    elif data["type"] == "email":
         email_channel_payload(data, payload)
-    elif data['type'] == 'googlechat':
-        payload['settings']['url'] = data['googlechat_url']
-    elif data['type'] == 'hipchat':
+    elif data["type"] == "googlechat":
+        payload["settings"]["url"] = data["googlechat_url"]
+    elif data["type"] == "hipchat":
         hipchat_channel_payload(data, payload)
-    elif data['type'] == 'kafka':
-        payload['settings']['kafkaRestProxy'] = data['kafka_url']
-        payload['settings']['kafkaTopic'] = data['kafka_topic']
-    elif data['type'] == 'line':
-        payload['settings']['token'] = data['line_token']
-    elif data['type'] == 'teams':
-        payload['settings']['url'] = data['teams_url']
-    elif data['type'] == 'opsgenie':
-        payload['settings']['apiUrl'] = data['opsgenie_url']
-        payload['settings']['apiKey'] = data['opsgenie_api_key']
-    elif data['type'] == 'pagerduty':
+    elif data["type"] == "kafka":
+        payload["settings"]["kafkaRestProxy"] = data["kafka_url"]
+        payload["settings"]["kafkaTopic"] = data["kafka_topic"]
+    elif data["type"] == "line":
+        payload["settings"]["token"] = data["line_token"]
+    elif data["type"] == "teams":
+        payload["settings"]["url"] = data["teams_url"]
+    elif data["type"] == "opsgenie":
+        payload["settings"]["apiUrl"] = data["opsgenie_url"]
+        payload["settings"]["apiKey"] = data["opsgenie_api_key"]
+    elif data["type"] == "pagerduty":
         pagerduty_channel_payload(data, payload)
-    elif data['type'] == 'prometheus':
+    elif data["type"] == "prometheus":
         prometheus_channel_payload(data, payload)
-    elif data['type'] == 'pushover':
+    elif data["type"] == "pushover":
         pushover_channel_payload(data, payload)
-    elif data['type'] == 'sensu':
+    elif data["type"] == "sensu":
         sensu_channel_payload(data, payload)
-    elif data['type'] == 'slack':
+    elif data["type"] == "slack":
         slack_channel_payload(data, payload)
-    elif data['type'] == 'telegram':
-        payload['settings']['bottoken'] = data['telegram_bot_token']
-        payload['settings']['chatid'] = data['telegram_chat_id']
-    elif data['type'] == 'threema':
-        payload['settings']['gateway_id'] = data['threema_gateway_id']
-        payload['settings']['recipient_id'] = data['threema_recipient_id']
-        payload['settings']['api_secret'] = data['threema_api_secret']
-    elif data['type'] == 'victorops':
-        payload['settings']['url'] = data['victorops_url']
-        if data.get('victorops_auto_resolve'):
-            payload['settings']['autoResolve'] = data['victorops_auto_resolve']
-    elif data['type'] == 'webhook':
+    elif data["type"] == "telegram":
+        payload["settings"]["bottoken"] = data["telegram_bot_token"]
+        payload["settings"]["chatid"] = data["telegram_chat_id"]
+    elif data["type"] == "threema":
+        payload["settings"]["gateway_id"] = data["threema_gateway_id"]
+        payload["settings"]["recipient_id"] = data["threema_recipient_id"]
+        payload["settings"]["api_secret"] = data["threema_api_secret"]
+    elif data["type"] == "victorops":
+        payload["settings"]["url"] = data["victorops_url"]
+        if data.get("victorops_auto_resolve"):
+            payload["settings"]["autoResolve"] = data["victorops_auto_resolve"]
+    elif data["type"] == "webhook":
         webhook_channel_payload(data, payload)
     return payload
 
 
 class GrafanaNotificationChannelInterface(object):
-
     def __init__(self, module):
         self._module = module
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        if module.params.get('grafana_api_key', None):
-            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
+        if module.params.get("grafana_api_key", None):
+            self.headers["Authorization"] = (
+                "Bearer %s" % module.params["grafana_api_key"]
+            )
         else:
-            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+            self.headers["Authorization"] = basic_auth_header(
+                module.params["url_username"], module.params["url_password"]
+            )
         # }}}
         self.grafana_url = clean_url(module.params.get("url"))
 
     def grafana_switch_organisation(self, grafana_url, org_id):
-        r, info = fetch_url(self._module, '%s/api/user/using/%s' % (grafana_url, org_id),
-                            headers=self.headers, method='POST')
-        if info['status'] != 200:
-            raise GrafanaAPIException('Unable to switch to organization %s : %s' %
-                                      (org_id, info))
+        r, info = fetch_url(
+            self._module,
+            "%s/api/user/using/%s" % (grafana_url, org_id),
+            headers=self.headers,
+            method="POST",
+        )
+        if info["status"] != 200:
+            raise GrafanaAPIException(
+                "Unable to switch to organization %s : %s" % (org_id, info)
+            )
 
     def grafana_create_notification_channel(self, data, payload):
-        r, info = fetch_url(self._module, '%s/api/alert-notifications' % data['url'],
-                            data=json.dumps(payload), headers=self.headers, method='POST')
-        if info['status'] == 200:
+        r, info = fetch_url(
+            self._module,
+            "%s/api/alert-notifications" % data["url"],
+            data=json.dumps(payload),
+            headers=self.headers,
+            method="POST",
+        )
+        if info["status"] == 200:
             return {
-                'state': 'present',
-                'changed': True,
-                'channel': json.loads(to_text(r.read())),
+                "state": "present",
+                "changed": True,
+                "channel": json.loads(to_text(r.read())),
             }
         else:
-            raise GrafanaAPIException("Unable to create notification channel: %s" % info)
+            raise GrafanaAPIException(
+                "Unable to create notification channel: %s" % info
+            )
 
     def grafana_update_notification_channel(self, data, payload, before):
-        r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
-                            (data['url'], data['uid']),
-                            data=json.dumps(payload), headers=self.headers, method='PUT')
-        if info['status'] == 200:
-            del before['created']
-            del before['updated']
+        r, info = fetch_url(
+            self._module,
+            "%s/api/alert-notifications/uid/%s" % (data["url"], data["uid"]),
+            data=json.dumps(payload),
+            headers=self.headers,
+            method="PUT",
+        )
+        if info["status"] == 200:
+            del before["created"]
+            del before["updated"]
 
             channel = json.loads(to_text(r.read()))
             after = channel.copy()
-            del after['created']
-            del after['updated']
+            del after["created"]
+            del after["updated"]
 
             if before == after:
                 return {
-                    'changed': False,
-                    'channel': channel,
+                    "changed": False,
+                    "channel": channel,
                 }
             else:
                 return {
-                    'changed': True,
-                    'diff': {
-                        'before': before,
-                        'after': after,
+                    "changed": True,
+                    "diff": {
+                        "before": before,
+                        "after": after,
                     },
-                    'channel': channel,
+                    "channel": channel,
                 }
         else:
-            raise GrafanaAPIException("Unable to update notification channel %s : %s" %
-                                      (data['uid'], info))
+            raise GrafanaAPIException(
+                "Unable to update notification channel %s : %s" % (data["uid"], info)
+            )
 
     def grafana_create_or_update_notification_channel(self, data):
         payload = grafana_notification_channel_payload(data)
-        r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
-                            (data['url'], data['uid']), headers=self.headers)
-        if info['status'] == 200:
+        r, info = fetch_url(
+            self._module,
+            "%s/api/alert-notifications/uid/%s" % (data["url"], data["uid"]),
+            headers=self.headers,
+        )
+        if info["status"] == 200:
             before = json.loads(to_text(r.read()))
             return self.grafana_update_notification_channel(data, payload, before)
-        elif info['status'] == 404:
+        elif info["status"] == 404:
             return self.grafana_create_notification_channel(data, payload)
         else:
-            raise GrafanaAPIException("Unable to get notification channel %s : %s" %
-                                      (data['uid'], info))
+            raise GrafanaAPIException(
+                "Unable to get notification channel %s : %s" % (data["uid"], info)
+            )
 
     def grafana_delete_notification_channel(self, data):
-        r, info = fetch_url(self._module, '%s/api/alert-notifications/uid/%s' %
-                            (data['url'], data['uid']),
-                            headers=self.headers, method='DELETE')
-        if info['status'] == 200:
-            return {
-                'state': 'absent',
-                'changed': True
-            }
-        elif info['status'] == 404:
-            return {
-                'changed': False
-            }
+        r, info = fetch_url(
+            self._module,
+            "%s/api/alert-notifications/uid/%s" % (data["url"], data["uid"]),
+            headers=self.headers,
+            method="DELETE",
+        )
+        if info["status"] == 200:
+            return {"state": "absent", "changed": True}
+        elif info["status"] == 404:
+            return {"changed": False}
         else:
-            raise GrafanaAPIException("Unable to delete notification channel %s : %s" %
-                                      (data['uid'], info))
+            raise GrafanaAPIException(
+                "Unable to delete notification channel %s : %s" % (data["uid"], info)
+            )
 
 
 def main():
     argument_spec = grafana_argument_spec()
     argument_spec.update(
-        org_id=dict(type='int', default=1),
-        uid=dict(type='str'),
-        name=dict(type='str'),
-        type=dict(type='str',
-                  choices=['dingding', 'discord', 'email', 'googlechat', 'hipchat',
-                           'kafka', 'line', 'teams', 'opsgenie', 'pagerduty',
-                           'prometheus', 'pushover', 'sensu', 'slack', 'telegram',
-                           'threema', 'victorops', 'webhook']),
-        is_default=dict(type='bool', default=False),
-        include_image=dict(type='bool', default=False),
-        disable_resolve_message=dict(type='bool', default=False),
-        reminder_frequency=dict(type='str'),
-
-        dingding_url=dict(type='str'),
-        dingding_message_type=dict(type='list', elements='str',
-                                   choices=['link', 'action_card']),
-
-        discord_url=dict(type='str'),
-        discord_message_content=dict(type='str'),
-
-        email_addresses=dict(type='list', elements='str'),
-        email_single=dict(type='bool'),
-
-        googlechat_url=dict(type='str'),
-
-        hipchat_url=dict(type='str'),
-        hipchat_api_key=dict(type='str', no_log=True),
-        hipchat_room_id=dict(type='str'),
-
-        kafka_url=dict(type='str'),
-        kafka_topic=dict(type='str'),
-
-        line_token=dict(type='str', no_log=True),
-
-        teams_url=dict(type='str'),
-
-        opsgenie_url=dict(type='str'),
-        opsgenie_api_key=dict(type='str', no_log=True),
-        opsgenie_auto_close=dict(type='bool'),
-        opsgenie_override_priority=dict(type='bool'),
-
-        pagerduty_integration_key=dict(type='str', no_log=True),
-        pagerduty_severity=dict(type='list', elements='str',
-                                choices=['critical', 'error', 'warning', 'info']),
-        pagerduty_auto_resolve=dict(type='bool'),
-        pagerduty_message_in_details=dict(type='bool'),
-
-        prometheus_url=dict(type='str'),
-        prometheus_username=dict(type='str'),
-        prometheus_password=dict(type='str', no_log=True),
-
-        pushover_api_token=dict(type='str', no_log=True),
-        pushover_user_key=dict(type='str', no_log=True),
-        pushover_devices=dict(type='list', elements='str'),
-        pushover_priority=dict(type='list', elements='str',
-                               choices=['emergency', 'high', 'normal', 'low', 'lowest']),
-        pushover_retry=dict(type='int'),        # TODO: only when priority==emergency
-        pushover_expire=dict(type='int'),       # TODO: only when priority==emergency
-        pushover_alert_sound=dict(type='str'),  # TODO: add sound choices
-        pushover_ok_sound=dict(type='str'),     # TODO: add sound choices
-
-        sensu_url=dict(type='str'),
-        sensu_source=dict(type='str'),
-        sensu_handler=dict(type='str'),
-        sensu_username=dict(type='str'),
-        sensu_password=dict(type='str', no_log=True),
-
-        slack_url=dict(type='str', no_log=True),
-        slack_recipient=dict(type='str'),
-        slack_username=dict(type='str'),
-        slack_icon_emoji=dict(type='str'),
-        slack_icon_url=dict(type='str'),
-        slack_mention_users=dict(type='list', elements='str'),
-        slack_mention_groups=dict(type='list', elements='str'),
-        slack_mention_channel=dict(type='list', elements='str',
-                                   choices=['here', 'channel']),
-        slack_token=dict(type='str', no_log=True),
-
-        telegram_bot_token=dict(type='str', no_log=True),
-        telegram_chat_id=dict(type='str'),
-
-        threema_gateway_id=dict(type='str'),
-        threema_recipient_id=dict(type='str'),
-        threema_api_secret=dict(type='str', no_log=True),
-
-        victorops_url=dict(type='str'),
-        victorops_auto_resolve=dict(type='bool'),
-
-        webhook_url=dict(type='str'),
-        webhook_username=dict(type='str'),
-        webhook_password=dict(type='str', no_log=True),
-        webhook_http_method=dict(type='list', elements='str', choices=['POST', 'PUT'])
+        org_id=dict(type="int", default=1),
+        uid=dict(type="str"),
+        name=dict(type="str"),
+        type=dict(
+            type="str",
+            choices=[
+                "dingding",
+                "discord",
+                "email",
+                "googlechat",
+                "hipchat",
+                "kafka",
+                "line",
+                "teams",
+                "opsgenie",
+                "pagerduty",
+                "prometheus",
+                "pushover",
+                "sensu",
+                "slack",
+                "telegram",
+                "threema",
+                "victorops",
+                "webhook",
+            ],
+        ),
+        is_default=dict(type="bool", default=False),
+        include_image=dict(type="bool", default=False),
+        disable_resolve_message=dict(type="bool", default=False),
+        reminder_frequency=dict(type="str"),
+        dingding_url=dict(type="str"),
+        dingding_message_type=dict(
+            type="list", elements="str", choices=["link", "action_card"]
+        ),
+        discord_url=dict(type="str"),
+        discord_message_content=dict(type="str"),
+        email_addresses=dict(type="list", elements="str"),
+        email_single=dict(type="bool"),
+        googlechat_url=dict(type="str"),
+        hipchat_url=dict(type="str"),
+        hipchat_api_key=dict(type="str", no_log=True),
+        hipchat_room_id=dict(type="str"),
+        kafka_url=dict(type="str"),
+        kafka_topic=dict(type="str"),
+        line_token=dict(type="str", no_log=True),
+        teams_url=dict(type="str"),
+        opsgenie_url=dict(type="str"),
+        opsgenie_api_key=dict(type="str", no_log=True),
+        opsgenie_auto_close=dict(type="bool"),
+        opsgenie_override_priority=dict(type="bool"),
+        pagerduty_integration_key=dict(type="str", no_log=True),
+        pagerduty_severity=dict(
+            type="list",
+            elements="str",
+            choices=["critical", "error", "warning", "info"],
+        ),
+        pagerduty_auto_resolve=dict(type="bool"),
+        pagerduty_message_in_details=dict(type="bool"),
+        prometheus_url=dict(type="str"),
+        prometheus_username=dict(type="str"),
+        prometheus_password=dict(type="str", no_log=True),
+        pushover_api_token=dict(type="str", no_log=True),
+        pushover_user_key=dict(type="str", no_log=True),
+        pushover_devices=dict(type="list", elements="str"),
+        pushover_priority=dict(
+            type="list",
+            elements="str",
+            choices=["emergency", "high", "normal", "low", "lowest"],
+        ),
+        pushover_retry=dict(type="int"),  # TODO: only when priority==emergency
+        pushover_expire=dict(type="int"),  # TODO: only when priority==emergency
+        pushover_alert_sound=dict(type="str"),  # TODO: add sound choices
+        pushover_ok_sound=dict(type="str"),  # TODO: add sound choices
+        sensu_url=dict(type="str"),
+        sensu_source=dict(type="str"),
+        sensu_handler=dict(type="str"),
+        sensu_username=dict(type="str"),
+        sensu_password=dict(type="str", no_log=True),
+        slack_url=dict(type="str", no_log=True),
+        slack_recipient=dict(type="str"),
+        slack_username=dict(type="str"),
+        slack_icon_emoji=dict(type="str"),
+        slack_icon_url=dict(type="str"),
+        slack_mention_users=dict(type="list", elements="str"),
+        slack_mention_groups=dict(type="list", elements="str"),
+        slack_mention_channel=dict(
+            type="list", elements="str", choices=["here", "channel"]
+        ),
+        slack_token=dict(type="str", no_log=True),
+        telegram_bot_token=dict(type="str", no_log=True),
+        telegram_chat_id=dict(type="str"),
+        threema_gateway_id=dict(type="str"),
+        threema_recipient_id=dict(type="str"),
+        threema_api_secret=dict(type="str", no_log=True),
+        victorops_url=dict(type="str"),
+        victorops_auto_resolve=dict(type="bool"),
+        webhook_url=dict(type="str"),
+        webhook_username=dict(type="str"),
+        webhook_password=dict(type="str", no_log=True),
+        webhook_http_method=dict(type="list", elements="str", choices=["POST", "PUT"]),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=[['url_username', 'url_password', 'org_id'],
-                           ['prometheus_username', 'prometheus_password'],
-                           ['sensu_username', 'sensu_password']],
-        mutually_exclusive=[['url_username', 'grafana_api_key']],
+        required_together=[
+            ["url_username", "url_password", "org_id"],
+            ["prometheus_username", "prometheus_password"],
+            ["sensu_username", "sensu_password"],
+        ],
+        mutually_exclusive=[["url_username", "grafana_api_key"]],
         required_if=[
-            ['state', 'present', ['name', 'type']],
-            ['type', 'dingding', ['dingding_url']],
-            ['type', 'discord', ['discord_url']],
-            ['type', 'email', ['email_addresses']],
-            ['type', 'googlechat', ['googlechat_url']],
-            ['type', 'hipchat', ['hipchat_url']],
-            ['type', 'kafka', ['kafka_url', 'kafka_topic']],
-            ['type', 'line', ['line_token']],
-            ['type', 'teams', ['teams_url']],
-            ['type', 'opsgenie', ['opsgenie_url', 'opsgenie_api_key']],
-            ['type', 'pagerduty', ['pagerduty_integration_key']],
-            ['type', 'prometheus', ['prometheus_url']],
-            ['type', 'pushover', ['pushover_api_token', 'pushover_user_key']],
-            ['type', 'sensu', ['sensu_url']],
-            ['type', 'slack', ['slack_url']],
-            ['type', 'telegram', ['telegram_bot_token', 'telegram_chat_id']],
-            ['type', 'threema', ['threema_gateway_id', 'threema_recipient_id',
-                                 'threema_api_secret']],
-            ['type', 'victorops', ['victorops_url']],
-            ['type', 'webhook', ['webhook_url']]
-        ]
+            ["state", "present", ["name", "type"]],
+            ["type", "dingding", ["dingding_url"]],
+            ["type", "discord", ["discord_url"]],
+            ["type", "email", ["email_addresses"]],
+            ["type", "googlechat", ["googlechat_url"]],
+            ["type", "hipchat", ["hipchat_url"]],
+            ["type", "kafka", ["kafka_url", "kafka_topic"]],
+            ["type", "line", ["line_token"]],
+            ["type", "teams", ["teams_url"]],
+            ["type", "opsgenie", ["opsgenie_url", "opsgenie_api_key"]],
+            ["type", "pagerduty", ["pagerduty_integration_key"]],
+            ["type", "prometheus", ["prometheus_url"]],
+            ["type", "pushover", ["pushover_api_token", "pushover_user_key"]],
+            ["type", "sensu", ["sensu_url"]],
+            ["type", "slack", ["slack_url"]],
+            ["type", "telegram", ["telegram_bot_token", "telegram_chat_id"]],
+            [
+                "type",
+                "threema",
+                ["threema_gateway_id", "threema_recipient_id", "threema_api_secret"],
+            ],
+            ["type", "victorops", ["victorops_url"]],
+            ["type", "webhook", ["webhook_url"]],
+        ],
     )
 
     module.params["url"] = clean_url(module.params["url"])
     alert_channel_iface = GrafanaNotificationChannelInterface(module)
 
-    if module.params['state'] == 'present':
-        result = alert_channel_iface.grafana_create_or_update_notification_channel(module.params)
+    if module.params["state"] == "present":
+        result = alert_channel_iface.grafana_create_or_update_notification_channel(
+            module.params
+        )
         module.exit_json(failed=False, **result)
     else:
         result = alert_channel_iface.grafana_delete_notification_channel(module.params)
         module.exit_json(failed=False, **result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
