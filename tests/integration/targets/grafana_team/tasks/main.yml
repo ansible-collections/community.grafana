@@ -31,7 +31,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: present
   register: result
@@ -39,7 +39,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
@@ -50,7 +50,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: absent
   register: result
@@ -66,7 +66,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: absent
   register: result
@@ -86,7 +86,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members:
       - john+doe@example.com
@@ -101,7 +101,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
@@ -112,7 +112,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members:
       - john+doe@example.com
@@ -122,7 +122,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
@@ -137,7 +137,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members: "{{ enforced_members }}"
     enforce_members: true
@@ -147,7 +147,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
@@ -157,7 +157,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: present
   register: result
@@ -165,7 +165,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
@@ -176,7 +176,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members:
       - john+doe@example.com
@@ -190,7 +190,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
