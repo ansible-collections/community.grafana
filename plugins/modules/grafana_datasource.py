@@ -735,9 +735,9 @@ class GrafanaInterface(object):
     def organization_by_name(self, org_name):
         url = "/api/user/orgs"
         organizations = self._send_request(url, headers=self.headers, method='GET')
-            orga = next((org for org in organizations if org['name'] == org_name))
-            if orga:
-                return orga['orgId']
+        orga = next((org for org in organizations if org['name'] == org_name))
+        if orga:
+            return orga['orgId']
 
         return self._module.fail_json(failed=True, msg="Current user isn't member of organization: %s" % org_name)
 
