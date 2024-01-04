@@ -1,5 +1,5 @@
 ---
-requires_ansible: '>=2.9.0'
+requires_ansible: ">=2.9.0"
 action_groups:
   grafana:
     - grafana_dashboard

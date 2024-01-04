@@ -13,6 +13,6 @@
   ignore_errors: true
 - ansible.builtin.assert:
     that:
-      - "result.failed == true"
-      - "result.changed == false"
+      - result.failed == true
+      - result.changed == false
       - "result.msg == 'error : Dashboard folder \\'inexistent\\' does not exist.'"

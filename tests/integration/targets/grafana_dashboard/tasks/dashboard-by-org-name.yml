@@ -15,9 +15,9 @@
       register: result
     - ansible.builtin.assert:
         that:
-          - "result.failed == false"
-          - "result.changed == true"
-          - "result.msg == 'Dashboard test created'"
+          - result.failed == false
+          - result.changed == true
+          - result.msg == 'Dashboard test created'
 
     - name: Check import grafana dashboard from file idempotency
       community.grafana.grafana_dashboard:
@@ -31,8 +31,9 @@
       register: result
     - ansible.builtin.assert:
         that:
-          - "result.failed == false"
-          - "result.changed == false"
-          - "result.msg == 'Dashboard test unchanged.'"
+          - result.failed == false
+          - result.changed == false
+          - result.msg == 'Dashboard test unchanged.'
 
-    - ansible.builtin.include_tasks: delete-dashboard.yml
+    - ansible.builtin.include_tasks:
+        file: delete-dashboard.yml
