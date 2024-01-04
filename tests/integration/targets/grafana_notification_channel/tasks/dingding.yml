@@ -1,7 +1,7 @@
 ---
 - name: Create dingding notification channel
   register: result
-  community.grafana.community.grafana.grafana_notification_channel:
+  community.grafana.grafana_notification_channel:
     uid: dingding
     name: dingding
     type: dingding
@@ -22,7 +22,7 @@
 
 - name: Create dingding notification channel (idempotency)
   register: result
-  community.grafana.community.grafana.grafana_notification_channel:
+  community.grafana.grafana_notification_channel:
     uid: dingding
     name: dingding
     type: dingding
@@ -43,7 +43,7 @@
 
 - name: Delete dingding notification channel
   register: result
-  community.grafana.community.grafana.grafana_notification_channel:
+  community.grafana.grafana_notification_channel:
     uid: dingding
     state: absent
     grafana_url: "{{ grafana_url }}"
@@ -59,7 +59,7 @@
 
 - name: Delete dingding notification channel (idempotency)
   register: result
-  community.grafana.community.grafana.grafana_notification_channel:
+  community.grafana.grafana_notification_channel:
     uid: dingding
     state: absent
     grafana_url: "{{ grafana_url }}"
