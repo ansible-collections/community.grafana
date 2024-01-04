@@ -182,6 +182,7 @@
       - john+doe@example.com
       - jane.doe@example.com
     state: present
+  register: result
 
 - ansible.builtin.set_fact:
     expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com'])
