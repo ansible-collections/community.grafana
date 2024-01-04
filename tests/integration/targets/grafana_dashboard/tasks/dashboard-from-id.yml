@@ -10,11 +10,11 @@
     dashboard_revision: "1"
     overwrite: true
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
-      - "result.msg == 'Dashboard Zabbix Host Status created'"
+      - result.failed == false
+      - result.changed == true
+      - result.msg == 'Dashboard Zabbix Host Status created'
 
 - name: Check import grafana dashboard from id idempotency
   community.grafana.grafana_dashboard:
@@ -29,8 +29,9 @@
   register: result
 - ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == false"
-      - "result.msg == 'Dashboard Zabbix Host Status unchanged.'"
+      - result.failed == false
+      - result.changed == false
+      - result.msg == 'Dashboard Zabbix Host Status unchanged.'
 
-- ansible.builtin.include_tasks: delete-dashboard.yml
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml

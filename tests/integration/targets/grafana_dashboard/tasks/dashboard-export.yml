@@ -11,9 +11,9 @@
   register: result
 - ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
-      - "result.msg == 'Dashboard ' ~ result.uid ~ ' exported to /tmp/dashboard_export.json'"
+      - result.failed == false
+      - result.changed == true
+      - result.msg == 'Dashboard ' ~ result.uid ~ ' exported to /tmp/dashboard_export.json'
 
 - name: Load /tmp/dashboard_export.json or fail if missing
   ansible.builtin.set_fact:
@@ -22,6 +22,6 @@
 - name: Assert that exported dashboard contains formatted JSON
   ansible.builtin.assert:
     that:
-      - "exported_dashboard_lines | length >= 2"
-      - "exported_dashboard_lines[0] == '{'"
-      - "exported_dashboard_lines[-1] == '}'"
+      - exported_dashboard_lines | length >= 2
+      - exported_dashboard_lines[0] == '{'
+      - exported_dashboard_lines[-1] == '}'
