@@ -107,7 +107,8 @@
     role: admin
     state: present
   register: result
-- ansible.builtin.assert:
+  when: not ansible_check_mode
+
 - ansible.builtin.assert:
     that:
       - result.failed == false
@@ -125,6 +126,8 @@
     login: orgtest
     state: absent
   register: result
+  when: not ansible_check_mode
+
 - ansible.builtin.assert:
     that:
       - result.failed == false
@@ -141,6 +144,8 @@
     role: admin
     state: present
   register: result
+  when: not ansible_check_mode
+
 - ansible.builtin.assert:
     that:
       - result.failed == false
@@ -158,6 +163,8 @@
     login: orgtest
     state: absent
   register: result
+  when: not ansible_check_mode
+
 - ansible.builtin.assert:
     that:
       - result.failed == false
