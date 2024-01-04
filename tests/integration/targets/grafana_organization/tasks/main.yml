@@ -6,7 +6,13 @@
     url_password: "{{ grafana_password }}"
     name: orgtest
     state: present
-  register: result - "result.changed == true" - "result.failed == false" - "result.org.name == 'orgtest'"
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.failed == false
+      - result.org.name == 'orgtest'
   when: not ansible_check_mode
 
 - name: Check idempotency Grafana organization
@@ -17,6 +23,7 @@
     name: orgtest
     state: present
   register: result
+
 - ansible.builtin.assert:
     that:
       - result.changed == false
@@ -32,6 +39,7 @@
     name: orgtest
     state: absent
   register: result
+
 - ansible.builtin.assert:
     that:
       - result.changed == true
@@ -47,6 +55,7 @@
     name: orgtest
     state: absent
   register: result
+
 - ansible.builtin.assert:
     that:
       - result.changed == false
