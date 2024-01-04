@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: grafana_organization
 author:
@@ -43,9 +43,9 @@ options:
     choices: ["present", "absent"]
 extends_documentation_fragment:
 - community.grafana.basic_auth
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 ---
 - name: Create a Grafana organization
   community.grafana.grafana_organization:
@@ -62,9 +62,9 @@ EXAMPLES = '''
     url_password: changeme
     name: orgtest
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = """
 ---
 org:
     description: Information about the organization
@@ -94,7 +94,7 @@ org:
                 country: ""
                 state: ""
                 zipCode: ""
-'''
+"""
 
 import json
 
@@ -107,12 +107,13 @@ __metaclass__ = type
 
 
 class GrafanaOrgInterface(object):
-
     def __init__(self, module):
         self._module = module
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+        self.headers["Authorization"] = basic_auth_header(
+            module.params["url_username"], module.params["url_password"]
+        )
         # }}}
         self.grafana_url = base.clean_url(module.params.get("url"))
 
@@ -123,20 +124,35 @@ class GrafanaOrgInterface(object):
             headers = []
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+        resp, info = fetch_url(
+            self._module, full_url, data=data, headers=headers, method=method
+        )
         status_code = info["status"]
         if status_code == 404:
             return None
         elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s' header: %s" % (method, full_url, self.headers))
+            self._module.fail_json(
+                failed=True,
+                msg="Unauthorized to perform action '%s' on '%s' header: %s"
+                % (method, full_url, self.headers),
+            )
         elif status_code == 403:
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 200:
             return self._module.from_json(resp.read())
         if resp is None:
-            self._module.fail_json(failed=True, msg="Cannot connect to API Grafana %s" % info['msg'], status=status_code, url=info['url'])
+            self._module.fail_json(
+                failed=True,
+                msg="Cannot connect to API Grafana %s" % info["msg"],
+                status=status_code,
+                url=info["url"],
+            )
         else:
-            self._module.fail_json(failed=True, msg="Grafana Org API answered with HTTP %d" % status_code, body=self._module.from_json(resp.read()))
+            self._module.fail_json(
+                failed=True,
+                msg="Grafana Org API answered with HTTP %d" % status_code,
+                body=self._module.from_json(resp.read()),
+            )
 
     def get_actual_org(self, name):
         # https://grafana.com/docs/grafana/latest/http_api/org/#get-organization-by-name
@@ -160,40 +176,48 @@ def setup_module_object():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=base.grafana_required_together()
+        required_together=base.grafana_required_together(),
     )
     return module
 
 
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
-    state=dict(choices=['present', 'absent'], default='present'),
-    name=dict(type='str', required=True),
+    state=dict(choices=["present", "absent"], default="present"),
+    name=dict(type="str", required=True),
 )
-argument_spec.pop('grafana_api_key')
+argument_spec.pop("grafana_api_key")
 
 
 def main():
     module = setup_module_object()
-    state = module.params['state']
-    name = module.params['name']
+    state = module.params["state"]
+    name = module.params["name"]
 
     grafana_iface = GrafanaOrgInterface(module)
 
     # search org by name
     actual_org = grafana_iface.get_actual_org(name)
-    if state == 'present':
+    if state == "present":
         has_changed = False
 
         if actual_org is None:
             # create new org
             actual_org = grafana_iface.create_org(name)
             has_changed = True
-            module.exit_json(changed=has_changed, msg='Organization %s created.' % name, org=actual_org)
+            module.exit_json(
+                changed=has_changed,
+                msg="Organization %s created." % name,
+                org=actual_org,
+            )
         else:
-            module.exit_json(changed=has_changed, msg='Organization %s already created.' % name, org=actual_org)
+            module.exit_json(
+                changed=has_changed,
+                msg="Organization %s already created." % name,
+                org=actual_org,
+            )
 
-    elif state == 'absent':
+    elif state == "absent":
         if actual_org is None:
             module.exit_json(msg="No org found, nothing to do")
         # delete org
@@ -201,5 +225,5 @@ def main():
         module.exit_json(changed=True, msg=result.get("message"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
