@@ -24,6 +24,7 @@
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Check idempotency on team creation
   community.grafana.grafana_team:
@@ -42,6 +43,7 @@
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Check a team can be deleted
   community.grafana.grafana_team:
@@ -57,6 +59,7 @@
     that:
       - result.changed == true
       - result.message == 'Team deleted'
+  when: not ansible_check_mode
 
 - name: Check idempotency on team deletion
   community.grafana.grafana_team:
@@ -72,10 +75,12 @@
     that:
       - result.changed == false
       - result.message == 'No team found'
+  when: not ansible_check_mode
 
 - name: Create users for tests purpose
   ansible.builtin.import_tasks:
     file: create_user.yml
+
 - name: Create a Team with members
   community.grafana.grafana_team:
     url: "{{ grafana_url }}"
@@ -100,6 +105,7 @@
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Ensure a Team exists with member not enforced
   community.grafana.grafana_team:
@@ -120,6 +126,7 @@
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - ansible.builtin.set_fact:
     enforced_members: "{{ auto_member | ternary(['admin@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
@@ -162,6 +169,7 @@
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Add new member to existing Team
   community.grafana.grafana_team:
@@ -186,3 +194,4 @@
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
