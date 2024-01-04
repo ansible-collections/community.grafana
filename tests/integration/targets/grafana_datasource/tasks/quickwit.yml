@@ -1,0 +1,137 @@
+---
+- name: Create Quickwit datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: Quickwit
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "1"
+    ds_type: quickwit-quickwit-datasource
+    ds_url: http://localhost:7280/api/v1
+    additional_json_data:
+      index: hdfs-logs
+      timeField: timestamp
+      timeOutputFormat: unix_timestamp_secs
+      logMessageField: body
+      logLevelField: severity_text
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.datasource.access == 'proxy'
+      - not result.datasource.isDefault
+      - result.datasource.database == ''
+      - result.datasource.name == 'Quickwit'
+      - result.datasource.orgId == 1
+      - result.datasource.type == 'quickwit-quickwit-datasource'
+      - result.datasource.url == 'http://localhost:7280/api/v1'
+      - result.msg == 'Datasource Quickwit created'
+      - result.datasource.jsonData.index == 'hdfs-logs'
+      - result.datasource.jsonData.timeField == 'timestamp'
+      - result.datasource.jsonData.timeOutputFormat == 'unix_timestamp_secs'
+      - result.datasource.jsonData.logMessageField == 'body'
+      - result.datasource.jsonData.logLevelField == 'severity_text'
+
+- name: Check Quickwit datasource creation (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: Quickwit
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "1"
+    ds_type: quickwit-quickwit-datasource
+    ds_url: http://localhost:7280/api/v1
+    additional_json_data:
+      index: hdfs-logs
+      timeField: timestamp
+      timeOutputFormat: unix_timestamp_secs
+      logMessageField: body
+      logLevelField: severity_text
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.datasource.access == 'proxy'
+      - not result.datasource.isDefault
+      - result.datasource.database == ''
+      - result.datasource.name == 'Quickwit'
+      - result.datasource.orgId == 1
+      - result.datasource.type == 'quickwit-quickwit-datasource'
+      - result.datasource.url == 'http://localhost:7280/api/v1'
+      - result.msg == 'Datasource Quickwit created'
+      - result.datasource.jsonData.index == 'hdfs-logs'
+      - result.datasource.jsonData.timeField == 'timestamp'
+      - result.datasource.jsonData.timeOutputFormat == 'unix_timestamp_secs'
+      - result.datasource.jsonData.logMessageField == 'body'
+      - result.datasource.jsonData.logLevelField == 'severity_text'
+
+- name: Update Quickwit datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: Quickwit
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    org_id: "1"
+    ds_type: quickwit-quickwit-datasource
+    ds_url: http://quickwit-url:7280/api/v1
+    additional_json_data:
+      index: hdfs-logs
+      timeField: timestamp
+      timeOutputFormat: unix_timestamp_millis
+      logMessageField: body
+      logLevelField: severity_text
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.datasource.access == 'proxy'
+      - not result.datasource.isDefault
+      - result.datasource.database == ''
+      - result.datasource.name == 'Quickwit'
+      - result.datasource.orgId == 1
+      - result.datasource.type == 'quickwit-quickwit-datasource'
+      - result.datasource.url == 'http://quickwit-url:7280/api/v1'
+      - result.msg == 'Datasource Quickwit created'
+      - result.datasource.jsonData.index == 'hdfs-logs'
+      - result.datasource.jsonData.timeField == 'timestamp'
+      - result.datasource.jsonData.timeOutputFormat == 'unix_timestamp_millis'
+      - result.datasource.jsonData.logMessageField == 'body'
+      - result.datasource.jsonData.logLevelField == 'severity_text'
+
+- name: Delete Quickwit datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: Quickwit
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+
+- name: Delete Quickwit datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: Quickwit
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed

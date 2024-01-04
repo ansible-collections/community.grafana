@@ -4,9 +4,10 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: present
+    skip_version_check: true
   register: result
 
 - ansible.builtin.set_fact:
@@ -19,17 +20,18 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Check idempotency on team creation
   community.grafana.grafana_team:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: present
   register: result
@@ -37,17 +39,18 @@
 - ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Check a team can be deleted
   community.grafana.grafana_team:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: absent
   register: result
@@ -56,13 +59,14 @@
     that:
       - result.changed == true
       - result.message == 'Team deleted'
+  when: not ansible_check_mode
 
 - name: Check idempotency on team deletion
   community.grafana.grafana_team:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: absent
   register: result
@@ -71,16 +75,18 @@
     that:
       - result.changed == false
       - result.message == 'No team found'
+  when: not ansible_check_mode
 
 - name: Create users for tests purpose
   ansible.builtin.import_tasks:
     file: create_user.yml
+
 - name: Create a Team with members
   community.grafana.grafana_team:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members:
       - john+doe@example.com
@@ -95,17 +101,18 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Ensure a Team exists with member not enforced
   community.grafana.grafana_team:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members:
       - john+doe@example.com
@@ -115,10 +122,11 @@
 - ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - ansible.builtin.set_fact:
     enforced_members: "{{ auto_member | ternary(['admin@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
@@ -129,7 +137,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members: "{{ enforced_members }}"
     enforce_members: true
@@ -139,7 +147,7 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
@@ -149,7 +157,7 @@
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     state: present
   register: result
@@ -157,17 +165,18 @@
 - ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Add new member to existing Team
   community.grafana.grafana_team:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    name: grafana_working_group
+    name: grafana working group
     email: foo.bar@example.com
     members:
       - john+doe@example.com
@@ -182,7 +191,8 @@
 - ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.team.name == 'grafana_working_group'
+      - result.team.name == 'grafana working group'
       - result.team.email == 'foo.bar@example.com'
       - result.team.memberCount == (expected_members|length)
       - result.team.members == expected_members
+  when: not ansible_check_mode

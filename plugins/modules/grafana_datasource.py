@@ -48,6 +48,7 @@ options:
     - loki
     - redis-datasource
     - tempo
+    - quickwit-quickwit-datasource
     type: str
   ds_url:
     description:
@@ -790,6 +791,7 @@ def setup_module_object():
                 "redis-datasource",
                 "loki",
                 "tempo",
+                "quickwit-quickwit-datasource",
             ]
         ),
         ds_url=dict(type="str"),
