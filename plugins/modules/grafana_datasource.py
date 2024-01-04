@@ -128,11 +128,19 @@ options:
     default: false
   org_id:
     description:
-    - Grafana Organisation ID in which the datasource should be created.
+    - Grafana organization ID in which the datasource should be created.
     - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
-      belong to one organisation.
+      belongs to one organization.
+    - Mutually exclusive with `org_name`.
     default: 1
     type: int
+  org_name:
+    description:
+    - Grafana organization name in which the datasource should be created.
+    - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+      belongs to one organization.
+    - Mutually exclusive with `org_id`.
+    type: str
   state:
     description:
     - Status of the datasource
@@ -609,7 +617,6 @@ def get_datasource_payload(data):
 
     # datasource type related parameters
     if data["ds_type"] == "elasticsearch":
-
         json_data["maxConcurrentShardRequests"] = data["max_concurrent_shard_requests"]
         json_data["timeField"] = data["time_field"]
         if data.get("interval"):
@@ -690,7 +697,12 @@ class GrafanaInterface(object):
             self.headers["Authorization"] = basic_auth_header(
                 module.params["url_username"], module.params["url_password"]
             )
-            self.switch_organisation(module.params["org_id"])
+            org_id = (
+                self.organization_by_name(module.params["org_name"])
+                if module.params["org_name"]
+                else module.params["org_id"]
+            )
+            self.switch_organization(org_id)
         # }}}
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
@@ -721,9 +733,20 @@ class GrafanaInterface(object):
             % (status_code, url, data),
         )
 
-    def switch_organisation(self, org_id):
+    def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
         response = self._send_request(url, headers=self.headers, method="POST")
+
+    def organization_by_name(self, org_name):
+        url = "/api/user/orgs"
+        organizations = self._send_request(url, headers=self.headers, method="GET")
+        orga = next((org for org in organizations if org["name"] == org_name))
+        if orga:
+            return orga["orgId"]
+
+        return self._module.fail_json(
+            failed=True, msg="Current user isn't member of organization: %s" % org_name
+        )
 
     def datasource_by_name(self, name):
         datasource_exists = False
@@ -783,6 +806,7 @@ def setup_module_object():
         tls_skip_verify=dict(type="bool", default=False),
         is_default=dict(default=False, type="bool"),
         org_id=dict(default=1, type="int"),
+        org_name=dict(type="str"),
         es_version=dict(
             type="str",
             default="7.10+",
@@ -866,6 +890,7 @@ def setup_module_object():
         mutually_exclusive=[
             ["url_username", "grafana_api_key"],
             ["tls_ca_cert", "tls_skip_verify"],
+            ["org_id", "org_name"],
         ],
         required_if=[
             ["state", "present", ["ds_type", "ds_url"]],
