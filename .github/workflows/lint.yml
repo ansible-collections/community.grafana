@@ -18,10 +18,12 @@ jobs:
         with:
           files: "**/*.py"
 
-      - uses: psf/black@stable
+      - if: ${{ steps.changed-files.outputs.all_changed_files != '' }}
+        uses: psf/black@stable
         with:
           src: ${{ steps.changed-files.outputs.all_changed_files }}
 
-      - uses: chartboost/ruff-action@v1
+      - if: ${{ steps.changed-files.outputs.all_changed_files != '' }}
+        uses: chartboost/ruff-action@v1
         with:
           src: ${{ steps.changed-files.outputs.all_changed_files }}
