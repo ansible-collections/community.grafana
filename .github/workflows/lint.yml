@@ -16,7 +16,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v41
         with:
-          files: **/*.py
+          files: "**/*.py"
 
       - uses: psf/black@stable
         src: ${{ steps.changed-files.outputs.all_changed_files }}
