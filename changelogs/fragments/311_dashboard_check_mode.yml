@@ -1,0 +1,2 @@
+minor_changes:
+  - grafana_dashboard - add check_mode support
