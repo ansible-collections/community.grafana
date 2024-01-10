@@ -19,4 +19,5 @@ jobs:
           files: "**/*.py"
 
       - uses: psf/black@stable
-        src: ${{ steps.changed-files.outputs.all_changed_files }}
+        with:
+          src: ${{ steps.changed-files.outputs.all_changed_files }}
