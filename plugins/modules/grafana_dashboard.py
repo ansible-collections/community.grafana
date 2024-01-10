@@ -285,7 +285,6 @@ def grafana_dashboard_exists(module, grafana_url, uid, headers):
 
 
 def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
-
     # search by title
     uri = "%s/api/search?%s" % (
         grafana_url,
@@ -339,7 +338,6 @@ def grafana_dashboard_changed(payload, dashboard):
 
 
 def grafana_create_dashboard(module, data):
-
     # define data payload for grafana API
     payload = {}
     if data.get("dashboard_id"):
@@ -482,7 +480,6 @@ def grafana_create_dashboard(module, data):
 
 
 def grafana_delete_dashboard(module, data):
-
     # define http headers
     headers = grafana_headers(module, data)
 
@@ -540,7 +537,6 @@ def grafana_delete_dashboard(module, data):
 
 
 def grafana_export_dashboard(module, data):
-
     # define http headers
     headers = grafana_headers(module, data)
 

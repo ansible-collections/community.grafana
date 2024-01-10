@@ -175,7 +175,6 @@ class GrafanaAPI:
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
-
         grafana_args = terms[0].split(" ")
         grafana_dict = {}
         ret = []

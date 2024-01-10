@@ -285,7 +285,6 @@ argument_spec.update(
 
 
 def main():
-
     module = setup_module_object()
     state = module.params["state"]
     title = module.params["name"]
