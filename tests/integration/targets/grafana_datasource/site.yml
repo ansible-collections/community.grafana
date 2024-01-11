@@ -1,0 +1,6 @@
+---
+- name: Run tests for grafana_datasource
+  hosts: localhost
+  tasks:
+    - ansible.builtin.include_role:
+        name: ../../grafana_datasource

@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: grafana_folder
 author:
@@ -50,14 +50,14 @@ options:
       - This parameter can be useful if you enabled `hide_version` in grafana.ini
     required: False
     type: bool
-    default: False
+    default: false
     version_added: "1.2.0"
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 ---
 - name: Create a folder
   community.grafana.grafana_folder:
@@ -72,9 +72,9 @@ EXAMPLES = '''
       grafana_api_key: "{{ some_api_token_value }}"
       title: "grafana_working_group"
       state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = """
 ---
 folder:
     description: Information about the Folder
@@ -159,7 +159,7 @@ folder:
             type: int
             sample:
               - 1
-'''
+"""
 
 import json
 
@@ -177,15 +177,18 @@ class GrafanaError(Exception):
 
 
 class GrafanaFolderInterface(object):
-
     def __init__(self, module):
         self._module = module
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        if module.params.get('grafana_api_key', None):
-            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
+        if module.params.get("grafana_api_key", None):
+            self.headers["Authorization"] = (
+                "Bearer %s" % module.params["grafana_api_key"]
+            )
         else:
-            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+            self.headers["Authorization"] = basic_auth_header(
+                module.params["url_username"], module.params["url_password"]
+            )
         # }}}
         self.grafana_url = base.clean_url(module.params.get("url"))
         if module.params.get("skip_version_check") is False:
@@ -194,7 +197,9 @@ class GrafanaFolderInterface(object):
             except GrafanaError as e:
                 self._module.fail_json(failed=True, msg=to_text(e))
             if grafana_version["major"] < 5:
-                self._module.fail_json(failed=True, msg="Folders API is available starting Grafana v5")
+                self._module.fail_json(
+                    failed=True, msg="Folders API is available starting Grafana v5"
+                )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -203,27 +208,36 @@ class GrafanaFolderInterface(object):
             headers = []
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+        resp, info = fetch_url(
+            self._module, full_url, data=data, headers=headers, method=method
+        )
         status_code = info["status"]
         if status_code == 404:
             return None
         elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
+            self._module.fail_json(
+                failed=True,
+                msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url),
+            )
         elif status_code == 403:
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 412:
-            error_msg = resp.read()['message']
+            error_msg = resp.read()["message"]
             self._module.fail_json(failed=True, msg=error_msg)
         elif status_code == 200:
             # XXX: Grafana folders endpoint stopped sending back json in response for delete operations
             # see https://github.com/grafana/grafana/issues/77673
             response = resp.read() or "{}"
             return self._module.from_json(response)
-        self._module.fail_json(failed=True, msg="Grafana Folders API answered with HTTP %d" % status_code)
+        self._module.fail_json(
+            failed=True, msg="Grafana Folders API answered with HTTP %d" % status_code
+        )
 
     def get_version(self):
         url = "/api/health"
-        response = self._send_request(url, data=None, headers=self.headers, method="GET")
+        response = self._send_request(
+            url, data=None, headers=self.headers, method="GET"
+        )
         version = response.get("version")
         if version is not None:
             major, minor, rev = version.split(".")
@@ -233,7 +247,9 @@ class GrafanaFolderInterface(object):
     def create_folder(self, title):
         url = "/api/folders"
         folder = dict(title=title)
-        response = self._send_request(url, data=folder, headers=self.headers, method="POST")
+        response = self._send_request(
+            url, data=folder, headers=self.headers, method="POST"
+        )
         return response
 
     def get_folder(self, title):
@@ -262,22 +278,21 @@ def setup_module_object():
 
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
-    name=dict(type='str', aliases=['title'], required=True),
-    state=dict(type='str', default='present', choices=['present', 'absent']),
-    skip_version_check=dict(type='bool', default=False),
+    name=dict(type="str", aliases=["title"], required=True),
+    state=dict(type="str", default="present", choices=["present", "absent"]),
+    skip_version_check=dict(type="bool", default=False),
 )
 
 
 def main():
-
     module = setup_module_object()
-    state = module.params['state']
-    title = module.params['name']
+    state = module.params["state"]
+    title = module.params["name"]
 
     grafana_iface = GrafanaFolderInterface(module)
 
     changed = False
-    if state == 'present':
+    if state == "present":
         folder = grafana_iface.get_folder(title)
         if folder is None:
             grafana_iface.create_folder(title)
@@ -285,7 +300,7 @@ def main():
             changed = True
         folder = grafana_iface.get_folder(title)
         module.exit_json(changed=changed, folder=folder)
-    elif state == 'absent':
+    elif state == "absent":
         folder = grafana_iface.get_folder(title)
         if folder is None:
             module.exit_json(changed=False, message="No folder found")
@@ -293,5 +308,5 @@ def main():
         module.exit_json(changed=True, message=result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,7 +1,20 @@
-- block:
-  - include_tasks: dashboard-from-url.yml
-  - include_tasks: delete-dashboard.yml
-  - include_tasks: dashboard-from-id.yml
-  - include_tasks: dashboard-from-file.yml
-  - include_tasks: dashboard-export.yml
-  - include_tasks: dashboard-folder-destination.yml
+---
+- name: Create dashboard from url
+  ansible.builtin.include_tasks:
+    file: dashboard-from-url.yml
+
+- name: Create dashboard from id
+  ansible.builtin.include_tasks:
+    file: dashboard-from-id.yml
+
+- name: Create dashboard from file and export
+  ansible.builtin.include_tasks:
+    file: dashboard-from-file-export.yml
+
+- name: Create dashboard from file by org_name
+  ansible.builtin.include_tasks:
+    file: dashboard-by-org-name.yml
+
+- name: Create dashboard in non existing folder
+  ansible.builtin.include_tasks:
+    file: dashboard-folder-destination.yml

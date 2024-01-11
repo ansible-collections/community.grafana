@@ -1,0 +1,3 @@
+collections:
+  - name: community.grafana
+    version: 1.5.3

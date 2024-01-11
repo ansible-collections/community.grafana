@@ -3,7 +3,7 @@
 ![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.grafana)](https://codecov.io/gh/ansible-collections/community.grafana)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This repo hosts the `community.grafana` Ansible Collection.
@@ -67,12 +67,9 @@ You can either call modules by their Fully Qualified Collection Namespace (FQCN)
   gather_facts: false
   connection: local
 
-  collections:
-    - community.grafana
-
   tasks:
     - name: Ensure Influxdb datasource exists.
-      grafana_datasource:
+      community.grafana.grafana_datasource:
         name: "datasource-influxdb"
         grafana_url: "https://grafana.company.com"
         grafana_user: "admin"
@@ -93,13 +90,11 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
 
 
 ```yaml
+---
 - hosts: localhost
   gather_facts: false
   connection: local
 
-  collections:
-    - community.grafana
-  
   module_defaults:
     group/community.grafana.grafana:
       grafana_url: "https://grafana.company.com"
@@ -108,7 +103,7 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
 
   tasks:
     - name: Ensure Influxdb datasource exists.
-      grafana_datasource:
+      community.grafana.grafana_datasource:
         name: "datasource-influxdb"
         org_id: "1"
         ds_type: "influxdb"
@@ -118,12 +113,51 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
         tls_ca_cert: "/etc/ssl/certs/ca.pem"
     
     - name: Create or update a Grafana user
-      grafana_user:
+      community.grafana.grafana_user:
         name: "Bruce Wayne"
         email: "batman@gotham.city"
         login: "batman"
         password: "robin"
         is_admin: true
+```
+
+## Complementary Collection: [`telekom-mms.grafana`](https://github.com/telekom-mms/ansible-role-grafana)
+
+The `telekom-mms.grafana` collection is an Ansible Collection that simplifies the use of the `community.grafana` collection. It provides an Ansible Role for easy integration with `community.grafana`. With this collection, you only need to define the variables for your Grafana resources.
+
+### Requirements
+    ansible-galaxy collection install telekom-mms.grafana
+... or use a requirements.yml:  
+`ansible-galaxy collection install -r requirements.yml`
+```yaml
+---
+collections:
+  - name: telekom-mms.grafana
+```
+
+### Example Playbook
+```yaml
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+
+  vars:
+    grafana_url: "https://grafana.company.com"
+    grafana_user: "admin"
+    grafana_password: "xxxxxx"
+
+    grafana_datasources:
+      - name: "Loki"
+        ds_type: "loki"
+        ds_url: "http://127.0.0.1:3100"
+        tls_skip_verify: yes
+    grafana_folders:
+      - name: my_service
+      - name: other_service
+
+  roles:
+    - role: telekom-mms.grafana
 ```
 
 ## Testing and Development
@@ -185,6 +219,7 @@ Any contribution is welcome and we only ask contributors to:
 * Provide *at least* integration tests for any contribution.
 * The Pull Request *MUST* contain a changelog fragment. See [Ansible documentation](https://docs.ansible.com/ansible/latest/community/development_process.html#creating-a-changelog-fragment) about fragments.
 * Create an issue for any significant contribution that would change a large portion of the code base.
+* Use [ruff](https://github.com/astral-sh/ruff) to lint and [black](https://github.com/psf/black) to format your changes on python code.
 
 ## Contributors ✨
 
@@ -219,6 +254,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/prndrbr"><img src="https://avatars.githubusercontent.com/u/96344856?v=4?s=100" width="100px;" alt="Pierre"/><br /><sub><b>Pierre</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/issues?q=author%3Aprndrbr" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/miksonx"><img src="https://avatars.githubusercontent.com/u/5308184?v=4?s=100" width="100px;" alt="MiksonX"/><br /><sub><b>MiksonX</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/issues?q=author%3Amiksonx" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/amenzhinsky"><img src="https://avatars.githubusercontent.com/u/1308953?v=4?s=100" width="100px;" alt="Aliaksandr Mianzhynski"/><br /><sub><b>Aliaksandr Mianzhynski</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/commits?author=amenzhinsky" title="Code">💻</a> <a href="https://github.com/ansible-collections/community.grafana/commits?author=amenzhinsky" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://nemental.de"><img src="https://avatars.githubusercontent.com/u/15136847?v=4?s=100" width="100px;" alt="Moritz"/><br /><sub><b>Moritz</b></sub></a><br /><a href="https://github.com/ansible-collections/community.grafana/issues?q=author%3ANemental" title="Bug reports">🐛</a> <a href="https://github.com/ansible-collections/community.grafana/commits?author=Nemental" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

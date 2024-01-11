@@ -1,6 +1,6 @@
 ---
 - name: Create test user (default org 1)
-  grafana_user:
+  community.grafana.grafana_user:
     url: "{{ grafana_url }}"
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
@@ -19,10 +19,11 @@
     login: orgtest
     state: absent
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
+      - result.failed == false
+      - result.changed == true
+  when: not ansible_check_mode
 
 - name: Check idempotency on user removal from org
   community.grafana.grafana_organization_user:
@@ -32,10 +33,11 @@
     login: orgtest
     state: absent
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == false"
+      - result.failed == false
+      - result.changed == false
+  when: not ansible_check_mode
 
 - name: Add user to organization
   community.grafana.grafana_organization_user:
@@ -46,12 +48,13 @@
     role: viewer
     state: present
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
-      - "result.user.orgId == 1"
-      - "result.user.role == 'Viewer'"
+      - result.failed == false
+      - result.changed == true
+      - result.user.orgId == 1
+      - result.user.role == 'Viewer'
+  when: not ansible_check_mode
 
 - name: Update existing user role
   community.grafana.grafana_organization_user:
@@ -62,12 +65,13 @@
     role: editor
     state: present
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
-      - "result.user.orgId == 1"
-      - "result.user.role == 'Editor'"
+      - result.failed == false
+      - result.changed == true
+      - result.user.orgId == 1
+      - result.user.role == 'Editor'
+  when: not ansible_check_mode
 
 - name: Check idempotency on user update
   community.grafana.grafana_organization_user:
@@ -78,10 +82,11 @@
     role: editor
     state: present
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == false"
+      - result.failed == false
+      - result.changed == false
+  when: not ansible_check_mode
 
 - name: Create a new organization
   community.grafana.grafana_organization:
@@ -102,12 +107,15 @@
     role: admin
     state: present
   register: result
-- assert:
+  when: not ansible_check_mode
+
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
-      - "result.user.orgId == org.org.id"
-      - "result.user.role == 'Admin'"
+      - result.failed == false
+      - result.changed == true
+      - result.user.orgId == org.org.id
+      - result.user.role == 'Admin'
+  when: not ansible_check_mode
 
 - name: Remove user from new organization by org_id
   community.grafana.grafana_organization_user:
@@ -118,10 +126,13 @@
     login: orgtest
     state: absent
   register: result
-- assert:
+  when: not ansible_check_mode
+
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
+      - result.failed == false
+      - result.changed == true
+  when: not ansible_check_mode
 
 - name: Add user to the new organization by org_name
   community.grafana.grafana_organization_user:
@@ -133,12 +144,15 @@
     role: admin
     state: present
   register: result
-- assert:
+  when: not ansible_check_mode
+
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
-      - "result.user.orgId == org.org.id"
-      - "result.user.role == 'Admin'"
+      - result.failed == false
+      - result.changed == true
+      - result.user.orgId == org.org.id
+      - result.user.role == 'Admin'
+  when: not ansible_check_mode
 
 - name: Remove user from new organization by org_name
   community.grafana.grafana_organization_user:
@@ -149,7 +163,10 @@
     login: orgtest
     state: absent
   register: result
-- assert:
+  when: not ansible_check_mode
+
+- ansible.builtin.assert:
     that:
-      - "result.failed == false"
-      - "result.changed == true"
+      - result.failed == false
+      - result.changed == true
+  when: not ansible_check_mode

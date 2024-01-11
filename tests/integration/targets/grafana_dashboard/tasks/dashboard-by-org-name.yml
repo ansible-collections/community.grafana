@@ -1,0 +1,39 @@
+---
+- module_defaults:
+    community.grafana.grafana_dashboard:
+      org_name: Main Org.
+  block:
+    - name: Check import grafana dashboard from file
+      community.grafana.grafana_dashboard:
+        grafana_url: "{{ grafana_url }}"
+        grafana_user: "{{ grafana_username }}"
+        grafana_password: "{{ grafana_password }}"
+        state: present
+        commit_message: Updated by ansible
+        path: /tmp/dashboard.json
+        overwrite: true
+      register: result
+    - ansible.builtin.assert:
+        that:
+          - result.failed == false
+          - result.changed == true
+          - result.msg == 'Dashboard test created'
+
+    - name: Check import grafana dashboard from file idempotency
+      community.grafana.grafana_dashboard:
+        grafana_url: "{{ grafana_url }}"
+        grafana_user: "{{ grafana_username }}"
+        grafana_password: "{{ grafana_password }}"
+        state: present
+        commit_message: Updated by ansible
+        path: /tmp/dashboard.json
+        overwrite: true
+      register: result
+    - ansible.builtin.assert:
+        that:
+          - result.failed == false
+          - result.changed == false
+          - result.msg == 'Dashboard test unchanged.'
+
+    - ansible.builtin.include_tasks:
+        file: delete-dashboard.yml

@@ -1,187 +1,198 @@
 ---
-
 - name: Create a Team
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: present
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    state: present
+    skip_version_check: true
   register: result
 
-- set_fact:
+- ansible.builtin.set_fact:
     # From Grafana 9.0.0, the API user automatically becomes a member of the team
     auto_member: "{{ result.team.memberCount == 1 }}"
 
-- set_fact:
+- ansible.builtin.set_fact:
     expected_members: "{{ auto_member | ternary(['********@localhost'], []) }}"
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.team.name == 'grafana_working_group'"
-      - "result.team.email == 'foo.bar@example.com'"
-      - "result.team.memberCount == (expected_members|length)"
-      - "result.team.members == expected_members"
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Check idempotency on team creation
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: present
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    state: present
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == false"
-      - "result.team.name == 'grafana_working_group'"
-      - "result.team.email == 'foo.bar@example.com'"
-      - "result.team.memberCount == (expected_members|length)"
-      - "result.team.members == expected_members"
+      - result.changed == false
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Check a team can be deleted
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: absent
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    state: absent
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.message == 'Team deleted'"
+      - result.changed == true
+      - result.message == 'Team deleted'
+  when: not ansible_check_mode
 
 - name: Check idempotency on team deletion
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: absent
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    state: absent
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == false"
-      - "result.message == 'No team found'"
+      - result.changed == false
+      - result.message == 'No team found'
+  when: not ansible_check_mode
 
 - name: Create users for tests purpose
-  import_tasks: create_user.yml
+  ansible.builtin.import_tasks:
+    file: create_user.yml
 
 - name: Create a Team with members
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members:
-          - "john+doe@example.com"
-          - "jane.doe@example.com"
-      state: present
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    members:
+      - john+doe@example.com
+      - jane.doe@example.com
+    state: present
   register: result
 
-- set_fact:
-    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com']) }}"
+- ansible.builtin.set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com'])
+      }}"
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.team.name == 'grafana_working_group'"
-      - "result.team.email == 'foo.bar@example.com'"
-      - "result.team.memberCount == (expected_members|length)"
-      - "result.team.members == expected_members"
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Ensure a Team exists with member not enforced
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members:
-          - "john+doe@example.com"
-      state: present
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    members:
+      - john+doe@example.com
+    state: present
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == false"
-      - "result.team.name == 'grafana_working_group'"
-      - "result.team.email == 'foo.bar@example.com'"
-      - "result.team.memberCount == (expected_members|length)"
-      - "result.team.members == expected_members"
+      - result.changed == false
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
 
-- set_fact:
+- ansible.builtin.set_fact:
     enforced_members: "{{ auto_member | ternary(['admin@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
     expected_members: "{{ auto_member | ternary(['********@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
 
 - name: Ensure a Team exists with member enforced
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members: "{{ enforced_members }}"
-      enforce_members: true
-      state: present
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    members: "{{ enforced_members }}"
+    enforce_members: true
+    state: present
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.team.name == 'grafana_working_group'"
-      - "result.team.email == 'foo.bar@example.com'"
-      - "result.team.memberCount == (expected_members|length)"
-      - "result.team.members == expected_members"
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
 
 - name: Ensure a Team exists with members omitted
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: present
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    state: present
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == false"
-      - "result.team.name == 'grafana_working_group'"
-      - "result.team.email == 'foo.bar@example.com'"
-      - "result.team.memberCount == (expected_members|length)"
-      - "result.team.members == expected_members"
+      - result.changed == false
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
 
 - name: Add new member to existing Team
-  grafana_team:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members:
-          - "john+doe@example.com"
-          - "jane.doe@example.com"
-      state: present
+  community.grafana.grafana_team:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    name: grafana working group
+    email: foo.bar@example.com
+    members:
+      - john+doe@example.com
+      - jane.doe@example.com
+    state: present
   register: result
 
-- set_fact:
-    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com']) }}"
+- ansible.builtin.set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com'])
+      }}"
 
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.team.name == 'grafana_working_group'"
-      - "result.team.email == 'foo.bar@example.com'"
-      - "result.team.memberCount == (expected_members|length)"
-      - "result.team.members == expected_members"
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode

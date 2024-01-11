@@ -1,16 +1,24 @@
 ---
-
 - block:
-  - include_tasks: errors.yml
-  - include_tasks: elastic.yml
-  - include_tasks: influx.yml
-  - include_tasks: postgres.yml
-  - include_tasks: cloudwatch.yml
-  - include_tasks: thruk.yml
-  - include_tasks: loki.yml
-  - include_tasks: zabbix.yml
-  - include_tasks: redis.yml
-  - include_tasks: azure.yml
-  - include_tasks: uid.yml
-
-...
+    - ansible.builtin.include_tasks:
+        file: errors.yml
+    - ansible.builtin.include_tasks:
+        file: elastic.yml
+    - ansible.builtin.include_tasks:
+        file: influx.yml
+    - ansible.builtin.include_tasks:
+        file: postgres.yml
+    - ansible.builtin.include_tasks:
+        file: cloudwatch.yml
+    - ansible.builtin.include_tasks:
+        file: thruk.yml
+    - ansible.builtin.include_tasks:
+        file: loki.yml
+    - ansible.builtin.include_tasks:
+        file: zabbix.yml
+    - ansible.builtin.include_tasks:
+        file: redis.yml
+    - ansible.builtin.include_tasks:
+        file: azure.yml
+    - ansible.builtin.include_tasks:
+        file: uid.yml
