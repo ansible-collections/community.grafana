@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
     name: grafana_annotations
     type: notification
     short_description: send ansible events as annotations on charts to grafana over http api.
@@ -104,7 +105,7 @@ DOCUMENTATION = '''
         default: []
         type: list
         elements: integer
-'''
+"""
 
 import json
 import socket
@@ -148,7 +149,7 @@ Result:
 
 
 def to_millis(dt):
-    return int(dt.strftime('%s')) * 1000
+    return int(dt.strftime("%s")) * 1000
 
 
 class CallbackModule(CallbackBase):
@@ -161,15 +162,14 @@ class CallbackModule(CallbackBase):
     """
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'community.grafana.grafana_annotations'
+    CALLBACK_TYPE = "aggregate"
+    CALLBACK_NAME = "community.grafana.grafana_annotations"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
-
         super(CallbackModule, self).__init__(display=display)
 
-        self.headers = {'Content-Type': 'application/json'}
+        self.headers = {"Content-Type": "application/json"}
         self.force_basic_auth = False
         self.hostname = socket.gethostname()
         self.username = getpass.getuser()
@@ -177,38 +177,42 @@ class CallbackModule(CallbackBase):
         self.errors = 0
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
+        super(CallbackModule, self).set_options(
+            task_keys=task_keys, var_options=var_options, direct=direct
+        )
 
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
-
-        self.grafana_api_key = self.get_option('grafana_api_key')
-        self.grafana_url = self.get_option('grafana_url')
-        self.validate_grafana_certs = self.get_option('validate_certs')
-        self.http_agent = self.get_option('http_agent')
-        self.grafana_user = self.get_option('grafana_user')
-        self.grafana_password = self.get_option('grafana_password')
-        self.dashboard_id = self.get_option('grafana_dashboard_id')
-        self.panel_ids = self.get_option('grafana_panel_ids')
+        self.grafana_api_key = self.get_option("grafana_api_key")
+        self.grafana_url = self.get_option("grafana_url")
+        self.validate_grafana_certs = self.get_option("validate_certs")
+        self.http_agent = self.get_option("http_agent")
+        self.grafana_user = self.get_option("grafana_user")
+        self.grafana_password = self.get_option("grafana_password")
+        self.dashboard_id = self.get_option("grafana_dashboard_id")
+        self.panel_ids = self.get_option("grafana_panel_ids")
 
         if self.grafana_api_key:
-            self.headers['Authorization'] = "Bearer %s" % self.grafana_api_key
+            self.headers["Authorization"] = "Bearer %s" % self.grafana_api_key
         else:
             self.force_basic_auth = True
 
         if self.grafana_url is None:
             self.disabled = True
-            self._display.warning('Grafana URL was not provided. The '
-                                  'Grafana URL can be provided using '
-                                  'the `GRAFANA_URL` environment variable.')
-        self._display.debug('Grafana URL: %s' % self.grafana_url)
+            self._display.warning(
+                "Grafana URL was not provided. The "
+                "Grafana URL can be provided using "
+                "the `GRAFANA_URL` environment variable."
+            )
+        self._display.debug("Grafana URL: %s" % self.grafana_url)
 
     def v2_playbook_on_start(self, playbook):
         self.playbook = playbook._file_name
-        text = PLAYBOOK_START_TXT.format(playbook=self.playbook, hostname=self.hostname,
-                                         username=self.username)
+        text = PLAYBOOK_START_TXT.format(
+            playbook=self.playbook, hostname=self.hostname, username=self.username
+        )
         data = {
-            'time': to_millis(self.start_time),
-            'text': text,
-            'tags': ['ansible', 'ansible_event_start', self.playbook, self.hostname]
+            "time": to_millis(self.start_time),
+            "text": text,
+            "tags": ["ansible", "ansible_event_start", self.playbook, self.hostname],
         }
         self._send_annotation(data)
 
@@ -223,30 +227,39 @@ class CallbackModule(CallbackBase):
         if self.errors == 0:
             status = "OK"
 
-        text = PLAYBOOK_STATS_TXT.format(playbook=self.playbook, hostname=self.hostname,
-                                         duration=duration.total_seconds(),
-                                         status=status, username=self.username,
-                                         summary=json.dumps(summarize_stat))
+        text = PLAYBOOK_STATS_TXT.format(
+            playbook=self.playbook,
+            hostname=self.hostname,
+            duration=duration.total_seconds(),
+            status=status,
+            username=self.username,
+            summary=json.dumps(summarize_stat),
+        )
 
         data = {
-            'time': to_millis(self.start_time),
-            'timeEnd': to_millis(end_time),
-            'isRegion': True,
-            'text': text,
-            'tags': ['ansible', 'ansible_report', self.playbook, self.hostname]
+            "time": to_millis(self.start_time),
+            "timeEnd": to_millis(end_time),
+            "isRegion": True,
+            "text": text,
+            "tags": ["ansible", "ansible_report", self.playbook, self.hostname],
         }
         self._send_annotations(data)
 
     def v2_runner_on_failed(self, result, ignore_errors=False, **kwargs):
-        text = PLAYBOOK_ERROR_TXT.format(playbook=self.playbook, hostname=self.hostname,
-                                         username=self.username, task=result._task,
-                                         host=result._host.name, result=self._dump_results(result._result))
+        text = PLAYBOOK_ERROR_TXT.format(
+            playbook=self.playbook,
+            hostname=self.hostname,
+            username=self.username,
+            task=result._task,
+            host=result._host.name,
+            result=self._dump_results(result._result),
+        )
         if ignore_errors:
             return
         data = {
-            'time': to_millis(datetime.now()),
-            'text': text,
-            'tags': ['ansible', 'ansible_event_failure', self.playbook, self.hostname]
+            "time": to_millis(datetime.now()),
+            "text": text,
+            "tags": ["ansible", "ansible_event_failure", self.playbook, self.hostname],
         }
         self.errors += 1
         self._send_annotations(data)
@@ -263,10 +276,16 @@ class CallbackModule(CallbackBase):
 
     def _send_annotation(self, annotation):
         try:
-            open_url(self.grafana_url, data=json.dumps(annotation), headers=self.headers,
-                     method="POST",
-                     validate_certs=self.validate_grafana_certs,
-                     url_username=self.grafana_user, url_password=self.grafana_password,
-                     http_agent=self.http_agent, force_basic_auth=self.force_basic_auth)
+            open_url(
+                self.grafana_url,
+                data=json.dumps(annotation),
+                headers=self.headers,
+                method="POST",
+                validate_certs=self.validate_grafana_certs,
+                url_username=self.grafana_user,
+                url_password=self.grafana_password,
+                http_agent=self.http_agent,
+                force_basic_auth=self.force_basic_auth,
+            )
         except Exception as e:
-            self._display.error(u'Could not submit message to Grafana: %s' % to_text(e))
+            self._display.error("Could not submit message to Grafana: %s" % to_text(e))

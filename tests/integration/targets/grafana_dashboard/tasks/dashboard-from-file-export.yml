@@ -1,12 +1,11 @@
 ---
-- name: copy dashboard file
-  copy:
-    src: "files/dashboard.json"
-    dest: "/tmp/dashboard.json"
-
+- name: Copy dashboard file
+  ansible.builtin.copy:
+    src: files/dashboard.json
+    dest: /tmp/dashboard.json
 
 - name: Check import grafana dashboard from file
-  grafana_dashboard:
+  community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -15,17 +14,14 @@
     path: /tmp/dashboard.json
     overwrite: true
   register: result
-
-- debug:
-    var: result
-
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == true"
-      - "result.msg == 'Dashboard test created'"
+      - result.failed == false
+      - result.changed == true
+      - result.msg == 'Dashboard test created'
 
 - name: Check import grafana dashboard from file idempotency
-  grafana_dashboard:
+  community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
@@ -34,11 +30,14 @@
     path: /tmp/dashboard.json
     overwrite: true
   register: result
-
-- debug:
-    var: result
-
-- assert:
+- ansible.builtin.assert:
     that:
-      - "result.changed == false"
-      - "result.msg == 'Dashboard test unchanged.'"
+      - result.failed == false
+      - result.changed == false
+      - result.msg == 'Dashboard test unchanged.'
+
+- ansible.builtin.include_tasks:
+    file: dashboard-export.yml
+
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml

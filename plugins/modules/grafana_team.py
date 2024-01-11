@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: grafana_team
 author:
@@ -72,9 +72,9 @@ options:
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 ---
 - name: Create a team
   community.grafana.grafana_team:
@@ -114,9 +114,9 @@ EXAMPLES = '''
       name: "grafana_working_group"
       email: "foo.bar@example.com"
       state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = """
 ---
 team:
     description: Information about the Team
@@ -165,7 +165,7 @@ team:
             type: int
             sample:
                 - 1
-'''
+"""
 
 import json
 
@@ -183,15 +183,18 @@ class GrafanaError(Exception):
 
 
 class GrafanaTeamInterface(object):
-
     def __init__(self, module):
         self._module = module
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        if module.params.get('grafana_api_key', None):
-            self.headers["Authorization"] = "Bearer %s" % module.params['grafana_api_key']
+        if module.params.get("grafana_api_key", None):
+            self.headers["Authorization"] = (
+                "Bearer %s" % module.params["grafana_api_key"]
+            )
         else:
-            self.headers["Authorization"] = basic_auth_header(module.params['url_username'], module.params['url_password'])
+            self.headers["Authorization"] = basic_auth_header(
+                module.params["url_username"], module.params["url_password"]
+            )
         # }}}
         self.grafana_url = base.clean_url(module.params.get("url"))
         if module.params.get("skip_version_check") is False:
@@ -200,7 +203,9 @@ class GrafanaTeamInterface(object):
             except GrafanaError as e:
                 self._module.fail_json(failed=True, msg=to_text(e))
             if grafana_version["major"] < 5:
-                self._module.fail_json(failed=True, msg="Teams API is available starting Grafana v5")
+                self._module.fail_json(
+                    failed=True, msg="Teams API is available starting Grafana v5"
+                )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -209,23 +214,32 @@ class GrafanaTeamInterface(object):
             headers = []
 
         full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(self._module, full_url, data=data, headers=headers, method=method)
+        resp, info = fetch_url(
+            self._module, full_url, data=data, headers=headers, method=method
+        )
         status_code = info["status"]
         if status_code == 404:
             return None
         elif status_code == 401:
-            self._module.fail_json(failed=True, msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url))
+            self._module.fail_json(
+                failed=True,
+                msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url),
+            )
         elif status_code == 403:
             self._module.fail_json(failed=True, msg="Permission Denied")
         elif status_code == 409:
             self._module.fail_json(failed=True, msg="Team name is taken")
         elif status_code == 200:
             return self._module.from_json(resp.read())
-        self._module.fail_json(failed=True, msg="Grafana Teams API answered with HTTP %d" % status_code)
+        self._module.fail_json(
+            failed=True, msg="Grafana Teams API answered with HTTP %d" % status_code
+        )
 
     def get_version(self):
         url = "/api/health"
-        response = self._send_request(url, data=None, headers=self.headers, method="GET")
+        response = self._send_request(
+            url, data=None, headers=self.headers, method="GET"
+        )
         version = response.get("version")
         if version is not None:
             major, minor, rev = version.split(".")
@@ -235,7 +249,9 @@ class GrafanaTeamInterface(object):
     def create_team(self, name, email):
         url = "/api/teams"
         team = dict(email=email, name=name)
-        response = self._send_request(url, data=team, headers=self.headers, method="POST")
+        response = self._send_request(
+            url, data=team, headers=self.headers, method="POST"
+        )
         return response
 
     def get_team(self, name):
@@ -251,7 +267,9 @@ class GrafanaTeamInterface(object):
     def update_team(self, team_id, name, email):
         url = "/api/teams/{team_id}".format(team_id=team_id)
         team = dict(email=email, name=name)
-        response = self._send_request(url, data=team, headers=self.headers, method="PUT")
+        response = self._send_request(
+            url, data=team, headers=self.headers, method="PUT"
+        )
         return response
 
     def delete_team(self, team_id):
@@ -272,7 +290,9 @@ class GrafanaTeamInterface(object):
 
     def delete_team_member(self, team_id, email):
         user_id = self.get_user_id_from_mail(email)
-        url = "/api/teams/{team_id}/members/{user_id}".format(team_id=team_id, user_id=user_id)
+        url = "/api/teams/{team_id}/members/{user_id}".format(
+            team_id=team_id, user_id=user_id
+        )
         self._send_request(url, headers=self.headers, method="DELETE")
 
     def get_user_id_from_mail(self, email):
@@ -295,27 +315,26 @@ def setup_module_object():
 
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
-    name=dict(type='str', required=True),
-    email=dict(type='str', required=True),
-    members=dict(type='list', elements='str', required=False),
-    enforce_members=dict(type='bool', default=False),
-    skip_version_check=dict(type='bool', default=False),
+    name=dict(type="str", required=True),
+    email=dict(type="str", required=True),
+    members=dict(type="list", elements="str", required=False),
+    enforce_members=dict(type="bool", default=False),
+    skip_version_check=dict(type="bool", default=False),
 )
 
 
 def main():
-
     module = setup_module_object()
-    state = module.params['state']
-    name = module.params['name']
-    email = module.params['email']
-    members = module.params['members']
-    enforce_members = module.params['enforce_members']
+    state = module.params["state"]
+    name = module.params["name"]
+    email = module.params["email"]
+    members = module.params["members"]
+    enforce_members = module.params["enforce_members"]
 
     grafana_iface = GrafanaTeamInterface(module)
 
     changed = False
-    if state == 'present':
+    if state == "present":
         team = grafana_iface.get_team(name)
         if team is None:
             grafana_iface.create_team(name, email)
@@ -332,9 +351,9 @@ def main():
                     grafana_iface.delete_team_member(team.get("id"), member)
                     changed = True
             team = grafana_iface.get_team(name)
-        team['members'] = grafana_iface.get_team_members(team.get("id"))
+        team["members"] = grafana_iface.get_team_members(team.get("id"))
         module.exit_json(failed=False, changed=changed, team=team)
-    elif state == 'absent':
+    elif state == "absent":
         team = grafana_iface.get_team(name)
         if team is None:
             module.exit_json(failed=False, changed=False, message="No team found")
@@ -353,5 +372,5 @@ def diff_members(target, current):
     return diff
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
