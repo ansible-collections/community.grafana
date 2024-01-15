@@ -736,7 +736,7 @@ class GrafanaInterface(object):
 
     def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
-        response = self._send_request(url, headers=self.headers, method="POST")
+        self._send_request(url, headers=self.headers, method="POST")
 
     def organization_by_name(self, org_name):
         url = "/api/user/orgs"
@@ -750,8 +750,6 @@ class GrafanaInterface(object):
         )
 
     def datasource_by_name(self, name):
-        datasource_exists = False
-        ds = {}
         url = "/api/datasources/name/%s" % quote(name, safe="")
         return self._send_request(url, headers=self.headers, method="GET")
 

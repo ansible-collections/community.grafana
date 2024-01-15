@@ -149,7 +149,6 @@ class GrafanaTeamsTest(TestCase):
         with self.assertRaises(AnsibleFailJson) as result:
             grafana_team.main()
             err, arg_list = result.exception.args[0]["msg"].split(":")
-            missing_args = [item.strip() for item in arg_list.split(",")]
             self.assertEqual(err, "missing required arguments")
             self.assertEqual(arg_list, ["name", "email", "url"])
 
@@ -219,7 +218,6 @@ class GrafanaTeamsTest(TestCase):
             }
         )
 
-        module = grafana_team.setup_module_object()
         mock_get_version.return_value = get_low_version_resp()
 
         with self.assertRaises(AnsibleFailJson) as result:
@@ -245,7 +243,6 @@ class GrafanaTeamsTest(TestCase):
                 "url": "http://grafana.example.com",
             }
         )
-        module = grafana_team.setup_module_object()
         mock_fetch_url.return_value = unauthorized_resp()
         mock_get_version.return_value = get_version_resp()
 
@@ -271,7 +268,6 @@ class GrafanaTeamsTest(TestCase):
                 "url": "http://grafana.example.com",
             }
         )
-        module = grafana_team.setup_module_object()
         mock_fetch_url.return_value = permission_denied_resp()
         mock_get_version.return_value = get_version_resp()
 
