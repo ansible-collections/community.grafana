@@ -221,7 +221,7 @@ def get_grafana_version(module, grafana_url, headers):
         try:
             settings = json.loads(to_text(r.read()))
             grafana_version = settings["buildInfo"]["version"].split(".")[0]
-        except UnicodeError as e:
+        except UnicodeError:
             raise GrafanaAPIException("Unable to decode version string to Unicode")
         except Exception as e:
             raise GrafanaAPIException(e)
