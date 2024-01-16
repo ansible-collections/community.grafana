@@ -38,6 +38,7 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | [**grafana_datasources**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html) |
 | tls_skip_verify | no |
 | org_id | no |
+| org_name | no |
 | name | yes |
 | ds_type | no |
 | access | no |
