@@ -18,6 +18,7 @@
       community.grafana.grafana_datasource:
         tls_skip_verify: "{{ datasource.tls_skip_verify | default(omit) }}"
         org_id: "{{ datasource.org_id | default(omit) }}"
+        org_name: "{{ datasource.org_name | default(omit) }}"
         name: "{{ datasource.name }}"
         ds_type: "{{ datasource.ds_type | default(omit) }}"
         access: "{{ datasource.access | default(omit) }}"
