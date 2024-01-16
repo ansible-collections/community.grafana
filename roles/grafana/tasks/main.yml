@@ -80,6 +80,7 @@
     - name: Manage dashboard
       community.grafana.grafana_dashboard:
         org_id: "{{ dashboard.org_id | default(omit) }}"
+        org_name: "{{ dashboard.org_name | default(omit) }}"
         folder: "{{ dashboard.folder | default(omit) }}"
         state: "{{ dashboard.state | default(omit) }}"
         slug: "{{ dashboard.slug | default(omit) }}"

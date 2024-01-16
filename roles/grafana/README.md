@@ -55,6 +55,7 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | skip_version_check | no |
 | [**grafana_dashboards**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html) |
 | org_id | no |
+| org_name | no |
 | folder | no |
 | state | no |
 | slug | no |
