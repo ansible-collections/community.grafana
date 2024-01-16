@@ -1,15 +1,6 @@
-# Ansible Grafana
-
-![telekom-mms/ansible-role-grafana](https://github.com/telekom-mms/ansible-role-grafana/workflows/test/badge.svg)
-[![Ansible Role](https://img.shields.io/ansible/role/d/32178)](https://galaxy.ansible.com/ui/standalone/roles/telekom-mms/grafana/)
+# Grafana Role for Ansible Collection Community.Grafana
 
 Configure Grafana organizations, dashboards, folders, datasources, teams and users.
-
-## Dependencies
-
-### Collections
-
-- community.grafana
 
 ## Role Variables
 
@@ -94,5 +85,5 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
       - name: other_service
 
   roles:
-    - role: telekom-mms.grafana
+    - role: community.grafana.grafana
 ```
