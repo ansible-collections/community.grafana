@@ -34,6 +34,12 @@
         password: supersecure!123
         email: testuser@example.de
 
+    grafana_organization_users:
+      - login: testuser
+        org_id: 1
+      - login: testuser
+        org_name: my_org
+
     grafana_dashboards:
       - folder: my_service
         path: test_dashboard.json
