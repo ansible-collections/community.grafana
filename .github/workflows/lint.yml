@@ -27,3 +27,10 @@ jobs:
         uses: chartboost/ruff-action@v1
         with:
           src: ${{ steps.changed-files.outputs.all_changed_files }}
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
