@@ -18,25 +18,24 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | grafana_url      | yes      |
 | grafana_username | yes      |
 | grafana_password | yes      |
-
-| [**grafana_users**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)
+| [**grafana_users**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html) |
 | name | yes |
 | email | no |
 | login | yes |
 | password | no |
 | is_admin | no |
 | state | no |
-| [**grafana_organizations**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_module.html)
+| [**grafana_organizations**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_module.html) |
 | name | yes |
 | state | no |
-| [**grafana_teams**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
+| [**grafana_teams**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html) |
 | name | yes |
 | email | no |
 | members | no |
 | state | no |
 | enforce_members | no |
 | skip_version_check | no |
-| [**grafana_datasources**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html)
+| [**grafana_datasources**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html) |
 | tls_skip_verify | no |
 | org_id | no |
 | name | yes |
@@ -50,11 +49,11 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | password | no |
 | additional_json_data | no |
 | additional_secure_json_data | no |
-| [**grafana_folders**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html)
+| [**grafana_folders**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html) |
 | name | yes |
 | state | no |
 | skip_version_check | no |
-| [**grafana_dashboards**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html)
+| [**grafana_dashboards**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html) |
 | org_id | no |
 | folder | no |
 | state | no |
@@ -65,6 +64,11 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | dashboard_id | no |
 | dashboard_revision | no |
 | commit_message | no |
+| [**grafana_organization_users**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_user_module.html) |
+| login | yes |
+| role | no |
+| state | no |
+| org_id / org_name | no |
 
 ## Example Playbook
 
