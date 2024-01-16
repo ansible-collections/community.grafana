@@ -6,7 +6,7 @@
       url_username: "{{ grafana_username }}"
       url_password: "{{ grafana_password }}"
   block:
-    - name: Manage organization
+    - name: Manage organization  # noqa: args[module]
       community.grafana.grafana_organization:
         name: "{{ organization.name }}"
         state: "{{ organization.state | default(omit) }}"
@@ -34,7 +34,7 @@
       loop_control: {loop_var: datasource}
       tags: datasource
 
-    - name: Manage folder
+    - name: Manage folder  # noqa: args[module]
       community.grafana.grafana_folder:
         name: "{{ folder.name }}"
         state: "{{ folder.state | default(omit) }}"
@@ -43,7 +43,7 @@
       loop_control: {loop_var: folder}
       tags: folder
 
-    - name: Manage team
+    - name: Manage team  # noqa: args[module]
       community.grafana.grafana_team:
         name: "{{ team.name }}"
         email: "{{ team.email }}"
@@ -55,7 +55,7 @@
       loop_control: {loop_var: team}
       tags: team
 
-    - name: Manage user
+    - name: Manage user  # noqa: args[module]
       community.grafana.grafana_user:
         name: "{{ user.name }}"
         email: "{{ user.email | default(omit) }}"
