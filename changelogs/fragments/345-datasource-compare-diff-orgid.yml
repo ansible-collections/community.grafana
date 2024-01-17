@@ -1,0 +1,3 @@
+---
+bugfix:
+  - `grafana_datasource` get orgId by name if defined to compare diff
