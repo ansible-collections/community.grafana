@@ -559,9 +559,9 @@ def compare_datasources(new, current, compareSecureData=True):
     return dict(before=current, after=new)
 
 
-def get_datasource_payload(data, org_id):
+def get_datasource_payload(data):
     payload = {
-        "orgId": org_id,
+        "orgId": data["org_id"],
         "name": data["name"],
         "uid": data["uid"],
         "type": data["ds_type"],
@@ -921,14 +921,15 @@ def main():
 
     grafana_iface = GrafanaInterface(module)
     ds = grafana_iface.datasource_by_name(name)
-    org_id = (
-        grafana_iface.organization_by_name(module.params["org_name"])
-        if module.params["org_name"]
-        else module.params["org_id"]
-    )
 
     if state == "present":
-        payload = get_datasource_payload(module.params, org_id)
+        params = module.params
+        params["org_id"] = (
+            grafana_iface.organization_by_name(params["org_name"])
+            if params["org_name"]
+            else params["org_id"]
+        )
+        payload = get_datasource_payload(params)
         if ds is None:
             grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)
