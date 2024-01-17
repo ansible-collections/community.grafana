@@ -5,6 +5,24 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.7.0
+======
+
+Minor Changes
+-------------
+
+- Add Quickwit search engine datasource (https://quickwit.io).
+- Add parameter `org_name` to `grafana_dashboard`
+- Add parameter `org_name` to `grafana_datasource`
+- Add parameter `org_name` to `grafana_organization_user`
+- Add support for Grafana Tempo datasource type (https://grafana.com/docs/grafana/latest/datasources/tempo/)
+- default to true/false in docs and code
+
+Bugfixes
+--------
+
+- Add `grafana_organiazion_user` to `action_groups.grafana`
+
 v1.6.1
 ======
 
