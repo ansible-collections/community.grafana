@@ -234,3 +234,29 @@ releases:
     - 300_datasource_prometheus_time_interval.yml
     - fix-316.yml
     release_date: '2023-11-05'
+  1.7.0:
+    changes:
+      bugfixes:
+      - Add `grafana_organiazion_user` to `action_groups.grafana`
+      minor_changes:
+      - Add Quickwit search engine datasource (https://quickwit.io).
+      - Add parameter `org_name` to `grafana_dashboard`
+      - Add parameter `org_name` to `grafana_datasource`
+      - Add parameter `org_name` to `grafana_organization_user`
+      - Add support for Grafana Tempo datasource type (https://grafana.com/docs/grafana/latest/datasources/tempo/)
+      - default to true/false in docs and code
+    fragments:
+    - 238_checkmode.yml
+    - 308_datasource_quickwit.yml
+    - 318-org_users_by_org_name.yml
+    - 321-action-groups-org-users.yml
+    - 324_formatting.yml
+    - 325_linting.yml
+    - 325_true_false.yml
+    - 331-dashboard-by-org-name.yml
+    - 332-datasource-by-org-name.yml
+    - 335-add-datasource-type-tempo.yml
+    - 339-lint-black.yml
+    - 341-lint-ruff.yml
+    - 342-ruff-findings.yml
+    release_date: '2024-01-17'
