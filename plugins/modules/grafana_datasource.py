@@ -688,6 +688,7 @@ class GrafanaInterface(object):
     def __init__(self, module):
         self._module = module
         self.grafana_url = base.clean_url(module.params.get("url"))
+        self.org_id = None
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
         if module.params.get("grafana_api_key", None):
@@ -698,12 +699,12 @@ class GrafanaInterface(object):
             self.headers["Authorization"] = basic_auth_header(
                 module.params["url_username"], module.params["url_password"]
             )
-            org_id = (
+            self.org_id = (
                 self.organization_by_name(module.params["org_name"])
                 if module.params["org_name"]
                 else module.params["org_id"]
             )
-            self.switch_organization(org_id)
+            self.switch_organization(self.org_id)
         # }}}
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
@@ -923,12 +924,7 @@ def main():
     ds = grafana_iface.datasource_by_name(name)
 
     if state == "present":
-        org_id = (
-            grafana_iface.organization_by_name(module.params["org_name"])
-            if module.params["org_name"]
-            else module.params["org_id"]
-        )
-        payload = get_datasource_payload(module.params, org_id)
+        payload = get_datasource_payload(module.params, grafana_iface.org_id)
         if ds is None:
             grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)
