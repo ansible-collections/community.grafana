@@ -238,6 +238,8 @@ releases:
     changes:
       bugfixes:
       - Add `grafana_organiazion_user` to `action_groups.grafana`
+      - Fixed orgId handling in diff comparison for `grafana_datasource` if using
+        org_name
       minor_changes:
       - Add Quickwit search engine datasource (https://quickwit.io).
       - Add parameter `org_name` to `grafana_dashboard`
@@ -259,4 +261,5 @@ releases:
     - 339-lint-black.yml
     - 341-lint-ruff.yml
     - 342-ruff-findings.yml
+    - 345-datasource-compare-diff-orgid.yml
     release_date: '2024-01-17'

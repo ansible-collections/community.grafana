@@ -22,6 +22,7 @@ Bugfixes
 --------
 
 - Add `grafana_organiazion_user` to `action_groups.grafana`
+- Fixed orgId handling in diff comparison for `grafana_datasource` if using org_name
 
 v1.6.1
 ======
