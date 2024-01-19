@@ -85,7 +85,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --no-cache-dir --upgrade pip
-          pip install "ansible-core==${{ matrix.ansible_version }}" molecule molecule-docker
+          pip install "git+https://github.com/ansible/ansible@${{ matrix.ansible_version }}" molecule molecule-docker
 
       - name: Test with molecule
         run: |
