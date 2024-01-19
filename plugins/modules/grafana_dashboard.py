@@ -90,42 +90,39 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- hosts: localhost
-  connection: local
-  tasks:
-    - name: Import Grafana dashboard foo
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        state: present
-        commit_message: Updated by ansible
-        overwrite: true
-        path: /path/to/dashboards/foo.json
+- name: Import Grafana dashboard foo
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    state: present
+    commit_message: Updated by ansible
+    overwrite: true
+    path: /path/to/dashboards/foo.json
 
-    - name: Import Grafana dashboard Zabbix
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        folder: zabbix
-        dashboard_id: 6098
-        dashboard_revision: 1
+- name: Import Grafana dashboard Zabbix
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    folder: zabbix
+    dashboard_id: 6098
+    dashboard_revision: 1
 
-    - name: Import Grafana dashboard zabbix
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        folder: public
-        dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+- name: Import Grafana dashboard zabbix
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    folder: public
+    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
 
-    - name: Export dashboard
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_user: "admin"
-        grafana_password: "{{ grafana_password }}"
-        org_id: 1
-        state: export
-        uid: "000000653"
-        path: "/path/to/dashboards/000000653.json"
+- name: Export dashboard
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_user: "admin"
+    grafana_password: "{{ grafana_password }}"
+    org_id: 1
+    state: export
+    uid: "000000653"
+    path: "/path/to/dashboards/000000653.json"
 """
 
 RETURN = """
