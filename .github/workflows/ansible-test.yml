@@ -73,12 +73,13 @@ jobs:
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
+        ports: ["3000:3000"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
 
