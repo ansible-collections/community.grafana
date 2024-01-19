@@ -10,58 +10,89 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | grafana_username | yes      |
 | grafana_password | yes      |
 | [**grafana_users**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html) |
-| name | yes |
 | email | no |
-| login | yes |
-| password | no |
 | is_admin | no |
+| login | yes |
+| name | yes |
+| password | no |
 | state | no |
 | [**grafana_organizations**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_module.html) |
 | name | yes |
 | state | no |
 | [**grafana_teams**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html) |
-| name | yes |
-| email | no |
-| members | no |
-| state | no |
+| email | yes |
 | enforce_members | no |
-| skip_version_check | no |
-| [**grafana_datasources**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html) |
-| tls_skip_verify | no |
-| org_id | no |
-| org_name | no |
+| members | no |
 | name | yes |
-| ds_type | no |
+| skip_version_check | no |
+| state | no |
+| [**grafana_datasources**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html) |
 | access | no |
-| ds_url | no |
-| database | no |
-| with_credentials | no |
-| is_default | no |
-| user | no |
-| password | no |
 | additional_json_data | no |
 | additional_secure_json_data | no |
-| [**grafana_folders**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html) |
+| aws_access_key | no |
+| aws_assume_role_arn | no |
+| aws_auth_type | no |
+| aws_credentials_profile | no |
+| aws_custom_metrics_namespaces | no |
+| aws_default_region | no |
+| aws_secret_key | no |
+| azure_client | no |
+| azure_cloud | no |
+| azure_secret | no |
+| azure_tenant | no |
+| basic_auth_password | no |
+| basic_auth_user | no |
+| database | no |
+| ds_type | no |
+| ds_url | no |
+| enforce_secure_data | no |
+| es_version | no |
+| interval | no |
+| is_default | no |
+| max_concurrent_shard_requests | no |
 | name | yes |
-| state | no |
-| skip_version_check | no |
-| [**grafana_dashboards**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html) |
 | org_id | no |
 | org_name | no |
-| folder | no |
+| password | no |
+| sslmode | no |
 | state | no |
-| slug | no |
+| time_field | no |
+| time_interval | no |
+| tls_ca_cert | no |
+| tls_client_cert | no |
+| tls_client_key | no |
+| tls_skip_verify | no |
+| trends | no |
+| tsdb_resolution | no |
+| tsdb_version | no |
 | uid | no |
-| path | no |
-| overwrite | no |
+| user | no |
+| with_credentials | no |
+| zabbix_password | no |
+| zabbix_user | no |
+| [**grafana_folders**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html) |
+| name | yes |
+| skip_version_check | no |
+| state | no |
+| [**grafana_dashboards**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html) |
+| commit_message | no |
 | dashboard_id | no |
 | dashboard_revision | no |
-| commit_message | no |
+| folder | no |
+| org_id | no |
+| org_name | no |
+| overwrite | no |
+| path | no |
+| slug | no |
+| state | no |
+| uid | no |
 | [**grafana_organization_users**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_user_module.html) |
 | login | yes |
+| org_id | no |
+| org_name | no |
 | role | no |
 | state | no |
-| org_id / org_name | no |
 
 ## Example Playbook
 
