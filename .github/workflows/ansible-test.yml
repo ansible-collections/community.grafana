@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.10"]
-        ansible_version: ["stable-2.13", "stable-2.14", "devel"]
+        ansible_version: ["stable-2.15", "stable-2.16", "devel"]
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.10"]
-        ansible_version: ["stable-2.13", "stable-2.14", "devel"]
+        ansible_version: ["stable-2.15", "stable-2.16", "devel"]
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
@@ -46,7 +46,7 @@ jobs:
       fail-fast: false
       matrix:
         grafana_version: ["9.5.14", "8.5.27", "10.2.2"]
-        ansible_version: ["stable-2.13", "stable-2.14", "devel"]
+        ansible_version: ["stable-2.15", "stable-2.16", "devel"]
         python_version: ["3.10"]
     services:
       grafana:
