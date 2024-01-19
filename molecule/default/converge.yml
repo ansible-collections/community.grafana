@@ -45,7 +45,4 @@
         path: test_dashboard.json
         overwrite: true
 
-  tasks:
-    - name: Include ansible-role-grafana
-      ansible.builtin.include_role:
-        name: ansible-role-grafana
+  roles: [{role: community.grafana.grafana}]
