@@ -1,10 +1,10 @@
 ---
-- name: Copy dashboard file
+- name: Create Dashboard from file | Copy dashboard file
   ansible.builtin.copy:
     src: files/dashboard.json
     dest: /tmp/dashboard.json
 
-- name: Check import grafana dashboard from file
+- name: Create Dashboard from file | check mode | dashboard does not exist
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
@@ -13,14 +13,16 @@
     commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
-  register: result
+  check_mode: true
+  register: dff_result1
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == true
-      - result.msg == 'Dashboard test created'
+      - dff_result1.failed == false
+      - dff_result1.changed == true
+      - dff_result1.uid is not defined
+      - dff_result1.msg == 'Dashboard test will be created'
 
-- name: Check import grafana dashboard from file idempotency
+- name: Create Dashboard from file | run mode | dashboard does not exist
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
@@ -29,15 +31,60 @@
     commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
-  register: result
+  check_mode: false
+  register: dff_result2
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == false
-      - result.msg == 'Dashboard test unchanged.'
+      - dff_result2.failed == false
+      - dff_result2.changed == true
+      - dff_result2.uid is defined
+      - dff_result2.uid | type_debug == "AnsibleUnsafeText"
+      - dff_result2.msg == 'Dashboard test created'
+
+- name: Create Dashboard from file | check mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    path: /tmp/dashboard.json
+    overwrite: true
+  check_mode: true
+  register: dff_result3
+- ansible.builtin.assert:
+    that:
+      - dff_result3.failed == false
+      - dff_result3.changed == false
+      - dff_result3.uid is defined
+      - dff_result3.uid | type_debug == "AnsibleUnsafeText"
+      - dff_result3.msg == 'Dashboard test unchanged.'
+
+- name: Create Dashboard from file | run mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    path: /tmp/dashboard.json
+    overwrite: true
+  check_mode: false
+  register: dff_result4
+- ansible.builtin.assert:
+    that:
+      - dff_result4.failed == false
+      - dff_result4.changed == false
+      - dff_result4.uid is defined
+      - dff_result4.uid | type_debug == "AnsibleUnsafeText"
+      - dff_result4.msg == 'Dashboard test unchanged.'
 
 - ansible.builtin.include_tasks:
     file: dashboard-export.yml
+  vars:
+    uid_to_export: '{{ dff_result4.uid }}'
 
 - ansible.builtin.include_tasks:
     file: delete-dashboard.yml
+  vars:
+    uid_to_delete: '{{ dff_result4.uid }}'

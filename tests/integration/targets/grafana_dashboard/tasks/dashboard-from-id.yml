@@ -1,5 +1,5 @@
 ---
-- name: Check import grafana dashboard from id
+- name: Create Dashboard from ID | check mode | dashboard does not exist
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
@@ -9,14 +9,16 @@
     dashboard_id: "6098"
     dashboard_revision: "1"
     overwrite: true
-  register: result
+  check_mode: true
+  register: dfi_result1
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == true
-      - result.msg == 'Dashboard Zabbix Host Status created'
+      - dfi_result1.failed == false
+      - dfi_result1.changed == true
+      - dfi_result1.uid is not defined
+      - dfi_result1.msg == 'Dashboard Zabbix Host Status will be created'
 
-- name: Check import grafana dashboard from id idempotency
+- name: Create Dashboard from ID | run mode | dashboard does not exist
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
@@ -26,12 +28,57 @@
     dashboard_id: "6098"
     dashboard_revision: "1"
     overwrite: true
-  register: result
+  check_mode: false
+  register: dfi_result2
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == false
-      - result.msg == 'Dashboard Zabbix Host Status unchanged.'
+      - dfi_result2.failed == false
+      - dfi_result2.changed == true
+      - dfi_result2.uid is defined
+      - dfi_result2.uid | type_debug == "AnsibleUnsafeText"
+      - dfi_result2.msg == 'Dashboard Zabbix Host Status created'
+
+- name: Create Dashboard from ID | check mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "6098"
+    dashboard_revision: "1"
+    overwrite: true
+  check_mode: true
+  register: dfi_result3
+- ansible.builtin.assert:
+    that:
+      - dfi_result3.failed == false
+      - dfi_result3.changed == false
+      - dfi_result3.uid is defined
+      - dfi_result3.uid | type_debug == "AnsibleUnsafeText"
+      - dfi_result3.msg == 'Dashboard Zabbix Host Status unchanged.'
+
+- name: Create Dashboard from ID | run mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "6098"
+    dashboard_revision: "1"
+    overwrite: true
+  check_mode: false
+  register: dfi_result4
+- ansible.builtin.assert:
+    that:
+      - dfi_result4.failed == false
+      - dfi_result4.changed == false
+      - dfi_result4.uid is defined
+      - dfi_result4.uid | type_debug == "AnsibleUnsafeText"
+      - dfi_result4.msg == 'Dashboard Zabbix Host Status unchanged.'
 
 - ansible.builtin.include_tasks:
     file: delete-dashboard.yml
+  vars:
+    uid_to_delete: '{{ dfi_result4.uid }}'
