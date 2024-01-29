@@ -559,9 +559,9 @@ def compare_datasources(new, current, compareSecureData=True):
     return dict(before=current, after=new)
 
 
-def get_datasource_payload(data):
+def get_datasource_payload(data, org_id=None):
     payload = {
-        "orgId": data["org_id"],
+        "orgId": data["org_id"] if org_id is None else org_id,
         "name": data["name"],
         "uid": data["uid"],
         "type": data["ds_type"],
@@ -688,6 +688,7 @@ class GrafanaInterface(object):
     def __init__(self, module):
         self._module = module
         self.grafana_url = base.clean_url(module.params.get("url"))
+        self.org_id = None
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
         if module.params.get("grafana_api_key", None):
@@ -698,12 +699,12 @@ class GrafanaInterface(object):
             self.headers["Authorization"] = basic_auth_header(
                 module.params["url_username"], module.params["url_password"]
             )
-            org_id = (
+            self.org_id = (
                 self.organization_by_name(module.params["org_name"])
                 if module.params["org_name"]
                 else module.params["org_id"]
             )
-            self.switch_organization(org_id)
+            self.switch_organization(self.org_id)
         # }}}
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
@@ -736,7 +737,7 @@ class GrafanaInterface(object):
 
     def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
-        response = self._send_request(url, headers=self.headers, method="POST")
+        self._send_request(url, headers=self.headers, method="POST")
 
     def organization_by_name(self, org_name):
         url = "/api/user/orgs"
@@ -750,8 +751,6 @@ class GrafanaInterface(object):
         )
 
     def datasource_by_name(self, name):
-        datasource_exists = False
-        ds = {}
         url = "/api/datasources/name/%s" % quote(name, safe="")
         return self._send_request(url, headers=self.headers, method="GET")
 
@@ -925,7 +924,7 @@ def main():
     ds = grafana_iface.datasource_by_name(name)
 
     if state == "present":
-        payload = get_datasource_payload(module.params)
+        payload = get_datasource_payload(module.params, grafana_iface.org_id)
         if ds is None:
             grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)

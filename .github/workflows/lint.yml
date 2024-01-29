@@ -1,0 +1,36 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: "**/*.py"
+
+      - if: ${{ steps.changed-files.outputs.all_changed_files != '' }}
+        uses: psf/black@stable
+        with:
+          src: ${{ steps.changed-files.outputs.all_changed_files }}
+
+      - if: ${{ steps.changed-files.outputs.all_changed_files != '' }}
+        uses: chartboost/ruff-action@v1
+        with:
+          src: ${{ steps.changed-files.outputs.all_changed_files }}
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main

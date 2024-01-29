@@ -121,45 +121,6 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
         is_admin: true
 ```
 
-## Complementary Collection: [`telekom-mms.grafana`](https://github.com/telekom-mms/ansible-role-grafana)
-
-The `telekom-mms.grafana` collection is an Ansible Collection that simplifies the use of the `community.grafana` collection. It provides an Ansible Role for easy integration with `community.grafana`. With this collection, you only need to define the variables for your Grafana resources.
-
-### Requirements
-    ansible-galaxy collection install telekom-mms.grafana
-... or use a requirements.yml:  
-`ansible-galaxy collection install -r requirements.yml`
-```yaml
----
-collections:
-  - name: telekom-mms.grafana
-```
-
-### Example Playbook
-```yaml
----
-- hosts: localhost
-  gather_facts: false
-  connection: local
-
-  vars:
-    grafana_url: "https://grafana.company.com"
-    grafana_user: "admin"
-    grafana_password: "xxxxxx"
-
-    grafana_datasources:
-      - name: "Loki"
-        ds_type: "loki"
-        ds_url: "http://127.0.0.1:3100"
-        tls_skip_verify: yes
-    grafana_folders:
-      - name: my_service
-      - name: other_service
-
-  roles:
-    - role: telekom-mms.grafana
-```
-
 ## Testing and Development
 
 If you want to develop new content for this collection or improve what's already here, the easiest way to work on the collection is to clone it into one of the configured [`COLLECTIONS_PATHS`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths), and work on it there.
@@ -219,6 +180,7 @@ Any contribution is welcome and we only ask contributors to:
 * Provide *at least* integration tests for any contribution.
 * The Pull Request *MUST* contain a changelog fragment. See [Ansible documentation](https://docs.ansible.com/ansible/latest/community/development_process.html#creating-a-changelog-fragment) about fragments.
 * Create an issue for any significant contribution that would change a large portion of the code base.
+* Use [ruff](https://github.com/astral-sh/ruff) to lint and [black](https://github.com/psf/black) to format your changes on python code.
 
 ## Contributors ✨
 

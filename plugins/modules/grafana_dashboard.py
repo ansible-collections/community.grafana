@@ -90,42 +90,39 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- hosts: localhost
-  connection: local
-  tasks:
-    - name: Import Grafana dashboard foo
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        state: present
-        commit_message: Updated by ansible
-        overwrite: true
-        path: /path/to/dashboards/foo.json
+- name: Import Grafana dashboard foo
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    state: present
+    commit_message: Updated by ansible
+    overwrite: true
+    path: /path/to/dashboards/foo.json
 
-    - name: Import Grafana dashboard Zabbix
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        folder: zabbix
-        dashboard_id: 6098
-        dashboard_revision: 1
+- name: Import Grafana dashboard Zabbix
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    folder: zabbix
+    dashboard_id: 6098
+    dashboard_revision: 1
 
-    - name: Import Grafana dashboard zabbix
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        folder: public
-        dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+- name: Import Grafana dashboard zabbix
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    folder: public
+    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
 
-    - name: Export dashboard
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_user: "admin"
-        grafana_password: "{{ grafana_password }}"
-        org_id: 1
-        state: export
-        uid: "000000653"
-        path: "/path/to/dashboards/000000653.json"
+- name: Export dashboard
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_user: "admin"
+    grafana_password: "{{ grafana_password }}"
+    org_id: 1
+    state: export
+    uid: "000000653"
+    path: "/path/to/dashboards/000000653.json"
 """
 
 RETURN = """
@@ -221,7 +218,7 @@ def get_grafana_version(module, grafana_url, headers):
         try:
             settings = json.loads(to_text(r.read()))
             grafana_version = settings["buildInfo"]["version"].split(".")[0]
-        except UnicodeError as e:
+        except UnicodeError:
             raise GrafanaAPIException("Unable to decode version string to Unicode")
         except Exception as e:
             raise GrafanaAPIException(e)
@@ -285,7 +282,6 @@ def grafana_dashboard_exists(module, grafana_url, uid, headers):
 
 
 def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
-
     # search by title
     uri = "%s/api/search?%s" % (
         grafana_url,
@@ -339,7 +335,6 @@ def is_grafana_dashboard_changed(payload, dashboard):
 
 
 def grafana_create_dashboard(module, data):
-
     # define data payload for grafana API
     payload = {}
     if data.get("dashboard_id"):
@@ -494,7 +489,6 @@ def grafana_create_dashboard(module, data):
 
 
 def grafana_delete_dashboard(module, data):
-
     # define http headers
     headers = grafana_headers(module, data)
 
@@ -558,7 +552,6 @@ def grafana_delete_dashboard(module, data):
 
 
 def grafana_export_dashboard(module, data):
-
     # define http headers
     headers = grafana_headers(module, data)
 

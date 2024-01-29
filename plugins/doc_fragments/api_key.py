@@ -8,7 +8,6 @@ __metaclass__ = type
 
 
 class ModuleDocFragment(object):
-
     DOCUMENTATION = r"""options:
   grafana_api_key:
     description:
