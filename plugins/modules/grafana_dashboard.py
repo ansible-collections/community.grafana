@@ -414,7 +414,8 @@ def grafana_create_dashboard(module, data):
 
         if grafana_dashboard_changed:
             if module.check_mode:
-                module.exit_json(failed=False,
+                module.exit_json(uid=uid,
+                                 failed=False,
                                  changed=True,
                                  msg="Dashboard %s will be updated" % payload['dashboard']['title'])
             # update
@@ -511,7 +512,8 @@ def grafana_delete_dashboard(module, data):
     result = {}
     if dashboard_exists is True:
         if module.check_mode:
-            module.exit_json(failed=False,
+            module.exit_json(uid=uid,
+                             failed=False,
                              changed=True,
                              msg="Dashboard %s will be deleted" % uid)
 
@@ -572,7 +574,8 @@ def grafana_export_dashboard(module, data):
 
     if dashboard_exists is True:
         if module.check_mode:
-            module.exit_json(failed=False,
+            module.exit_json(uid=uid,
+                             failed=False,
                              changed=True,
                              msg="Dashboard %s will be exported to %s" % (uid, data['path']))
         try:

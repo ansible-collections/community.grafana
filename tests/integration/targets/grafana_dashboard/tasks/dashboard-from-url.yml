@@ -1,5 +1,5 @@
 ---
-- name: Check import grafana dashboard from url
+- name: Create Dashboard from URL | check mode | dashboard does not exist
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
@@ -8,14 +8,16 @@
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
     overwrite: true
-  register: result
+  check_mode: true
+  register: dfu_result1
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == true
-      - result.msg == 'Dashboard Zabbix Host Status created'
+      - dfu_result1.failed == false
+      - dfu_result1.changed == true
+      - dfu_result1.uid is not defined
+      - dfu_result1.msg == 'Dashboard Zabbix Host Status will be created'
 
-- name: Check import grafana dashboard from url idempotency
+- name: Create Dashboard from URL | run mode | dashboard does not exist
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
@@ -24,12 +26,55 @@
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
     overwrite: true
-  register: result
+  check_mode: false
+  register: dfu_result2
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == false
-      - result.msg == 'Dashboard Zabbix Host Status unchanged.'
+      - dfu_result2.failed == false
+      - dfu_result2.changed == true
+      - dfu_result2.uid is defined
+      - dfu_result2.uid | type_debug == "AnsibleUnsafeText"
+      - dfu_result2.msg == 'Dashboard Zabbix Host Status created'
+
+- name: Create Dashboard from URL | check mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+    overwrite: true
+  check_mode: true
+  register: dfu_result3
+- ansible.builtin.assert:
+    that:
+      - dfu_result3.failed == false
+      - dfu_result3.changed == false
+      - dfu_result3.uid is defined
+      - dfu_result3.uid | type_debug == "AnsibleUnsafeText"
+      - dfu_result3.msg == 'Dashboard Zabbix Host Status unchanged.'
+
+- name: Create Dashboard from URL | run mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: present
+    commit_message: Updated by ansible
+    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+    overwrite: true
+  check_mode: false
+  register: dfu_result4
+- ansible.builtin.assert:
+    that:
+      - dfu_result4.failed == false
+      - dfu_result4.changed == false
+      - dfu_result4.uid is defined
+      - dfu_result4.uid | type_debug == "AnsibleUnsafeText"
+      - dfu_result4.msg == 'Dashboard Zabbix Host Status unchanged.'
 
 - ansible.builtin.include_tasks:
     file: delete-dashboard.yml
+  vars:
+    uid_to_delete: '{{ dfu_result4.uid }}'

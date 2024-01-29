@@ -1,5 +1,5 @@
 ---
-- name: Check export grafana dashboard to file
+- name: Export Dashboard | check mode | uid does not exist
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
@@ -7,19 +7,85 @@
     state: export
     path: /tmp/dashboard_export.json
     overwrite: true
-    uid: "{{ result.uid }}"
-  register: result
+    uid: "090909090"
+  check_mode: true
+  ignore_errors: true
+  register: de_result1
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == true
-      - result.msg == 'Dashboard ' ~ result.uid ~ ' exported to /tmp/dashboard_export.json'
+      - de_result1.failed == false
+      - de_result1.changed == false
+      - de_result1.uid is defined
+      - de_result1.uid | type_debug == "AnsibleUnsafeText"
+      - de_result1.uid == "090909090"
+      - de_result1.msg == 'Dashboard ' ~ de_result1.uid ~ ' does not exist.'
 
-- name: Load /tmp/dashboard_export.json or fail if missing
+- name: Export Dashboard | run mode | uid does not exist
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: export
+    path: /tmp/dashboard_export.json
+    overwrite: true
+    uid: "090909090"
+  check_mode: false
+  ignore_errors: true
+  register: de_result2
+- ansible.builtin.assert:
+    that:
+      - de_result2.failed == false
+      - de_result2.changed == false
+      - de_result2.uid is defined
+      - de_result2.uid | type_debug == "AnsibleUnsafeText"
+      - de_result2.uid == "090909090"
+      - de_result2.msg == 'Dashboard ' ~ de_result2.uid ~ ' does not exist.'
+
+- name: Export Dashboard | check mode | uid exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: export
+    path: /tmp/dashboard_export.json
+    overwrite: true
+    uid: "{{ uid_to_export }}"
+  check_mode: true
+  register: de_result3
+- ansible.builtin.assert:
+    that:
+      - de_result3.failed == false
+      - de_result3.changed == true
+      - de_result3.uid is defined
+      - de_result3.uid | type_debug == "AnsibleUnsafeText"
+      - de_result3.uid == uid_to_export
+      - de_result3.msg == 'Dashboard ' ~ de_result3.uid ~ ' will be exported to /tmp/dashboard_export.json'
+
+- name: Export Dashboard | run mode | uid exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: export
+    path: /tmp/dashboard_export.json
+    overwrite: true
+    uid: "{{ uid_to_export }}"
+  check_mode: false
+  register: de_result4
+- ansible.builtin.assert:
+    that:
+      - de_result4.failed == false
+      - de_result4.changed == true
+      - de_result4.uid is defined
+      - de_result4.uid | type_debug == "AnsibleUnsafeText"
+      - de_result4.uid == uid_to_export
+      - de_result4.msg == 'Dashboard ' ~ de_result4.uid ~ ' exported to /tmp/dashboard_export.json'
+
+- name: Export Dashboard | Load /tmp/dashboard_export.json or fail if missing
   ansible.builtin.set_fact:
     exported_dashboard_lines: "{{ lookup('file', '/tmp/dashboard_export.json').splitlines() }}"
 
-- name: Assert that exported dashboard contains formatted JSON
+- name: Export Dashboard | Assert that exported dashboard contains formatted JSON
   ansible.builtin.assert:
     that:
       - exported_dashboard_lines | length >= 2
