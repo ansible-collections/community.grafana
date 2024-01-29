@@ -414,10 +414,12 @@ def grafana_create_dashboard(module, data):
 
         if grafana_dashboard_changed:
             if module.check_mode:
-                module.exit_json(uid=uid,
-                                 failed=False,
-                                 changed=True,
-                                 msg="Dashboard %s will be updated" % payload['dashboard']['title'])
+                module.exit_json(
+                    uid=uid,
+                    failed=False,
+                    changed=True,
+                    msg="Dashboard %s will be updated" % payload["dashboard"]["title"],
+                )
             # update
             if "overwrite" in data and data["overwrite"]:
                 payload["overwrite"] = True
@@ -454,9 +456,11 @@ def grafana_create_dashboard(module, data):
             result["changed"] = False
     else:
         if module.check_mode:
-            module.exit_json(failed=False,
-                             changed=True,
-                             msg="Dashboard %s will be created" % payload['dashboard']['title'])
+            module.exit_json(
+                failed=False,
+                changed=True,
+                msg="Dashboard %s will be created" % payload["dashboard"]["title"],
+            )
 
         # Ensure there is no id in payload
         if "id" in payload["dashboard"]:
@@ -512,10 +516,12 @@ def grafana_delete_dashboard(module, data):
     result = {}
     if dashboard_exists is True:
         if module.check_mode:
-            module.exit_json(uid=uid,
-                             failed=False,
-                             changed=True,
-                             msg="Dashboard %s will be deleted" % uid)
+            module.exit_json(
+                uid=uid,
+                failed=False,
+                changed=True,
+                msg="Dashboard %s will be deleted" % uid,
+            )
 
         # delete
         if grafana_version < 5:
@@ -574,10 +580,12 @@ def grafana_export_dashboard(module, data):
 
     if dashboard_exists is True:
         if module.check_mode:
-            module.exit_json(uid=uid,
-                             failed=False,
-                             changed=True,
-                             msg="Dashboard %s will be exported to %s" % (uid, data['path']))
+            module.exit_json(
+                uid=uid,
+                failed=False,
+                changed=True,
+                msg="Dashboard %s will be exported to %s" % (uid, data["path"]),
+            )
         try:
             with open(data["path"], "w", encoding="utf-8") as f:
                 f.write(json.dumps(dashboard, indent=2))
