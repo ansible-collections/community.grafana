@@ -172,7 +172,13 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible.module_utils._text import to_text
-from ansible_collections.community.grafana.plugins.module_utils import base
+from ansible_collections.community.grafana.plugins.module_utils.base import (
+    BaseInterface,
+    grafana_argument_spec,
+    grafana_required_together,
+    grafana_mutually_exclusive,
+    clean_url,
+)
 from ansible.module_utils.six.moves.urllib.parse import quote
 
 __metaclass__ = type
@@ -182,8 +188,9 @@ class GrafanaError(Exception):
     pass
 
 
-class GrafanaTeamInterface(object):
+class GrafanaTeamInterface(BaseInterface):
     def __init__(self, module):
+        super().__init__()
         self._module = module
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
@@ -196,16 +203,7 @@ class GrafanaTeamInterface(object):
                 module.params["url_username"], module.params["url_password"]
             )
         # }}}
-        self.grafana_url = base.clean_url(module.params.get("url"))
-        if module.params.get("skip_version_check") is False:
-            try:
-                grafana_version = self.get_version()
-            except GrafanaError as e:
-                self._module.fail_json(failed=True, msg=to_text(e))
-            if grafana_version["major"] < 5:
-                self._module.fail_json(
-                    failed=True, msg="Teams API is available starting Grafana v5"
-                )
+        self.grafana_url = clean_url(module.params.get("url"))
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -234,17 +232,6 @@ class GrafanaTeamInterface(object):
         self._module.fail_json(
             failed=True, msg="Grafana Teams API answered with HTTP %d" % status_code
         )
-
-    def get_version(self):
-        url = "/api/health"
-        response = self._send_request(
-            url, data=None, headers=self.headers, method="GET"
-        )
-        version = response.get("version")
-        if version is not None:
-            major, minor, rev = version.split(".")
-            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
-        raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
     def create_team(self, name, email):
         url = "/api/teams"
@@ -307,13 +294,13 @@ def setup_module_object():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=base.grafana_required_together(),
-        mutually_exclusive=base.grafana_mutually_exclusive(),
+        required_together=grafana_required_together(),
+        mutually_exclusive=grafana_mutually_exclusive(),
     )
     return module
 
 
-argument_spec = base.grafana_argument_spec()
+argument_spec = grafana_argument_spec()
 argument_spec.update(
     name=dict(type="str", required=True),
     email=dict(type="str", required=True),
@@ -332,6 +319,8 @@ def main():
     enforce_members = module.params["enforce_members"]
 
     grafana_iface = GrafanaTeamInterface(module)
+
+    check_required_version(grafana_iface, minimum_version="5")
 
     changed = False
     if state == "present":
