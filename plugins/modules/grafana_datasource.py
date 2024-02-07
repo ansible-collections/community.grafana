@@ -132,7 +132,7 @@ options:
     - Grafana organization ID in which the datasource should be created.
     - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
       belongs to one organization.
-    - Mutually exclusive with `org_name`.
+    - Mutually exclusive with C(org_name).
     default: 1
     type: int
   org_name:
@@ -140,7 +140,7 @@ options:
     - Grafana organization name in which the datasource should be created.
     - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
       belongs to one organization.
-    - Mutually exclusive with `org_id`.
+    - Mutually exclusive with C(org_id).
     type: str
   state:
     description:
