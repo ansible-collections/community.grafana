@@ -1,0 +1,58 @@
+---
+- name: Create a Folder
+  community.grafana.grafana_folder:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    title: grafana_working_group
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.folder.title == 'grafana_working_group'
+  when: not ansible_check_mode
+
+- name: Test folder creation idempotency
+  community.grafana.grafana_folder:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    title: grafana_working_group
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.folder.title == 'grafana_working_group'
+  when: not ansible_check_mode
+
+- name: Delete a Folder
+  community.grafana.grafana_folder:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    title: grafana_working_group
+    state: absent
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+  when: not ansible_check_mode
+
+- name: Test folder deletion idempotency
+  community.grafana.grafana_folder:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    title: grafana_working_group
+    state: absent
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == false
+  when: not ansible_check_mode
