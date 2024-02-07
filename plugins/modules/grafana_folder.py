@@ -44,10 +44,25 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
+  org_id:
+    description:
+    - Grafana organization ID in which the datasource should be created.
+    - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+      belongs to one organization.
+    - Mutually exclusive with C(org_name).
+    default: 1
+    type: int
+  org_name:
+    description:
+    - Grafana organization name in which the datasource should be created.
+    - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+      belongs to one organization.
+    - Mutually exclusive with C(org_id).
+    type: str
   skip_version_check:
     description:
       - Skip Grafana version check and try to reach api endpoint anyway.
-      - This parameter can be useful if you enabled `hide_version` in grafana.ini
+      - This parameter can be useful if you enabled C(hide_version) in grafana.ini
     required: False
     type: bool
     default: false
@@ -179,6 +194,8 @@ class GrafanaError(Exception):
 class GrafanaFolderInterface(object):
     def __init__(self, module):
         self._module = module
+        self.grafana_url = base.clean_url(module.params.get("url"))
+        self.org_id = None
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
         if module.params.get("grafana_api_key", None):
@@ -189,8 +206,13 @@ class GrafanaFolderInterface(object):
             self.headers["Authorization"] = basic_auth_header(
                 module.params["url_username"], module.params["url_password"]
             )
+            self.org_id = (
+                self.organization_by_name(module.params["org_name"])
+                if module.params["org_name"]
+                else module.params["org_id"]
+            )
+            self.switch_organization(self.org_id)
         # }}}
-        self.grafana_url = base.clean_url(module.params.get("url"))
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()
@@ -233,6 +255,21 @@ class GrafanaFolderInterface(object):
             failed=True, msg="Grafana Folders API answered with HTTP %d" % status_code
         )
 
+    def switch_organization(self, org_id):
+        url = "/api/user/using/%d" % org_id
+        self._send_request(url, headers=self.headers, method="POST")
+
+    def organization_by_name(self, org_name):
+        url = "/api/user/orgs"
+        organizations = self._send_request(url, headers=self.headers, method="GET")
+        orga = next((org for org in organizations if org["name"] == org_name))
+        if orga:
+            return orga["orgId"]
+
+        self._module.fail_json(
+            failed=True, msg="Current user isn't member of organization: %s" % org_name
+        )
+
     def get_version(self):
         url = "/api/health"
         response = self._send_request(
@@ -266,28 +303,28 @@ class GrafanaFolderInterface(object):
         return response
 
 
-def setup_module_object():
+def main():
+    argument_spec = base.grafana_argument_spec()
+    argument_spec.update(
+        name=dict(type="str", aliases=["title"], required=True),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        skip_version_check=dict(type="bool", default=False),
+        org_id=dict(default=1, type="int"),
+        org_name=dict(type="str"),
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=base.grafana_required_together(),
-        mutually_exclusive=base.grafana_mutually_exclusive(),
+        required_together=base.grafana_required_together()
+        + [["url_username", "url_password", "org_id"]],
+        mutually_exclusive=base.grafana_mutually_exclusive()
+        + [
+            ["org_id", "org_name"],
+        ],
     )
-    return module
-
-
-argument_spec = base.grafana_argument_spec()
-argument_spec.update(
-    name=dict(type="str", aliases=["title"], required=True),
-    state=dict(type="str", default="present", choices=["present", "absent"]),
-    skip_version_check=dict(type="bool", default=False),
-)
-
-
-def main():
-    module = setup_module_object()
     state = module.params["state"]
     title = module.params["name"]
+    module.params["url"] = base.clean_url(module.params["url"])
 
     grafana_iface = GrafanaFolderInterface(module)
 
