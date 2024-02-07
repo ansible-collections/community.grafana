@@ -20,14 +20,14 @@ options:
     description:
       - The Grafana organization ID where the dashboard will be imported / exported / deleted.
       - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
-      - Mutually exclusive with `org_name`.
+      - Mutually exclusive with C(org_name).
     default: 1
     type: int
   org_name:
     description:
       - The Grafana organization name where the dashboard will be imported / exported / deleted.
       - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
-      - Mutually exclusive with `org_id`.
+      - Mutually exclusive with C(org_id).
     type: str
   folder:
     description:
