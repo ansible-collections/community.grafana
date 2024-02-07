@@ -5,6 +5,16 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.7.1
+======
+
+Minor Changes
+-------------
+
+- Manage `grafana_folder` for organizations
+- Merged ansible role telekom-mms/ansible-role-grafana into ansible-collections/community.grafana
+- grafana_dashboard - add check_mode support
+
 v1.7.0
 ======
 
