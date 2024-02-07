@@ -1,4 +1,3 @@
-
 ---
 - module_defaults:
     community.grafana.grafana_folder:
