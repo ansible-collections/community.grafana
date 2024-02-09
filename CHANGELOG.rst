@@ -13,6 +13,7 @@ Minor Changes
 
 - Manage `grafana_folder` for organizations
 - Merged ansible role telekom-mms/ansible-role-grafana into ansible-collections/community.grafana
+- added `community.grafana.notification_channel` to role
 - grafana_dashboard - add check_mode support
 
 v1.7.0

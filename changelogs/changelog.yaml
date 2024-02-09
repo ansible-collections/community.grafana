@@ -268,9 +268,11 @@ releases:
       minor_changes:
       - Manage `grafana_folder` for organizations
       - Merged ansible role telekom-mms/ansible-role-grafana into ansible-collections/community.grafana
+      - added `community.grafana.notification_channel` to role
       - grafana_dashboard - add check_mode support
     fragments:
     - 311_dashboard_check_mode.yml
     - 343-telekom-mms-role.yml
     - 347-folder-for-orgs.yml
+    - 349-role-notification-channel.yml
     release_date: '2024-02-07'
