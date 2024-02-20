@@ -191,7 +191,7 @@ class GrafanaUserTest(TestCase):
 
         mock_fetch_url.assert_has_calls(expected_fetch_url_calls, any_order=False)
 
-        self.assertEquals(
+        self.assertEqual(
             result,
             {
                 "id": 2,
@@ -238,4 +238,4 @@ class GrafanaUserTest(TestCase):
             },
             method="DELETE",
         )
-        self.assertEquals(result, {"message": "User deleted"})
+        self.assertEqual(result, {"message": "User deleted"})

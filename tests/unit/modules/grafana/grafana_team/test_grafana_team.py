@@ -306,7 +306,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, {"email": "email@test.com", "name": "MyTestTeam"})
+        self.assertEqual(res, {"email": "email@test.com", "name": "MyTestTeam"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -341,7 +341,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, None)
+        self.assertEqual(res, None)
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -377,7 +377,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="POST",
         )
-        self.assertEquals(res, {"message": "Team created", "teamId": 2})
+        self.assertEqual(res, {"message": "Team created", "teamId": 2})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -412,7 +412,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="PUT",
         )
-        self.assertEquals(res, {"message": "Team updated"})
+        self.assertEqual(res, {"message": "Team updated"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -445,7 +445,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="DELETE",
         )
-        self.assertEquals(res, {"message": "Team deleted"})
+        self.assertEqual(res, {"message": "Team deleted"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -478,7 +478,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, ["user1@email.com", "user2@email.com"])
+        self.assertEqual(res, ["user1@email.com", "user2@email.com"])
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -513,7 +513,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, [])
+        self.assertEqual(res, [])
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -550,7 +550,7 @@ class GrafanaTeamsTest(TestCase):
                 },
                 method="POST",
             )
-            self.assertEquals(res, None)
+            self.assertEqual(res, None)
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -587,13 +587,13 @@ class GrafanaTeamsTest(TestCase):
                 },
                 method="DELETE",
             )
-            self.assertEquals(res, None)
+            self.assertEqual(res, None)
 
     def test_diff_members_function(self):
         list1 = ["foo@example.com", "bar@example.com"]
         list2 = ["bar@example.com", "random@example.com"]
 
         res = grafana_team.diff_members(list1, list2)
-        self.assertEquals(
+        self.assertEqual(
             res, {"to_del": ["random@example.com"], "to_add": ["foo@example.com"]}
         )
