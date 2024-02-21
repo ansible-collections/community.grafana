@@ -265,6 +265,8 @@ releases:
     release_date: '2024-01-17'
   1.7.1:
     changes:
+      bugfixes:
+      - 'test: replace deprecated `TestCase.assertEquals` to support Python 3.12'
       minor_changes:
       - Manage `grafana_folder` for organizations
       - Merged ansible role telekom-mms/ansible-role-grafana into ansible-collections/community.grafana
@@ -275,4 +277,5 @@ releases:
     - 343-telekom-mms-role.yml
     - 347-folder-for-orgs.yml
     - 349-role-notification-channel.yml
+    - 350-python3.12.yml
     release_date: '2024-02-07'

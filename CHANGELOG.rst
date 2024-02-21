@@ -16,6 +16,11 @@ Minor Changes
 - added `community.grafana.notification_channel` to role
 - grafana_dashboard - add check_mode support
 
+Bugfixes
+--------
+
+- test: replace deprecated `TestCase.assertEquals` to support Python 3.12
+
 v1.7.0
 ======
 
