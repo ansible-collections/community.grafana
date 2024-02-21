@@ -5,6 +5,22 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.8.0
+======
+
+Minor Changes
+-------------
+
+- Manage `grafana_folder` for organizations
+- Merged ansible role telekom-mms/ansible-role-grafana into ansible-collections/community.grafana
+- added `community.grafana.notification_channel` to role
+- grafana_dashboard - add check_mode support
+
+Bugfixes
+--------
+
+- test: replace deprecated `TestCase.assertEquals` to support Python 3.12
+
 v1.7.0
 ======
 
