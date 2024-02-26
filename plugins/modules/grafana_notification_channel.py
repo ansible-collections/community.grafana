@@ -611,6 +611,7 @@ def grafana_notification_channel_payload(data):
 class GrafanaNotificationChannelInterface(object):
     def __init__(self, module):
         self._module = module
+        self.org_id = None
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
         if module.params.get("grafana_api_key", None):
@@ -621,13 +622,18 @@ class GrafanaNotificationChannelInterface(object):
             self.headers["Authorization"] = basic_auth_header(
                 module.params["url_username"], module.params["url_password"]
             )
+            self.org_id = (
+                self.organization_by_name(module.params["org_name"])
+                if module.params["org_name"]
+                else module.params["org_id"]
+            )
+            self.grafana_switch_organisation(module.params, self.org_id)
         # }}}
-        self.grafana_url = clean_url(module.params.get("url"))
 
-    def grafana_switch_organisation(self, grafana_url, org_id):
+    def grafana_switch_organisation(self, data, org_id):
         r, info = fetch_url(
             self._module,
-            "%s/api/user/using/%s" % (grafana_url, org_id),
+            "%s/api/user/using/%s" % (data["url"], org_id),
             headers=self.headers,
             method="POST",
         )
@@ -635,6 +641,22 @@ class GrafanaNotificationChannelInterface(object):
             raise GrafanaAPIException(
                 "Unable to switch to organization %s : %s" % (org_id, info)
             )
+
+    def organization_by_name(self, data, org_name):
+        r, info = fetch_url(
+            self._module,
+            "%s/api/user/orgs" % data["url"],
+            headers=self.headers,
+            method="GET",
+        )
+        organizations = json.loads(to_text(r.read()))
+        orga = next((org for org in organizations if org["name"] == org_name))
+        if orga:
+            return orga["orgId"]
+
+        raise GrafanaAPIException(
+            "Current user isn't member of organization: %s" % org_name
+        )
 
     def grafana_create_notification_channel(self, data, payload):
         r, info = fetch_url(
@@ -729,6 +751,7 @@ def main():
     argument_spec = grafana_argument_spec()
     argument_spec.update(
         org_id=dict(type="int", default=1),
+        org_name=dict(type="str"),
         uid=dict(type="str"),
         name=dict(type="str"),
         type=dict(
@@ -797,8 +820,8 @@ def main():
             elements="str",
             choices=["emergency", "high", "normal", "low", "lowest"],
         ),
-        pushover_retry=dict(type="int"),  # TODO: only when priority==emergency
-        pushover_expire=dict(type="int"),  # TODO: only when priority==emergency
+        pushover_retry=dict(type="int"),
+        pushover_expire=dict(type="int"),
         pushover_alert_sound=dict(type="str"),  # TODO: add sound choices
         pushover_ok_sound=dict(type="str"),  # TODO: add sound choices
         sensu_url=dict(type="str"),
@@ -863,6 +886,7 @@ def main():
             ],
             ["type", "victorops", ["victorops_url"]],
             ["type", "webhook", ["webhook_url"]],
+            ["pushover_priority", "emergency", ["pushover_retry", "pushover_expire"]],
         ],
     )
 
