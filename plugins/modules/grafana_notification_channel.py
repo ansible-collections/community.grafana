@@ -38,8 +38,15 @@ options:
     description:
       - The Grafana Organisation ID where the notification channel will be handled.
       - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation..
+      - Mutually exclusive with C(org_name).
     default: 1
     type: int
+  org_name:
+    description:
+      - The Grafana Organisation name where the notification channel will be handled.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organisation..
+      - Mutually exclusive with C(org_id).
+    type: str
   state:
     type: str
     default: present
