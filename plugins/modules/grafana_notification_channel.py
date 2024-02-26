@@ -629,6 +629,26 @@ class GrafanaNotificationChannelInterface(object):
             )
             self.grafana_switch_organisation(module.params, self.org_id)
         # }}}
+        self.grafana_check_unified_alerting(module.params)
+
+    def grafana_check_unified_alerting(self, data):
+        self.grafana_unified_alerting = None
+        r, info = fetch_url(
+            self._module,
+            "%s/api/frontend/settings" % data["url"],
+            headers=self.headers,
+            method="GET",
+        )
+        if info["status"] == 200:
+            try:
+                settings = json.loads(to_text(r.read()))
+                self.grafana_unified_alerting = settings["unifiedAlertingEnabled"]
+            except UnicodeError:
+                raise GrafanaAPIException("Unable to decode version string to Unicode")
+            except Exception as e:
+                raise GrafanaAPIException(e)
+        else:
+            raise GrafanaAPIException("Unable to get grafana version: %s" % info)
 
     def grafana_switch_organisation(self, data, org_id):
         r, info = fetch_url(
