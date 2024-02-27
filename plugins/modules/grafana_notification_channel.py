@@ -721,18 +721,21 @@ class GrafanaNotificationChannelInterface(object):
             )
 
     def grafana_update_notification_channel(self, data, payload, before):
-        url = (
+        url_template = (
             "%s/api/v1/provisioning/contact-points/%s"
             if self.grafana_unified_alerting
             else "%s/api/alert-notifications/uid/%s"
         )
+        url = url_template % (data["url"], data["uid"])
+
         r, info = fetch_url(
             self._module,
-            url % (data["url"], data["uid"]),
+            url,
             data=json.dumps(payload),
             headers=self.headers,
             method="PUT",
         )
+
         if info["status"] == 200:
             del before["created"]
             del before["updated"]
@@ -742,18 +745,12 @@ class GrafanaNotificationChannelInterface(object):
             del after["created"]
             del after["updated"]
 
-            if before == after:
-                return {
-                    "changed": False,
-                    "channel": channel,
-                }
+            if before == channel:
+                return {"changed": False, "channel": channel}
             else:
                 return {
                     "changed": True,
-                    "diff": {
-                        "before": before,
-                        "after": after,
-                    },
+                    "diff": {"before": before, "after": after},
                     "channel": channel,
                 }
         else:
@@ -769,6 +766,7 @@ class GrafanaNotificationChannelInterface(object):
             if self.grafana_unified_alerting
             else "%s/api/alert-notifications/uid/%s" % (data["url"], data["uid"])
         )
+
         r, info = fetch_url(
             self._module,
             url,
@@ -776,15 +774,16 @@ class GrafanaNotificationChannelInterface(object):
             headers=self.headers,
             method="GET",
         )
+
         before = json.loads(to_text(r.read()))
-        if info["status"] == 200 and before != None:
+        if info["status"] == 200 and before is not None:
             if data["state"] == "present":
                 return self.grafana_update_notification_channel(data, payload, before)
             else:
                 return self.grafana_delete_notification_channel(data)
-        elif info["status"] == 404 or (before == None and data["state"] == "present"):
+        elif info["status"] == 404 or (before is None and data["state"] == "present"):
             return self.grafana_create_notification_channel(data, payload)
-        elif info["status"] == 200 and before == None and data["state"] == "absent":
+        elif info["status"] == 200 and before is None and data["state"] == "absent":
             return {"changed": False}
         else:
             raise GrafanaAPIException(
@@ -792,17 +791,20 @@ class GrafanaNotificationChannelInterface(object):
             )
 
     def grafana_delete_notification_channel(self, data):
-        url = (
+        url_template = (
             "%s/api/v1/provisioning/contact-points/%s"
             if self.grafana_unified_alerting
             else "%s/api/alert-notifications/uid/%s"
         )
+        url = url_template % (data["url"], data["uid"])
+
         r, info = fetch_url(
             self._module,
-            url % (data["url"], data["uid"]),
+            url,
             headers=self.headers,
             method="DELETE",
         )
+
         if info["status"] == 200 or info["status"] == 202:
             return {"state": "absent", "changed": True}
         elif info["status"] == 404:
