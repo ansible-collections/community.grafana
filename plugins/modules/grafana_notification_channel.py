@@ -431,6 +431,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
+from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible_collections.community.grafana.plugins.module_utils.base import (
     grafana_argument_spec,
     clean_url,
@@ -763,7 +764,7 @@ class GrafanaNotificationChannelInterface(object):
     def grafana_create_or_update_notification_channel(self, data):
         payload = grafana_notification_channel_payload(data)
         url = (
-            "%s/api/v1/provisioning/contact-points" % data["url"]
+            "%s/api/v1/provisioning/contact-points?name=%s" % (data["url"], quote(data["name"]))
             if self.grafana_unified_alerting
             else "%s/api/alert-notifications/uid/%s" % (data["url"], data["uid"])
         )
@@ -774,10 +775,10 @@ class GrafanaNotificationChannelInterface(object):
             headers=self.headers,
             method="GET",
         )
-        if info["status"] == 200:
-            before = json.loads(to_text(r.read()))
+        before = json.loads(to_text(r.read()))
+        if info["status"] == 200 and before != None:
             return self.grafana_update_notification_channel(data, payload, before)
-        elif info["status"] == 404:
+        elif info["status"] == 404 or before == None:
             return self.grafana_create_notification_channel(data, payload)
         else:
             raise GrafanaAPIException(
