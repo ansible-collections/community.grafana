@@ -764,7 +764,8 @@ class GrafanaNotificationChannelInterface(object):
     def grafana_create_or_update_notification_channel(self, data):
         payload = grafana_notification_channel_payload(data)
         url = (
-            "%s/api/v1/provisioning/contact-points?name=%s" % (data["url"], quote(data["name"]))
+            "%s/api/v1/provisioning/contact-points?name=%s"
+            % (data["url"], quote(data["name"]))
             if self.grafana_unified_alerting
             else "%s/api/alert-notifications/uid/%s" % (data["url"], data["uid"])
         )
@@ -777,9 +778,14 @@ class GrafanaNotificationChannelInterface(object):
         )
         before = json.loads(to_text(r.read()))
         if info["status"] == 200 and before != None:
-            return self.grafana_update_notification_channel(data, payload, before)
-        elif info["status"] == 404 or before == None:
+            if data["state"] == "present":
+                return self.grafana_update_notification_channel(data, payload, before)
+            else:
+                return self.grafana_delete_notification_channel(data)
+        elif info["status"] == 404 or (before == None and data["state"] == "present"):
             return self.grafana_create_notification_channel(data, payload)
+        elif info["status"] == 200 and before == None and data["state"] == "absent":
+            return {"changed": False}
         else:
             raise GrafanaAPIException(
                 "Unable to get %s %s : %s" % (self.endpoint_type, data["uid"], info)
@@ -797,7 +803,7 @@ class GrafanaNotificationChannelInterface(object):
             headers=self.headers,
             method="DELETE",
         )
-        if info["status"] == 200:
+        if info["status"] == 200 or info["status"] == 202:
             return {"state": "absent", "changed": True}
         elif info["status"] == 404:
             return {"changed": False}
@@ -951,16 +957,12 @@ def main():
     )
 
     module.params["url"] = clean_url(module.params["url"])
-    alert_channel_iface = GrafanaNotificationChannelInterface(module)
 
-    if module.params["state"] == "present":
-        result = alert_channel_iface.grafana_create_or_update_notification_channel(
-            module.params
-        )
-        module.exit_json(failed=False, **result)
-    else:
-        result = alert_channel_iface.grafana_delete_notification_channel(module.params)
-        module.exit_json(failed=False, **result)
+    alert_channel_iface = GrafanaNotificationChannelInterface(module)
+    result = alert_channel_iface.grafana_create_or_update_notification_channel(
+        module.params
+    )
+    module.exit_json(failed=False, **result)
 
 
 if __name__ == "__main__":
