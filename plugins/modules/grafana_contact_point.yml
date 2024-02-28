@@ -195,11 +195,13 @@ class GrafanaContactPointInterface(object):
 
         if info["status"] == 202:
             contact_point = json.loads(to_text(r.read()))
-            return {"changed": True, "state": data["state"], "contact_point": contact_point}
+            return {
+                "changed": True,
+                "state": data["state"],
+                "contact_point": contact_point,
+            }
         else:
-            raise GrafanaAPIException(
-                "Unable to create contact point: %s" % info
-            )
+            raise GrafanaAPIException("Unable to create contact point: %s" % info)
 
     def grafana_update_contact_point(self, data, payload, before):
         r, info = fetch_url(
@@ -216,7 +218,11 @@ class GrafanaContactPointInterface(object):
             if before == contact_point:
                 return {"changed": False}
             else:
-                return {"changed": True, "diff": {"before": before, "after": payload}, "contact_point": contact_point}
+                return {
+                    "changed": True,
+                    "diff": {"before": before, "after": payload},
+                    "contact_point": contact_point,
+                }
         else:
             raise GrafanaAPIException(
                 "Unable to update contact point %s : %s" % (data["uid"], info)
