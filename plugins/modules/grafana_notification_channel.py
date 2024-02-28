@@ -690,31 +690,31 @@ class GrafanaNotificationChannelInterface(object):
         )
 
     def grafana_create_notification_channel(self, data, payload):
-        url = (
+        url_template = (
             "%s/api/v1/provisioning/contact-points"
             if self.grafana_unified_alerting
             else "%s/api/alert-notifications"
         )
+        url = url_template % data["url"]
+
         r, info = fetch_url(
             self._module,
-            url % data["url"],
+            url,
             data=json.dumps(payload),
             headers=self.headers,
             method="POST",
         )
-        if info["status"] == 200:
-            if self.grafana_unified_alerting:
-                return {
-                    "state": "present",
-                    "changed": True,
-                    "contact-point": json.loads(to_text(r.read())),
-                }
-            else:
-                return {
-                    "state": "present",
-                    "changed": True,
-                    "channel": json.loads(to_text(r.read())),
-                }
+
+        status = info["status"]
+        channel = json.loads(to_text(r.read()))
+
+        if status in [200, 202]:
+            type_key = "contact-point" if self.grafana_unified_alerting else "channel"
+            return {
+                "state": "present",
+                "changed": True,
+                type_key: channel,
+            }
         else:
             raise GrafanaAPIException(
                 "Unable to create %s: %s" % (self.endpoint_type, info)
@@ -736,7 +736,9 @@ class GrafanaNotificationChannelInterface(object):
             method="PUT",
         )
 
-        if info["status"] == 200:
+        status = info["status"]
+
+        if status == 200:
             del before["created"]
             del before["updated"]
 
@@ -753,6 +755,12 @@ class GrafanaNotificationChannelInterface(object):
                     "diff": {"before": before, "after": after},
                     "channel": channel,
                 }
+        elif status == 202:
+            contact_point = json.loads(to_text(r.read()))
+            return {
+                "changed": True,
+                "contact-point": contact_point,
+            }
         else:
             raise GrafanaAPIException(
                 "Unable to update %s %s : %s" % (self.endpoint_type, data["uid"], info)
@@ -776,15 +784,24 @@ class GrafanaNotificationChannelInterface(object):
         )
 
         before = json.loads(to_text(r.read()))
-        if info["status"] == 200 and before is not None:
-            if data["state"] == "present":
-                return self.grafana_update_notification_channel(data, payload, before)
+        status = info.get("status")
+        state = data["state"]
+
+        if status == 200:
+            if state == "present":
+                if before is None:
+                    return self.grafana_create_notification_channel(data, payload)
+                else:
+                    return self.grafana_update_notification_channel(
+                        data, payload, before
+                    )
             else:
-                return self.grafana_delete_notification_channel(data)
-        elif info["status"] == 404 or (before is None and data["state"] == "present"):
+                if before is None:
+                    return {"changed": False}
+                else:
+                    return self.grafana_delete_notification_channel(data)
+        elif status == 404:
             return self.grafana_create_notification_channel(data, payload)
-        elif info["status"] == 200 and before is None and data["state"] == "absent":
-            return {"changed": False}
         else:
             raise GrafanaAPIException(
                 "Unable to get %s %s : %s" % (self.endpoint_type, data["uid"], info)
