@@ -163,6 +163,16 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | webhook_password | no |
 | webhook_url | no |
 | webhook_username | no |
+| [**grafana_contact_point**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_contact_point_module.html) |
+| email_addresses | no |
+| email_single | no |
+| is_default | no |
+| name | yes |
+| org_id | no |
+| org_name | no |
+| state | no |
+| type | yes |
+| uid | no |
 
 ## Example Playbook
 
