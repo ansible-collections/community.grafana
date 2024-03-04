@@ -78,11 +78,6 @@ class GrafanaAPIException(Exception):
     pass
 
 
-def grafana_contact_point_payload_email(data, payload):
-    payload["settings"]["addresses"] = ";".join(data["email_addresses"])
-    if data.get("email_single"):
-        payload["settings"]["singleEmail"] = data["email_single"]
-
 def grafana_contact_point_payload(data):
     payload = {
         "uid": data["uid"],
@@ -93,8 +88,189 @@ def grafana_contact_point_payload(data):
         "settings": {},
     }
 
-    if data["type"] == "email":
-        grafana_contact_point_payload_email(data, payload)
+    type_settings_map = {
+        "alertmanager": {
+            "basicAuthPassword": "alertmanager_password",
+            "url": "alertmanager_url",
+            "basicAuthUser": "alertmanager_username",
+        },
+        "dingding": {
+            "message": "dingding_message",
+            "msgType": "dingding_message_type",
+            "title": "dingding_title",
+            "url": "dingding_url",
+        },
+        "discord": {
+            "avatar_url": "discord_avatar_url",
+            "message": "discord_message",
+            "title": "discord_title",
+            "url": "discord_url",
+            "use_discord_username": "discord_use_username",
+        },
+        "email": {
+            "addresses": "email_addresses",
+            "message": "email_message",
+            "singleEmail": "email_single",
+            "subject": "email_subject",
+        },
+        "googlechat": {
+            "url": "googlechat_url",
+            "message": "googlechat_message",
+            "title": "googlechat_title",
+        },
+        "kafka": {
+            "apiVersion": "kafka_api_version",
+            "kafkaClusterId": "kafka_cluster_id",
+            "description": "kafka_description",
+            "details": "kafka_details",
+            "password": "kafka_password",
+            "kafkaRestProxy": "kafka_rest_proxy_url",
+            "kafkaTopic": "kafka_topic",
+            "username": "kafka_username",
+        },
+        "line": {
+            "description": "line_description",
+            "title": "line_title",
+            "token": "line_token",
+        },
+        "opsgenie": {
+            "apiKey": "opsgenie_api_key",
+            "autoClose": "opsgenie_auto_close",
+            "description": "opsgenie_description",
+            "message": "opsgenie_message",
+            "overridePriority": "opsgenie_override_priority",
+            "responders": "opsgenie_responders",
+            "sendTagsAs": "opsgenie_send_tags_as",
+            "apiUrl": "opsgenie_url",
+        },
+        "pagerduty": {
+            "class": "pagerduty_class",
+            "client": "pagerduty_client",
+            "client_url": "pagerduty_client_url",
+            "component": "pagerduty_component",
+            "details": "pagerduty_details",
+            "group": "pagerduty_group",
+            "integrationKey": "pagerduty_integration_key",
+            "severity": "pagerduty_severity",
+            "source": "pagerduty_source",
+            "summary": "pagerduty_summary",
+        },
+        "pushover": {
+            "apiToken": "pushover_api_token",
+            "device": "pushover_devices",
+            "expire": "pushover_expire",
+            "message": "pushover_message",
+            "okPriority": "pushover_ok_priority",
+            "okSound": "pushover_ok_sound",
+            "priority": "pushover_priority",
+            "retry": "pushover_retry",
+            "sound": "pushover_sound",
+            "title": "pushover_title",
+            "uploadImage": "pushover_upload_image",
+            "userKey": "pushover_user_key",
+        },
+        "sensugo": {
+            "apiKey": "sensugo_api_key",
+            "url": "sensugo_url",
+            "check": "sensugo_check",
+            "entity": "sensugo_entity",
+            "handler": "sensugo_handler",
+            "message": "sensugo_message",
+            "namespace": "sensugo_namespace",
+        },
+        "slack": {
+            "endpointUrl": "slack_endpoint_url",
+            "icon_emoji": "slack_icon_emoji",
+            "icon_url": "slack_icon_url",
+            "mentionChannel": "slack_mention_channel",
+            "mentionGroups": "slack_mention_groups",
+            "mentionUsers": "slack_mention_users",
+            "recipient": "slack_recipient",
+            "text": "slack_text",
+            "title": "slack_title",
+            "token": "slack_token",
+            "url": "slack_url",
+            "username": "slack_username",
+        },
+        "teams": {
+            "message": "teams_message",
+            "sectiontitle": "teams_section_title",
+            "title": "teams_title",
+            "url": "teams_url",
+        },
+        "telegram": {
+            "chatid": "telegram_chat_id",
+            "disable_notification": "telegram_disable_notifications",
+            "message": "telegram_message",
+            "parse_mode": "telegram_parse_mode",
+            "protect_content": "telegram_protect_content",
+            "bottoken": "telegram_token",
+            "disable_web_page_preview": "telegram_web_page_view",
+        },
+        "threema": {
+            "api_secret": "threema_api_secret",
+            "description": "threema_description",
+            "gateway_id": "threema_gateway_id",
+            "recipient_id": "threema_recipient_id",
+            "title": "threema_title",
+        },
+        "victorops": {
+            "description": "victorops_description",
+            "messageType": "victorops_message_type",
+            "title": "victorops_title",
+            "url": "victorops_url",
+        },
+        "webex": {
+            "api_url": "webex_api_url",
+            "message": "webex_message",
+            "room_id": "webex_room_id",
+            "bot_token": "webex_token",
+        },
+        "webhook": {
+            "authorization_credentials": "webhook_authorization_credentials",
+            "authorization_scheme": "webhook_authorization_scheme",
+            "httpMethod": "webhook_http_method",
+            "maxAlerts": "webhook_max_alerts",
+            "message": "webhook_message",
+            "password": "webhook_password",
+            "title": "webhook_title",
+            "url": "webhook_url",
+            "username": "webhook_username",
+        },
+        "wecom": {
+            "agent_id": "wecom_agent_id",
+            "corp_id": "wecom_corp_id",
+            "message": "wecom_message",
+            "msgtype": "wecom_msg_type",
+            "secret": "wecom_secret",
+            "title": "wecom_title",
+            "touser": "wecom_to_user",
+            "url": "wecom_url",
+        },
+    }
+
+    type_settings = type_settings_map.get(data["type"])
+    if type_settings:
+        for setting_key, data_key in type_settings.items():
+            if data_key == "pushover_priority":
+                payload["settings"][setting_key] = {
+                    "emergency": "2",
+                    "high": "1",
+                    "normal": "0",
+                    "low": "-1",
+                    "lowest": "-2",
+                }[data[data_key]]
+            elif data_key == "dingding_message_type":
+                payload["settings"][setting_key] = {
+                    "link": "link",
+                    "action_card": "actionCard",
+                }[data[data_key]]
+            elif data_key in ["email_addresses", "pushover_devices"]:
+                payload["settings"][setting_key] = ";".join(data[data_key])
+            elif data_key in ["slack_mention_users", "slack_mention_groups"]:
+                payload["settings"][setting_key] = ",".join(data[data_key])
+            elif data.get(data_key):
+                payload["settings"][setting_key] = data[data_key]
 
     return payload
 
