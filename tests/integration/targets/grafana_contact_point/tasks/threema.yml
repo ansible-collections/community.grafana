@@ -1,0 +1,60 @@
+---
+- name: Create threema contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    name: threema
+    type: threema
+    threema_gateway_id: "*xxxxxxx"
+    threema_recipient_id: yyyyyyyy
+    threema_api_secret: zzz
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Create threema contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    name: threema
+    type: threema
+    threema_gateway_id: xxx
+    threema_recepient_id: yyy
+    threema_api_secret: zzz
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Delete threema contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Delete threema contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False

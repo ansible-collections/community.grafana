@@ -1,0 +1,11 @@
+---
+- name: Run tests for grafana_contact_point
+  hosts: localhost
+  module_defaults:
+    community.grafana.grafana_contact_point:
+      grafana_url: http://grafana:3000
+      grafana_user: admin
+      grafana_password: admin
+  tasks:
+    - ansible.builtin.include_role:
+        name: ../../grafana_contact_point

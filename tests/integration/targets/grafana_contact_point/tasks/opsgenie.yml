@@ -1,0 +1,59 @@
+---
+- name: Create opsgenie contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    name: opsgenie
+    type: opsgenie
+    opsgenie_url: https://example.org
+    opsgenie_api_key: xxx
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Create opsgenie contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    name: opsgenie
+    type: opsgenie
+    opsgenie_url: https://example.org
+    opsgenie_api_key: xxx
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False
+
+- name: Delete opsgenie contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+      - result.state == 'absent'
+
+- name: Delete opsgenie contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False
