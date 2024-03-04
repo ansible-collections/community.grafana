@@ -83,7 +83,6 @@ def grafana_contact_point_payload(data):
         "uid": data["uid"],
         "name": data["name"],
         "type": data["type"],
-        "isDefault": data["is_default"],
         "disableResolveMessage": data["disable_resolve_message"],
         "settings": {},
     }
@@ -300,9 +299,16 @@ class GrafanaContactPointInterface(object):
             self.grafana_switch_organisation(module.params, self.org_id)
         # }}}
 
-    def grafana_api_provisioning(self, data):
-        if not data["provisioning"]:
+    def grafana_api_provisioning(self, data, before):
+        if not before or (
+            not before.get("provenance") and not data.get("provisioning")
+        ):
             self.headers["X-Disable-Provenance"] = "true"
+        elif before.get("provenance") and not data.get("provisioning"):
+            self._module.fail_json(
+                msg="Unable to update contact point '%s': provisioning cannot be disabled if it's already enabled"
+                % data["uid"]
+            )
 
     def grafana_organization_by_name(self, data, org_name):
         r, info = fetch_url(
@@ -329,7 +335,7 @@ class GrafanaContactPointInterface(object):
         )
         if info["status"] != 200:
             raise GrafanaAPIException(
-                "Unable to switch to organization %s : %s" % (org_id, info)
+                "Unable to switch to organization '%s': %s" % (org_id, info)
             )
 
     def grafana_check_contact_point_match(self, data):
@@ -348,17 +354,17 @@ class GrafanaContactPointInterface(object):
             return self.grafana_handle_contact_point(data, before)
         else:
             raise GrafanaAPIException(
-                "Unable to get contact point %s : %s" % (data["uid"], info)
+                "Unable to get contact point '%s': %s" % (data["uid"], info)
             )
 
     def grafana_handle_contact_point(self, data, before):
         payload = grafana_contact_point_payload(data)
 
         if data["state"] == "present":
+            self.grafana_api_provisioning(data, before)
             if before:
                 return self.grafana_update_contact_point(data, payload, before)
             else:
-                self.grafana_api_provisioning(data)
                 return self.grafana_create_contact_point(data, payload)
         else:
             if before:
@@ -395,19 +401,20 @@ class GrafanaContactPointInterface(object):
         )
 
         if info["status"] == 202:
-            contact_point = json.loads(to_text(r.read()))
+            if before.get("provenance") and data.get("provisioning"):
+                del before["provenance"]
 
-            if before == contact_point:
+            if before == payload:
                 return {"changed": False}
             else:
                 return {
                     "changed": True,
                     "diff": {"before": before, "after": payload},
-                    "contact_point": contact_point,
+                    "contact_point": payload,
                 }
         else:
             raise GrafanaAPIException(
-                "Unable to update contact point %s : %s" % (data["uid"], info)
+                "Unable to update contact point '%s': %s" % (data["uid"], info)
             )
 
     def grafana_delete_contact_point(self, data):
@@ -424,7 +431,7 @@ class GrafanaContactPointInterface(object):
             return {"changed": False}
         else:
             raise GrafanaAPIException(
-                "Unable to delete contact point %s : %s" % (data["uid"], info)
+                "Unable to delete contact point '%s': %s" % (data["uid"], info)
             )
 
 
@@ -434,7 +441,6 @@ def main():
         # general arguments
         disable_resolve_message=dict(type="bool", default=False),
         include_image=dict(type="bool", default=False),
-        is_default=dict(type="bool", default=False),
         name=dict(type="str"),
         org_id=dict(type="int", default=1),
         org_name=dict(type="str"),
