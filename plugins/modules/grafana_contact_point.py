@@ -78,24 +78,11 @@ class GrafanaAPIException(Exception):
     pass
 
 
-def grafana_contact_point_payload(data):
-    payload = {
-        "uid": data["uid"],
-        "name": data["name"],
-        "type": data["type"],
-        "isDefault": data["is_default"],
-        "disableResolveMessage": data["disable_resolve_message"],
-    }
-
-    return payload
-
-
 def grafana_contact_point_payload_email(data, payload):
     payload["settings"]["addresses"] = ";".join(data["email_addresses"])
     if data.get("email_single"):
         payload["settings"]["singleEmail"] = data["email_single"]
 
-
 def grafana_contact_point_payload(data):
     payload = {
         "uid": data["uid"],
@@ -103,7 +90,7 @@ def grafana_contact_point_payload(data):
         "type": data["type"],
         "isDefault": data["is_default"],
         "disableResolveMessage": data["disable_resolve_message"],
-        "settings": {"uploadImage": data["include_image"]},
+        "settings": {},
     }
 
     if data["type"] == "email":
@@ -133,6 +120,10 @@ class GrafanaContactPointInterface(object):
             )
             self.grafana_switch_organisation(module.params, self.org_id)
         # }}}
+
+    def grafana_api_provisioning(self, data):
+        if not data["provisioning"]:
+            self.headers["X-Disable-Provenance"] = "true"
 
     def grafana_organization_by_name(self, data, org_name):
         r, info = fetch_url(
@@ -188,6 +179,7 @@ class GrafanaContactPointInterface(object):
             if before:
                 return self.grafana_update_contact_point(data, payload, before)
             else:
+                self.grafana_api_provisioning(data)
                 return self.grafana_create_contact_point(data, payload)
         else:
             if before:
@@ -267,6 +259,7 @@ def main():
         name=dict(type="str"),
         org_id=dict(type="int", default=1),
         org_name=dict(type="str"),
+        provisioning=dict(type="bool", default=True),
         type=dict(
             type="str",
             choices=[
