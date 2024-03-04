@@ -346,7 +346,9 @@ def main():
         pagerduty_details=dict(type="list", elements="dict"),
         pagerduty_group=dict(type="str"),
         pagerduty_integration_key=dict(type="str", no_log=True),
-        pagerduty_severity=dict(type="str", choices=["critical", "error", "warning", "info"]),
+        pagerduty_severity=dict(
+            type="str", choices=["critical", "error", "warning", "info"]
+        ),
         pagerduty_source=dict(type="str"),
         pagerduty_summary=dict(type="str"),
         # type: pushover
@@ -455,11 +457,19 @@ def main():
             ["type", "slack", ["slack_recipient", "slack_token", "slack_url"]],
             ["type", "teams", ["teams_url"]],
             ["type", "telegram", ["telegram_chat_id", "telegram_token"]],
-            ["type", "threema", ["threema_api_secret", "threema_gateway_id", "threema_recipient_id"]],
+            [
+                "type",
+                "threema",
+                ["threema_api_secret", "threema_gateway_id", "threema_recipient_id"],
+            ],
             ["type", "victorops", ["victorops_url"]],
             ["type", "webex", ["webex_token", "webex_room_id"]],
             ["type", "webhook", ["webhook_url"]],
-            ["type", "wecom", ["wecom_url", "wecom_agent_id", "wecom_corp_id", "wecom_secret"]],
+            [
+                "type",
+                "wecom",
+                ["wecom_url", "wecom_agent_id", "wecom_corp_id", "wecom_secret"],
+            ],
         ],
     )
 
