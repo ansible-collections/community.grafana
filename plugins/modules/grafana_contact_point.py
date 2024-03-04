@@ -88,6 +88,9 @@ def grafana_contact_point_payload(data):
         "settings": {},
     }
 
+    if data["type"] == "alertmanager":
+        payload["type"] = "prometheus-alertmanager"
+
     type_settings_map = {
         "alertmanager": {
             "basicAuthPassword": "alertmanager_password",
