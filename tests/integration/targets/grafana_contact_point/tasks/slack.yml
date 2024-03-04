@@ -1,0 +1,86 @@
+---
+- name: Create slack contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: slack
+    name: slack
+    type: slack
+    slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Create slack contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: slack
+    name: slack
+    type: slack
+    slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False
+
+- name: Check slack contact point idempotency
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: slack
+    name: slack
+    type: slack
+    slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False
+
+- name: Update slack contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: slack
+    name: slack
+    type: slack
+    slack_url: https://hooks.slack.com/services/xxx/yyy/fff
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Delete slack contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    state: absent
+    uid: slack
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Delete slack contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    state: absent
+    uid: slack
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False

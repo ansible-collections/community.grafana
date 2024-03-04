@@ -1,0 +1,56 @@
+---
+- name: Create webhook contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: webhook
+    name: webhook
+    type: webhook
+    webhook_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Create webhook contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: webhook
+    name: webhook
+    type: webhook
+    webhook_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False
+
+- name: Delete webhook contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: webhook
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Delete webhook contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: webhook
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False
