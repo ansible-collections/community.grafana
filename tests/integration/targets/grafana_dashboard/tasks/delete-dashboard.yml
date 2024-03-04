@@ -1,14 +1,60 @@
 ---
-- name: Delete dashboard
+- name: Delete dashboard | check mode | dashboard exists
   community.grafana.grafana_dashboard:
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
     state: absent
-    uid: "{{ result.uid }}"
-  register: result
+    uid: "{{ uid_to_delete }}"
+  check_mode: true
+  register: dd_result1
 - ansible.builtin.assert:
     that:
-      - result.failed == false
-      - result.changed == true
-      - result.msg == 'Dashboard ' ~ result.uid ~ ' deleted'
+      - dd_result1.failed == false
+      - dd_result1.changed == true
+      - dd_result1.msg == 'Dashboard ' ~ dd_result1.uid ~ ' will be deleted'
+
+- name: Delete dashboard | run mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+    uid: "{{ uid_to_delete }}"
+  check_mode: false
+  register: dd_result2
+- ansible.builtin.assert:
+    that:
+      - dd_result2.failed == false
+      - dd_result2.changed == true
+      - dd_result2.msg == 'Dashboard ' ~ dd_result2.uid ~ ' deleted'
+
+- name: Delete dashboard | check mode | dashboard does not exist
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+    uid: "{{ uid_to_delete }}"
+  check_mode: true
+  register: dd_result1
+- ansible.builtin.assert:
+    that:
+      - dd_result1.failed == false
+      - dd_result1.changed == false
+      - dd_result1.msg == 'Dashboard ' ~ dd_result1.uid ~ ' does not exist.'
+
+- name: Delete dashboard | run mode | dashboard does not exist
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+    uid: "{{ uid_to_delete }}"
+  check_mode: false
+  register: dd_result2
+- ansible.builtin.assert:
+    that:
+      - dd_result2.failed == false
+      - dd_result2.changed == false
+      - dd_result2.msg == 'Dashboard ' ~ dd_result2.uid ~ ' does not exist.'

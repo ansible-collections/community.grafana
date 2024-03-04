@@ -64,7 +64,7 @@ options:
   skip_version_check:
     description:
       - Skip Grafana version check and try to reach api endpoint anyway.
-      - This parameter can be useful if you enabled `hide_version` in grafana.ini
+      - This parameter can be useful if you enabled C(hide_version) in grafana.ini
     required: False
     type: bool
     default: false

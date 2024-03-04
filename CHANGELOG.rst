@@ -5,6 +5,41 @@ Grafana Collection Release Notes
 .. contents:: Topics
 
 
+v1.8.0
+======
+
+Minor Changes
+-------------
+
+- Manage `grafana_folder` for organizations
+- Merged ansible role telekom-mms/ansible-role-grafana into ansible-collections/community.grafana
+- added `community.grafana.notification_channel` to role
+- grafana_dashboard - add check_mode support
+
+Bugfixes
+--------
+
+- test: replace deprecated `TestCase.assertEquals` to support Python 3.12
+
+v1.7.0
+======
+
+Minor Changes
+-------------
+
+- Add Quickwit search engine datasource (https://quickwit.io).
+- Add parameter `org_name` to `grafana_dashboard`
+- Add parameter `org_name` to `grafana_datasource`
+- Add parameter `org_name` to `grafana_organization_user`
+- Add support for Grafana Tempo datasource type (https://grafana.com/docs/grafana/latest/datasources/tempo/)
+- default to true/false in docs and code
+
+Bugfixes
+--------
+
+- Add `grafana_organiazion_user` to `action_groups.grafana`
+- Fixed orgId handling in diff comparison for `grafana_datasource` if using org_name
+
 v1.6.1
 ======
 

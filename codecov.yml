@@ -3,4 +3,4 @@ coverage:
   round: down
   range: "70...100"
 fixes:
-   - "/ansible_collections/community/grafana/::"
+  - "/ansible_collections/community/grafana/::"

@@ -1,0 +1,203 @@
+---
+- name: Group tasks for authentication parameters
+  module_defaults:
+    group/community.grafana.grafana:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      use_proxy: "{{ grafana_use_proxy | default(omit) }}"
+      validate_certs: "{{ grafana_validate_certs | default(omit) }}"
+  block:
+    - name: Manage organization  # noqa: args[module]
+      community.grafana.grafana_organization:
+        name: "{{ organization.name }}"
+        state: "{{ organization.state | default(omit) }}"
+      loop: "{{ grafana_organizations }}"
+      loop_control: {loop_var: organization}
+      tags: organization
+
+    - name: Manage notification channel
+      community.grafana.grafana_notification_channel:
+        dingding_message_type: "{{ notification_channel.dingding_message_type | default(omit) }}"
+        dingding_url: "{{ notification_channel.dingding_url | default(omit) }}"
+        disable_resolve_message: "{{ notification_channel.disable_resolve_message | default(omit) }}"
+        discord_message_content: "{{ notification_channel.discord_message_content | default(omit) }}"
+        discord_url: "{{ notification_channel.discord_url | default(omit) }}"
+        email_addresses: "{{ notification_channel.email_addresses | default(omit) }}"
+        email_single: "{{ notification_channel.email_single | default(omit) }}"
+        googlechat_url: "{{ notification_channel.googlechat_url | default(omit) }}"
+        hipchat_api_key: "{{ notification_channel.hipchat_api_key | default(omit) }}"
+        hipchat_room_id: "{{ notification_channel.hipchat_room_id | default(omit) }}"
+        hipchat_url: "{{ notification_channel.hipchat_url | default(omit) }}"
+        include_image: "{{ notification_channel.include_image | default(omit) }}"
+        is_default: "{{ notification_channel.is_default | default(omit) }}"
+        kafka_topic: "{{ notification_channel.kafka_topic | default(omit) }}"
+        kafka_url: "{{ notification_channel.kafka_url | default(omit) }}"
+        line_token: "{{ notification_channel.line_token | default(omit) }}"
+        name: "{{ notification_channel.name }}"
+        opsgenie_api_key: "{{ notification_channel.opsgenie_api_key | default(omit) }}"
+        opsgenie_auto_close: "{{ notification_channel.opsgenie_auto_close | default(omit) }}"
+        opsgenie_override_priority: "{{ notification_channel.opsgenie_override_priority | default(omit) }}"
+        opsgenie_url: "{{ notification_channel.opsgenie_url | default(omit) }}"
+        org_id: "{{ notification_channel.org_id | default(omit) }}"
+        pagerduty_auto_resolve: "{{ notification_channel.pagerduty_auto_resolve | default(omit) }}"
+        pagerduty_integration_key: "{{ notification_channel.pagerduty_integration_key | default(omit) }}"
+        pagerduty_message_in_details: "{{ notification_channel.pagerduty_message_in_details | default(omit) }}"
+        pagerduty_severity: "{{ notification_channel.pagerduty_severity | default(omit) }}"
+        prometheus_password: "{{ notification_channel.prometheus_password | default(omit) }}"
+        prometheus_url: "{{ notification_channel.prometheus_url | default(omit) }}"
+        prometheus_username: "{{ notification_channel.prometheus_username | default(omit) }}"
+        pushover_alert_sound: "{{ notification_channel.pushover_alert_sound | default(omit) }}"
+        pushover_api_token: "{{ notification_channel.pushover_api_token | default(omit) }}"
+        pushover_devices: "{{ notification_channel.pushover_devices | default(omit) }}"
+        pushover_expire: "{{ notification_channel.pushover_expire | default(omit) }}"
+        pushover_ok_sound: "{{ notification_channel.pushover_ok_sound | default(omit) }}"
+        pushover_priority: "{{ notification_channel.pushover_priority | default(omit) }}"
+        pushover_retry: "{{ notification_channel.pushover_retry | default(omit) }}"
+        pushover_user_key: "{{ notification_channel.pushover_user_key | default(omit) }}"
+        reminder_frequency: "{{ notification_channel.reminder_frequency | default(omit) }}"
+        sensu_handler: "{{ notification_channel.sensu_handler | default(omit) }}"
+        sensu_password: "{{ notification_channel.sensu_password | default(omit) }}"
+        sensu_source: "{{ notification_channel.sensu_source | default(omit) }}"
+        sensu_url: "{{ notification_channel.sensu_url | default(omit) }}"
+        sensu_username: "{{ notification_channel.sensu_username | default(omit) }}"
+        slack_icon_emoji: "{{ notification_channel.slack_icon_emoji | default(omit) }}"
+        slack_icon_url: "{{ notification_channel.slack_icon_url | default(omit) }}"
+        slack_mention_channel: "{{ notification_channel.slack_mention_channel | default(omit) }}"
+        slack_mention_groups: "{{ notification_channel.slack_mention_groups | default(omit) }}"
+        slack_mention_users: "{{ notification_channel.slack_mention_users | default(omit) }}"
+        slack_recipient: "{{ notification_channel.slack_recipient | default(omit) }}"
+        slack_token: "{{ notification_channel.slack_token | default(omit) }}"
+        slack_url: "{{ notification_channel.slack_url | default(omit) }}"
+        slack_username: "{{ notification_channel.slack_username | default(omit) }}"
+        state: "{{ notification_channel.state | default(omit) }}"
+        teams_url: "{{ notification_channel.teams_url | default(omit) }}"
+        telegram_bot_token: "{{ notification_channel.telegram_bot_token | default(omit) }}"
+        telegram_chat_id: "{{ notification_channel.telegram_chat_id | default(omit) }}"
+        threema_api_secret: "{{ notification_channel.threema_api_secret | default(omit) }}"
+        threema_gateway_id: "{{ notification_channel.threema_gateway_id | default(omit) }}"
+        threema_recipient_id: "{{ notification_channel.threema_recipient_id | default(omit) }}"
+        type: "{{ notification_channel.type }}"
+        uid: "{{ notification_channel.uid | default(omit) }}"
+        victorops_auto_resolve: "{{ notification_channel.victorops_auto_resolve | default(omit) }}"
+        victorops_url: "{{ notification_channel.victorops_url | default(omit) }}"
+        webhook_http_method: "{{ notification_channel.webhook_http_method | default(omit) }}"
+        webhook_password: "{{ notification_channel.webhook_password | default(omit) }}"
+        webhook_url: "{{ notification_channel.webhook_url | default(omit) }}"
+        webhook_username: "{{ notification_channel.webhook_username | default(omit) }}"
+      loop: "{{ grafana_notification_channels }}"
+      loop_control: {loop_var: notification_channel}
+      tags: notification_channel
+
+    - name: Manage datasource
+      community.grafana.grafana_datasource:
+        access: "{{ datasource.access | default(omit) }}"
+        additional_json_data: "{{ datasource.additional_json_data | default(omit) }}"
+        additional_secure_json_data: "{{ datasource.additional_secure_json_data | default(omit) }}"
+        aws_access_key: "{{ datasource.aws_access_key | default(omit) }}"
+        aws_assume_role_arn: "{{ datasource.aws_assume_role_arn | default(omit) }}"
+        aws_auth_type: "{{ datasource.aws_auth_type | default(omit) }}"
+        aws_credentials_profile: "{{ datasource.aws_credentials_profile | default(omit) }}"
+        aws_custom_metrics_namespaces: "{{ datasource.aws_custom_metrics_namespaces | default(omit) }}"
+        aws_default_region: "{{ datasource.aws_default_region | default(omit) }}"
+        aws_secret_key: "{{ datasource.aws_secret_key | default(omit) }}"
+        azure_client: "{{ datasource.azure_client | default(omit) }}"
+        azure_cloud: "{{ datasource.azure_cloud | default(omit) }}"
+        azure_secret: "{{ datasource.azure_secret | default(omit) }}"
+        azure_tenant: "{{ datasource.azure_tenant | default(omit) }}"
+        basic_auth_password: "{{ datasource.basic_auth_password | default(omit) }}"
+        basic_auth_user: "{{ datasource.basic_auth_user | default(omit) }}"
+        database: "{{ datasource.database | default(omit) }}"
+        ds_type: "{{ datasource.ds_type | default(omit) }}"
+        ds_url: "{{ datasource.ds_url | default(omit) }}"
+        enforce_secure_data: "{{ datasource.enforce_secure_data | default(omit) }}"
+        es_version: "{{ datasource.es_version | default(omit) }}"
+        interval: "{{ datasource.interval | default(omit) }}"
+        is_default: "{{ datasource.is_default | default(omit) }}"
+        max_concurrent_shard_requests: "{{ datasource.max_concurrent_shard_requests | default(omit) }}"
+        name: "{{ datasource.name }}"
+        org_id: "{{ datasource.org_id | default(omit) }}"
+        org_name: "{{ datasource.org_name | default(omit) }}"
+        password: "{{ datasource.password | default(omit) }}"
+        sslmode: "{{ datasource.sslmode | default(omit) }}"
+        state: "{{ datasource.state | default(omit) }}"
+        time_field: "{{ datasource.time_field | default(omit) }}"
+        time_interval: "{{ datasource.time_interval | default(omit) }}"
+        tls_ca_cert: "{{ datasource.tls_ca_cert | default(omit) }}"
+        tls_client_cert: "{{ datasource.tls_client_cert | default(omit) }}"
+        tls_client_key: "{{ datasource.tls_client_key | default(omit) }}"
+        tls_skip_verify: "{{ datasource.tls_skip_verify | default(omit) }}"
+        trends: "{{ datasource.trends | default(omit) }}"
+        tsdb_resolution: "{{ datasource.tsdb_resolution | default(omit) }}"
+        tsdb_version: "{{ datasource.tsdb_version | default(omit) }}"
+        uid: "{{ datasource.uid | default(omit) }}"
+        user: "{{ datasource.user | default(omit) }}"
+        with_credentials: "{{ datasource.with_credentials | default(omit) }}"
+        zabbix_password: "{{ datasource.zabbix_password | default(omit) }}"
+        zabbix_user: "{{ datasource.zabbix_user | default(omit) }}"
+      loop: "{{ grafana_datasources }}"
+      loop_control: {loop_var: datasource}
+      tags: datasource
+
+    - name: Manage folder  # noqa: args[module]
+      community.grafana.grafana_folder:
+        name: "{{ folder.name }}"
+        skip_version_check: "{{ folder.skip_version_check | default(omit) }}"
+        state: "{{ folder.state | default(omit) }}"
+        org_id: "{{ folder.org_id | default(omit) }}"
+        org_name: "{{ folder.org_name | default(omit) }}"
+      loop: "{{ grafana_folders }}"
+      loop_control: {loop_var: folder}
+      tags: folder
+
+    - name: Manage team  # noqa: args[module]
+      community.grafana.grafana_team:
+        email: "{{ team.email }}"
+        enforce_members: "{{ team.enforce_members | default(omit) }}"
+        members: "{{ team.members | default(omit) }}"
+        name: "{{ team.name }}"
+        skip_version_check: "{{ team.skip_version_check | default(omit) }}"
+        state: "{{ team.state | default(omit) }}"
+      loop: "{{ grafana_teams }}"
+      loop_control: {loop_var: team}
+      tags: team
+
+    - name: Manage user  # noqa: args[module]
+      community.grafana.grafana_user:
+        email: "{{ user.email | default(omit) }}"
+        is_admin: "{{ user.is_admin | default(omit) }}"
+        login: "{{ user.login }}"
+        name: "{{ user.name }}"
+        password: "{{ user.password | default(omit) }}"
+        state: "{{ user.state | default(omit) }}"
+      loop: "{{ grafana_users }}"
+      loop_control: {loop_var: user}
+      tags: user
+
+    - name: Manage organization users
+      community.grafana.grafana_organization_user:
+        login: "{{ organization_user.login }}"
+        org_id: "{{ organization_user.org_id | default(omit) }}"
+        org_name: "{{ organization_user.org_name | default(omit) }}"
+        role: "{{ organization_user.role | default(omit) }}"
+        state: "{{ organization_user.state | default(omit) }}"
+      loop: "{{ grafana_organization_users }}"
+      loop_control: {loop_var: organization_user}
+      tags: organization_user
+
+    - name: Manage dashboard
+      community.grafana.grafana_dashboard:
+        commit_message: "{{ dashboard.commit_message | default(omit) }}"
+        dashboard_id: "{{ dashboard.dashboard_id | default(omit) }}"
+        dashboard_revision: "{{ dashboard.dashboard_revision | default(omit) }}"
+        folder: "{{ dashboard.folder | default(omit) }}"
+        org_id: "{{ dashboard.org_id | default(omit) }}"
+        org_name: "{{ dashboard.org_name | default(omit) }}"
+        overwrite: "{{ dashboard.overwrite | default(omit) }}"
+        path: "{{ dashboard.path | default(omit) }}"
+        slug: "{{ dashboard.slug | default(omit) }}"
+        state: "{{ dashboard.state | default(omit) }}"
+        uid: "{{ dashboard.uid | default(omit) }}"
+      loop: "{{ grafana_dashboards }}"
+      loop_control: {loop_var: dashboard}
+      tags: [dashboard, molecule-idempotence-notest]

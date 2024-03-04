@@ -20,14 +20,14 @@ options:
     description:
       - The Grafana organization ID where the dashboard will be imported / exported / deleted.
       - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
-      - Mutually exclusive with `org_name`.
+      - Mutually exclusive with C(org_name).
     default: 1
     type: int
   org_name:
     description:
       - The Grafana organization name where the dashboard will be imported / exported / deleted.
       - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
-      - Mutually exclusive with `org_id`.
+      - Mutually exclusive with C(org_id).
     type: str
   folder:
     description:
@@ -90,42 +90,39 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- hosts: localhost
-  connection: local
-  tasks:
-    - name: Import Grafana dashboard foo
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        state: present
-        commit_message: Updated by ansible
-        overwrite: true
-        path: /path/to/dashboards/foo.json
+- name: Import Grafana dashboard foo
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    state: present
+    commit_message: Updated by ansible
+    overwrite: true
+    path: /path/to/dashboards/foo.json
 
-    - name: Import Grafana dashboard Zabbix
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        folder: zabbix
-        dashboard_id: 6098
-        dashboard_revision: 1
+- name: Import Grafana dashboard Zabbix
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    folder: zabbix
+    dashboard_id: 6098
+    dashboard_revision: 1
 
-    - name: Import Grafana dashboard zabbix
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_api_key: "{{ grafana_api_key }}"
-        folder: public
-        dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+- name: Import Grafana dashboard zabbix
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    folder: public
+    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
 
-    - name: Export dashboard
-      community.grafana.grafana_dashboard:
-        grafana_url: http://grafana.company.com
-        grafana_user: "admin"
-        grafana_password: "{{ grafana_password }}"
-        org_id: 1
-        state: export
-        uid: "000000653"
-        path: "/path/to/dashboards/000000653.json"
+- name: Export dashboard
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_user: "admin"
+    grafana_password: "{{ grafana_password }}"
+    org_id: 1
+    state: export
+    uid: "000000653"
+    path: "/path/to/dashboards/000000653.json"
 """
 
 RETURN = """
@@ -221,7 +218,7 @@ def get_grafana_version(module, grafana_url, headers):
         try:
             settings = json.loads(to_text(r.read()))
             grafana_version = settings["buildInfo"]["version"].split(".")[0]
-        except UnicodeError as e:
+        except UnicodeError:
             raise GrafanaAPIException("Unable to decode version string to Unicode")
         except Exception as e:
             raise GrafanaAPIException(e)
@@ -309,7 +306,7 @@ def grafana_dashboard_search(module, grafana_url, folder_id, title, headers):
 
 
 # for comparison, we sometimes need to ignore a few keys
-def grafana_dashboard_changed(payload, dashboard):
+def is_grafana_dashboard_changed(payload, dashboard):
     # you don't need to set the version, but '0' is incremented to '1' by Grafana's API
     if "version" in payload["dashboard"]:
         del payload["dashboard"]["version"]
@@ -413,7 +410,16 @@ def grafana_create_dashboard(module, data):
         )
 
     if dashboard_exists is True:
-        if grafana_dashboard_changed(payload, dashboard):
+        grafana_dashboard_changed = is_grafana_dashboard_changed(payload, dashboard)
+
+        if grafana_dashboard_changed:
+            if module.check_mode:
+                module.exit_json(
+                    uid=uid,
+                    failed=False,
+                    changed=True,
+                    msg="Dashboard %s will be updated" % payload["dashboard"]["title"],
+                )
             # update
             if "overwrite" in data and data["overwrite"]:
                 payload["overwrite"] = True
@@ -449,6 +455,13 @@ def grafana_create_dashboard(module, data):
             result["msg"] = "Dashboard %s unchanged." % payload["dashboard"]["title"]
             result["changed"] = False
     else:
+        if module.check_mode:
+            module.exit_json(
+                failed=False,
+                changed=True,
+                msg="Dashboard %s will be created" % payload["dashboard"]["title"],
+            )
+
         # Ensure there is no id in payload
         if "id" in payload["dashboard"]:
             del payload["dashboard"]["id"]
@@ -502,6 +515,14 @@ def grafana_delete_dashboard(module, data):
 
     result = {}
     if dashboard_exists is True:
+        if module.check_mode:
+            module.exit_json(
+                uid=uid,
+                failed=False,
+                changed=True,
+                msg="Dashboard %s will be deleted" % uid,
+            )
+
         # delete
         if grafana_version < 5:
             r, info = fetch_url(
@@ -558,6 +579,13 @@ def grafana_export_dashboard(module, data):
     )
 
     if dashboard_exists is True:
+        if module.check_mode:
+            module.exit_json(
+                uid=uid,
+                failed=False,
+                changed=True,
+                msg="Dashboard %s will be exported to %s" % (uid, data["path"]),
+            )
         try:
             with open(data["path"], "w", encoding="utf-8") as f:
                 f.write(json.dumps(dashboard, indent=2))
@@ -604,7 +632,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_if=[
             ["state", "export", ["path"]],
         ],

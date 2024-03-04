@@ -149,7 +149,6 @@ class GrafanaTeamsTest(TestCase):
         with self.assertRaises(AnsibleFailJson) as result:
             grafana_team.main()
             err, arg_list = result.exception.args[0]["msg"].split(":")
-            missing_args = [item.strip() for item in arg_list.split(",")]
             self.assertEqual(err, "missing required arguments")
             self.assertEqual(arg_list, ["name", "email", "url"])
 
@@ -219,7 +218,6 @@ class GrafanaTeamsTest(TestCase):
             }
         )
 
-        module = grafana_team.setup_module_object()
         mock_get_version.return_value = get_low_version_resp()
 
         with self.assertRaises(AnsibleFailJson) as result:
@@ -245,7 +243,6 @@ class GrafanaTeamsTest(TestCase):
                 "url": "http://grafana.example.com",
             }
         )
-        module = grafana_team.setup_module_object()
         mock_fetch_url.return_value = unauthorized_resp()
         mock_get_version.return_value = get_version_resp()
 
@@ -271,7 +268,6 @@ class GrafanaTeamsTest(TestCase):
                 "url": "http://grafana.example.com",
             }
         )
-        module = grafana_team.setup_module_object()
         mock_fetch_url.return_value = permission_denied_resp()
         mock_get_version.return_value = get_version_resp()
 
@@ -310,7 +306,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, {"email": "email@test.com", "name": "MyTestTeam"})
+        self.assertEqual(res, {"email": "email@test.com", "name": "MyTestTeam"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -345,7 +341,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, None)
+        self.assertEqual(res, None)
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -381,7 +377,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="POST",
         )
-        self.assertEquals(res, {"message": "Team created", "teamId": 2})
+        self.assertEqual(res, {"message": "Team created", "teamId": 2})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -416,7 +412,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="PUT",
         )
-        self.assertEquals(res, {"message": "Team updated"})
+        self.assertEqual(res, {"message": "Team updated"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -449,7 +445,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="DELETE",
         )
-        self.assertEquals(res, {"message": "Team deleted"})
+        self.assertEqual(res, {"message": "Team deleted"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -482,7 +478,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, ["user1@email.com", "user2@email.com"])
+        self.assertEqual(res, ["user1@email.com", "user2@email.com"])
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -517,7 +513,7 @@ class GrafanaTeamsTest(TestCase):
             },
             method="GET",
         )
-        self.assertEquals(res, [])
+        self.assertEqual(res, [])
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -554,7 +550,7 @@ class GrafanaTeamsTest(TestCase):
                 },
                 method="POST",
             )
-            self.assertEquals(res, None)
+            self.assertEqual(res, None)
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -591,13 +587,13 @@ class GrafanaTeamsTest(TestCase):
                 },
                 method="DELETE",
             )
-            self.assertEquals(res, None)
+            self.assertEqual(res, None)
 
     def test_diff_members_function(self):
         list1 = ["foo@example.com", "bar@example.com"]
         list2 = ["bar@example.com", "random@example.com"]
 
         res = grafana_team.diff_members(list1, list2)
-        self.assertEquals(
+        self.assertEqual(
             res, {"to_del": ["random@example.com"], "to_add": ["foo@example.com"]}
         )
