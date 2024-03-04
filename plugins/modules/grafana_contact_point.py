@@ -78,6 +78,18 @@ class GrafanaAPIException(Exception):
     pass
 
 
+def grafana_contact_point_payload(data):
+    payload = {
+        "uid": data["uid"],
+        "name": data["name"],
+        "type": data["type"],
+        "isDefault": data["is_default"],
+        "disableResolveMessage": data["disable_resolve_message"],
+    }
+
+    return payload
+
+
 def grafana_contact_point_payload_email(data, payload):
     payload["settings"]["addresses"] = ";".join(data["email_addresses"])
     if data.get("email_single"):
@@ -248,16 +260,177 @@ class GrafanaContactPointInterface(object):
 def main():
     argument_spec = grafana_argument_spec()
     argument_spec.update(
+        # general arguments
+        disable_resolve_message=dict(type="bool", default=False),
+        include_image=dict(type="bool", default=False),
+        is_default=dict(type="bool", default=False),
+        name=dict(type="str"),
         org_id=dict(type="int", default=1),
         org_name=dict(type="str"),
+        type=dict(
+            type="str",
+            choices=[
+                "alertmanager",
+                "dingding",
+                "discord",
+                "email",
+                "googlechat",
+                "kaska",
+                "line",
+                "opsgenie",
+                "pagerduty",
+                "pushover",
+                "sensugo",
+                "slack",
+                "teams",
+                "telegram",
+                "threema",
+                "victorops",
+                "webex",
+                "webhook",
+                "wecom",
+            ],
+        ),
         uid=dict(type="str"),
-        name=dict(type="str"),
-        type=dict(type="str", choices=["email"]),
-        is_default=dict(type="bool", default=False),
-        include_image=dict(type="bool", default=False),
-        disable_resolve_message=dict(type="bool", default=False),
+        # type: alertmanager
+        alertmanager_password=dict(type="str", no_log=True),
+        alertmanager_url=dict(type="str"),
+        alertmanager_username=dict(type="str"),
+        # type: dingding
+        dingding_message=dict(type="str"),
+        dingding_message_type=dict(type="str"),
+        dingding_title=dict(type="str"),
+        dingding_url=dict(type="str"),
+        # type: discord
+        discord_avatar_url=dict(type="str"),
+        discord_message=dict(type="str"),
+        discord_title=dict(type="str"),
+        discord_url=dict(type="str", no_log=True),
+        discord_use_username=dict(type="bool", default=False),
+        # type: email
         email_addresses=dict(type="list", elements="str"),
-        email_single=dict(type="bool"),
+        email_message=dict(type="str"),
+        email_single=dict(type="bool", default=False),
+        email_subject=dict(type="str"),
+        # type: googlechat
+        googlechat_url=dict(type="str", no_log=True),
+        googlechat_message=dict(type="str"),
+        googlechat_title=dict(type="str"),
+        # type: kafka
+        kafka_api_version=dict(type="str", default="v2"),
+        kafka_cluster_id=dict(type="str"),
+        kafka_description=dict(type="str"),
+        kafka_details=dict(type="str"),
+        kafka_password=dict(type="str", no_log=True),
+        kafka_rest_proxy_url=dict(type="str", no_log=True),
+        kafka_topic=dict(type="str"),
+        kafka_username=dict(type="str"),
+        # type: line
+        line_description=dict(type="str"),
+        line_title=dict(type="str"),
+        line_token=dict(type="str", no_log=True),
+        # type: opsgenie
+        opsgenie_api_key=dict(type="str", no_log=True),
+        opsgenie_auto_close=dict(type="bool"),
+        opsgenie_description=dict(type="str"),
+        opsgenie_message=dict(type="str"),
+        opsgenie_override_priority=dict(type="bool"),
+        opsgenie_responders=dict(type="list", elements="dict"),
+        opsgenie_send_tags_as=dict(type="str"),
+        opsgenie_url=dict(type="str"),
+        # type: pagerduty
+        pagerduty_class=dict(type="str"),
+        pagerduty_client=dict(type="str"),
+        pagerduty_client_url=dict(type="str"),
+        pagerduty_component=dict(type="str"),
+        pagerduty_details=dict(type="list", elements="dict"),
+        pagerduty_group=dict(type="str"),
+        pagerduty_integration_key=dict(type="str", no_log=True),
+        pagerduty_severity=dict(type="str", choices=["critical", "error", "warning", "info"]),
+        pagerduty_source=dict(type="str"),
+        pagerduty_summary=dict(type="str"),
+        # type: pushover
+        pushover_api_token=dict(type="str", no_log=True),
+        pushover_devices=dict(type="list", elements="str"),
+        pushover_expire=dict(type="int"),
+        pushover_message=dict(type="str"),
+        pushover_ok_priority=dict(type="int"),
+        pushover_ok_sound=dict(type="str"),
+        pushover_priority=dict(type="int"),
+        pushover_retry=dict(type="int"),
+        pushover_sound=dict(type="str"),
+        pushover_title=dict(type="str"),
+        pushover_upload_image=dict(type="bool", default=True),
+        pushover_user_key=dict(type="str", no_log=True),
+        # type: sensugo
+        sensugo_api_key=dict(type="str", no_log=True),
+        sensugo_url=dict(type="str"),
+        sensugo_check=dict(type="str"),
+        sensugo_entity=dict(type="str"),
+        sensugo_handler=dict(type="str"),
+        sensugo_message=dict(type="str"),
+        sensugo_namespace=dict(type="str"),
+        # type: slack
+        slack_endpoint_url=dict(type="str"),
+        slack_icon_emoji=dict(type="str"),
+        slack_icon_url=dict(type="str"),
+        slack_mention_channel=dict(type="str", choices=["here", "channel"]),
+        slack_mention_groups=dict(type="list"),
+        slack_mention_users=dict(type="list"),
+        slack_recipient=dict(type="str"),
+        slack_text=dict(type="str"),
+        slack_title=dict(type="str"),
+        slack_token=dict(type="str", no_log=True),
+        slack_url=dict(type="str", no_log=True),
+        slack_username=dict(type="str"),
+        # type: teams
+        teams_message=dict(type="str"),
+        teams_section_title=dict(type="str"),
+        teams_title=dict(type="str"),
+        teams_url=dict(type="str", no_log=True),
+        # type: telegram
+        telegram_chat_id=dict(type="str"),
+        telegram_disable_notifications=dict(type="bool"),
+        telegram_message=dict(type="str"),
+        telegram_parse_mode=dict(type="str"),
+        telegram_protect_content=dict(type="bool"),
+        telegram_token=dict(type="str", no_log=True),
+        telegram_web_page_view=dict(type="bool"),
+        # type: threema
+        threema_api_secret=dict(type="str", no_log=True),
+        threema_description=dict(type="str"),
+        threema_gateway_id=dict(type="str"),
+        threema_recipient_id=dict(type="str"),
+        threema_title=dict(type="str"),
+        # type: victorops
+        victorops_description=dict(type="str"),
+        victorops_message_type=dict(type="str", choices=["CRITICAL", "RECOVERY"]),
+        victorops_title=dict(type="str"),
+        victorops_url=dict(type="str"),
+        # type: webex
+        webex_api_url=dict(type="str"),
+        webex_message=dict(type="str"),
+        webex_room_id=dict(type="str"),
+        webex_token=dict(type="str", no_log=True),
+        # type: webhook
+        webhook_authorization_credentials=dict(type="str", no_log=True),
+        webhook_authorization_scheme=dict(type="str"),
+        webhook_http_method=dict(type="str", choices=["POST", "PUT"]),
+        webhook_max_alerts=dict(type="int"),
+        webhook_message=dict(type="str"),
+        webhook_password=dict(type="str", no_log=True),
+        webhook_title=dict(type="str"),
+        webhook_url=dict(type="str"),
+        webhook_username=dict(type="str"),
+        # type: wecom
+        wecom_agent_id=dict(type="str"),
+        wecom_corp_id=dict(type="str"),
+        wecom_message=dict(type="str"),
+        wecom_msg_type=dict(type="str"),
+        wecom_secret=dict(type="str", no_log=True),
+        wecom_title=dict(type="str"),
+        wecom_to_user=dict(type="list"),
+        wecom_url=dict(type="str", no_log=True),
     )
 
     module = AnsibleModule(
@@ -267,7 +440,26 @@ def main():
         mutually_exclusive=[["url_username", "grafana_api_key"]],
         required_if=[
             ["state", "present", ["name", "type"]],
+            ["state", "absent", ["uid"]],
+            ["type", "alertmanager", ["alertmanager_url"]],
+            ["type", "dingding", ["dingding_url"]],
+            ["type", "discord", ["discord_url"]],
             ["type", "email", ["email_addresses"]],
+            ["type", "googlechat", ["googlechat_url"]],
+            ["type", "kafka", ["kafka_rest_proxy_url", "kafka_topic"]],
+            ["type", "line", ["line_token"]],
+            ["type", "opsgenie", ["opsgenie_api_key"]],
+            ["type", "pagerduty", ["pagerduty_integration_key"]],
+            ["type", "pushover", ["pushover_api_token", "pushover_user_key"]],
+            ["type", "sensugo", ["sensugo_api_key", "sensugo_url"]],
+            ["type", "slack", ["slack_recipient", "slack_token", "slack_url"]],
+            ["type", "teams", ["teams_url"]],
+            ["type", "telegram", ["telegram_chat_id", "telegram_token"]],
+            ["type", "threema", ["threema_api_secret", "threema_gateway_id", "threema_recipient_id"]],
+            ["type", "victorops", ["victorops_url"]],
+            ["type", "webex", ["webex_token", "webex_room_id"]],
+            ["type", "webhook", ["webhook_url"]],
+            ["type", "wecom", ["wecom_url", "wecom_agent_id", "wecom_corp_id", "wecom_secret"]],
         ],
     )
 
