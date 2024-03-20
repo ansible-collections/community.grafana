@@ -5,7 +5,7 @@
     uid: kafka
     name: kafka
     type: kafka
-    kafka_url: https://example.org
+    kafka_rest_proxy_url: https://example.org
     kafka_topic: test
 
 - ansible.builtin.debug:
@@ -21,7 +21,7 @@
     uid: kafka
     name: kafka
     type: kafka
-    kafka_url: https://example.org
+    kafka_rest_proxy_url: https://example.org
     kafka_topic: test
 
 - ansible.builtin.debug:
