@@ -6,6 +6,8 @@
     name: slack
     type: slack
     slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
+    slack_token: testapitoken
+    slack_recipient: foo
 
 - ansible.builtin.debug:
     var: result
@@ -14,28 +16,15 @@
     that:
       - result.changed == True
 
-- name: Create slack contact point
+- name: Check slack contact point (idempotency)
   register: result
   community.grafana.grafana_contact_point:
     uid: slack
     name: slack
     type: slack
     slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
-
-- ansible.builtin.debug:
-    var: result
-
-- ansible.builtin.assert:
-    that:
-      - result.changed == False
-
-- name: Check slack contact point idempotency
-  register: result
-  community.grafana.grafana_contact_point:
-    uid: slack
-    name: slack
-    type: slack
-    slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
+    slack_token: testapitoken
+    slack_recipient: foo
 
 - ansible.builtin.debug:
     var: result
@@ -51,6 +40,8 @@
     name: slack
     type: slack
     slack_url: https://hooks.slack.com/services/xxx/yyy/fff
+    slack_token: testapitoken
+    slack_recipient: foo
 
 - ansible.builtin.debug:
     var: result

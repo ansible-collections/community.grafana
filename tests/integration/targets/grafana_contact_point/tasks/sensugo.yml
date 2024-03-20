@@ -1,11 +1,12 @@
 ---
-- name: Create sensu contact point
+- name: Create sensugo contact point
   register: result
   community.grafana.grafana_contact_point:
-    uid: sensu
-    name: sensu
-    type: sensu
-    sensu_url: https://example.org
+    uid: sensugo
+    name: sensugo
+    type: sensugo
+    sensugo_url: https://example.org
+    sensugo_api_key: testapikey
 
 - ansible.builtin.debug:
     var: result
@@ -14,13 +15,14 @@
     that:
       - result.changed == True
 
-- name: Create sensu contact point
+- name: Create sensugo contact point
   register: result
   community.grafana.grafana_contact_point:
-    uid: sensu
-    name: sensu
-    type: sensu
-    sensu_url: https://example.org
+    uid: sensugo
+    name: sensugo
+    type: sensugo
+    sensugo_url: https://example.org
+    sensugo_api_key: testapikey
 
 - ansible.builtin.debug:
     var: result
@@ -29,10 +31,10 @@
     that:
       - result.changed == False
 
-- name: Delete sensu contact point
+- name: Delete sensugo contact point
   register: result
   community.grafana.grafana_contact_point:
-    uid: sensu
+    uid: sensugo
     state: absent
 
 - ansible.builtin.debug:
@@ -42,10 +44,10 @@
     that:
       - result.changed == True
 
-- name: Delete sensu contact point (idempotency)
+- name: Delete sensugo contact point (idempotency)
   register: result
   community.grafana.grafana_contact_point:
-    uid: sensu
+    uid: sensugo
     state: absent
 
 - ansible.builtin.debug:
