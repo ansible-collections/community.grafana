@@ -254,25 +254,26 @@ def grafana_contact_point_payload(data):
     type_settings = type_settings_map.get(data["type"])
     if type_settings:
         for setting_key, data_key in type_settings.items():
-            if data_key == "pushover_priority":
-                payload["settings"][setting_key] = {
-                    "emergency": "2",
-                    "high": "1",
-                    "normal": "0",
-                    "low": "-1",
-                    "lowest": "-2",
-                }[data[data_key]]
-            elif data_key == "dingding_message_type":
-                payload["settings"][setting_key] = {
-                    "link": "link",
-                    "action_card": "actionCard",
-                }[data[data_key]]
-            elif data_key in ["email_addresses", "pushover_devices"]:
-                payload["settings"][setting_key] = ";".join(data[data_key])
-            elif data_key in ["slack_mention_users", "slack_mention_groups"]:
-                payload["settings"][setting_key] = ",".join(data[data_key])
-            elif data.get(data_key):
-                payload["settings"][setting_key] = data[data_key]
+            if data[data_key] is not None:
+                if data_key == "pushover_priority":
+                    payload["settings"][setting_key] = {
+                        "emergency": "2",
+                        "high": "1",
+                        "normal": "0",
+                        "low": "-1",
+                        "lowest": "-2",
+                    }[data[data_key]]
+                elif data_key == "dingding_message_type":
+                    payload["settings"][setting_key] = {
+                        "link": "link",
+                        "action_card": "actionCard",
+                    }[data[data_key]]
+                elif data_key in ["email_addresses", "pushover_devices"]:
+                    payload["settings"][setting_key] = ";".join(data[data_key])
+                elif data_key in ["slack_mention_users", "slack_mention_groups"]:
+                    payload["settings"][setting_key] = ",".join(data[data_key])
+                elif data.get(data_key):
+                    payload["settings"][setting_key] = data[data_key]
 
     return payload
 
@@ -403,6 +404,10 @@ class GrafanaContactPointInterface(object):
 
         if info["status"] == 202:
             contact_point = self.grafana_check_contact_point_match(data)
+
+            if contact_point.get("provenance") and data.get("provisioning"):
+                del contact_point["provenance"]
+
             if self.contact_point == contact_point:
                 return {"changed": False}
             else:
@@ -452,7 +457,7 @@ def main():
                 "discord",
                 "email",
                 "googlechat",
-                "kaska",
+                "kafka",
                 "line",
                 "opsgenie",
                 "pagerduty",
