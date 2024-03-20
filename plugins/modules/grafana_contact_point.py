@@ -299,12 +299,12 @@ class GrafanaContactPointInterface(object):
             self.grafana_switch_organisation(module.params, self.org_id)
         # }}}
 
-    def grafana_api_provisioning(self, data, before):
-        if not before or (
-            not before.get("provenance") and not data.get("provisioning")
+    def grafana_api_provisioning(self, data, contact_point):
+        if not contact_point or (
+            not contact_point.get("provenance") and not data.get("provisioning")
         ):
             self.headers["X-Disable-Provenance"] = "true"
-        elif before.get("provenance") and not data.get("provisioning"):
+        elif contact_point.get("provenance") and not data.get("provisioning"):
             self._module.fail_json(
                 msg="Unable to update contact point '%s': provisioning cannot be disabled if it's already enabled"
                 % data["uid"]
@@ -348,26 +348,26 @@ class GrafanaContactPointInterface(object):
 
         if info["status"] == 200:
             contact_points = json.loads(to_text(r.read()))
-            before = next(
+            contact_point = next(
                 (cp for cp in contact_points if cp["uid"] == data["uid"]), None
             )
-            return self.grafana_handle_contact_point(data, before)
+            return self.grafana_handle_contact_point(data, contact_point)
         else:
             raise GrafanaAPIException(
                 "Unable to get contact point '%s': %s" % (data["uid"], info)
             )
 
-    def grafana_handle_contact_point(self, data, before):
+    def grafana_handle_contact_point(self, data, contact_point):
         payload = grafana_contact_point_payload(data)
 
         if data["state"] == "present":
-            self.grafana_api_provisioning(data, before)
-            if before:
-                return self.grafana_update_contact_point(data, payload, before)
+            self.grafana_api_provisioning(data, contact_point)
+            if contact_point:
+                return self.grafana_update_contact_point(data, payload, contact_point)
             else:
                 return self.grafana_create_contact_point(data, payload)
         else:
-            if before:
+            if contact_point:
                 return self.grafana_delete_contact_point(data)
             else:
                 return {"changed": False}
@@ -391,7 +391,7 @@ class GrafanaContactPointInterface(object):
         else:
             raise GrafanaAPIException("Unable to create contact point: %s" % info)
 
-    def grafana_update_contact_point(self, data, payload, before):
+    def grafana_update_contact_point(self, data, payload, contact_point):
         r, info = fetch_url(
             self._module,
             "%s/api/v1/provisioning/contact-points/%s" % (data["url"], data["uid"]),
@@ -401,15 +401,15 @@ class GrafanaContactPointInterface(object):
         )
 
         if info["status"] == 202:
-            if before.get("provenance") and data.get("provisioning"):
-                del before["provenance"]
+            if contact_point.get("provenance") and data.get("provisioning"):
+                del contact_point["provenance"]
 
-            if before == payload:
+            if contact_point == payload:
                 return {"changed": False}
             else:
                 return {
                     "changed": True,
-                    "diff": {"before": before, "after": payload},
+                    "diff": {"before": contact_point, "after": payload},
                     "contact_point": payload,
                 }
         else:
