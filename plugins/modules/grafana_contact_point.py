@@ -402,16 +402,14 @@ class GrafanaContactPointInterface(object):
         )
 
         if info["status"] == 202:
-            if self.contact_point.get("provenance") and data.get("provisioning"):
-                del self.contact_point["provenance"]
-
-            if self.contact_point == payload:
+            contact_point = self.grafana_check_contact_point_match(data)
+            if self.contact_point == contact_point:
                 return {"changed": False}
             else:
                 return {
                     "changed": True,
-                    "diff": {"before": self.contact_point, "after": payload},
-                    "contact_point": payload,
+                    "diff": {"before": self.contact_point, "after": contact_point},
+                    "contact_point": contact_point,
                 }
         else:
             raise GrafanaAPIException(
