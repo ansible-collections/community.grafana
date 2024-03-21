@@ -1,0 +1,56 @@
+---
+- name: Create googlechat contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    name: googlechat
+    type: googlechat
+    googlechat_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Create googlechat contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    name: googlechat
+    type: googlechat
+    googlechat_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False
+
+- name: Delete googlechat contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == True
+
+- name: Delete googlechat contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == False

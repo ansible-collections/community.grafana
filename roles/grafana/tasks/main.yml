@@ -89,6 +89,21 @@
       loop_control: {loop_var: notification_channel}
       tags: notification_channel
 
+    - name: Manage contact point
+      community.grafana.grafana_contact_point:
+        email_addresses: "{{ contact_point.email_addresses | default(omit) }}"
+        email_single: "{{ contact_point.email_single | default(omit) }}"
+        is_default: "{{ contact_point.is_default | default(omit) }}"
+        name: "{{ contact_point.name }}"
+        org_id: "{{ contact_point.org_id | default(omit) }}"
+        org_name: "{{ contact_point.org_id | default(omit) }}"
+        state: "{{ contact_point.state | default(omit) }}"
+        type: "{{ contact_point.type }}"
+        uid: "{{ contact_point.uid | default(omit) }}"
+      loop: "{{ grafana_contact_points }}"
+      loop_control: {loop_var: contact_point}
+      tags: contact_point
+
     - name: Manage datasource
       community.grafana.grafana_datasource:
         access: "{{ datasource.access | default(omit) }}"
