@@ -354,6 +354,10 @@ class GrafanaContactPointInterface(object):
                 (cp for cp in contact_points if cp["uid"] == data["uid"]), None
             )
             return contact_point
+        elif info["status"] == 404:
+            self._module.fail_json(
+                msg="Unable to get contact point: API endpoint not found"
+            )
         else:
             raise GrafanaAPIException(
                 "Unable to get contact point '%s': %s" % (data["uid"], info)
