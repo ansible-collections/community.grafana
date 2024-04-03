@@ -61,20 +61,20 @@ def silence_created_resp():
     )
     return (MockedReponse(server_response), {"status": 200})
 
+
 def silence_get_resp():
-    server_response = json.dumps(
-        [], sort_keys=True
-    )
+    server_response = json.dumps([], sort_keys=True)
     return (MockedReponse(server_response), {"status": 200})
 
+
 def get_silence_by_id_resp():
-    server_response = json.dumps(
-        [], sort_keys=True
-    )
+    server_response = json.dumps([], sort_keys=True)
     return (MockedReponse(server_response), {"status": 200})
+
 
 def get_version_resp():
     return {"major": 10, "minor": 0, "rev": 0}
+
 
 class GrafanaSilenceTest(TestCase):
     def setUp(self):

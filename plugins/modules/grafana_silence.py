@@ -251,9 +251,9 @@ class GrafanaSilenceInterface(object):
         silence = dict(
             comment=comment,
             createdBy=created_by,
-            startsAt=starts_at,
             endsAt=ends_at,
             matchers=matchers,
+            startsAt=starts_at,
         )
         response = self._send_request(
             url, data=silence, headers=self.headers, method="POST"

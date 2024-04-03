@@ -4,3 +4,4 @@
   tasks:
     - ansible.builtin.include_role:
         name: ../../grafana_silence
+
