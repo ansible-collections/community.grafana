@@ -85,10 +85,10 @@ EXAMPLES = """
       starts_at: "2029-07-29T08:45:45.000Z"
       ends_at: "2029-07-29T08:55:45.000Z"
       matchers:
-        - isEqual: true
-          isRegex: true
-          name: environment
-          value: test
+          - isEqual: true
+            isRegex: true
+            name: environment
+            value: test
       state: present
 
 - name: Delete a silence
@@ -100,10 +100,10 @@ EXAMPLES = """
       starts_at: "2029-07-29T08:45:45.000Z"
       ends_at: "2029-07-29T08:55:45.000Z"
       matchers:
-        - isEqual: true
-          isRegex: true
-          name: environment
-          value: test
+          - isEqual: true
+            isRegex: true
+            name: environment
+            value: test
       state: absent
 """
 

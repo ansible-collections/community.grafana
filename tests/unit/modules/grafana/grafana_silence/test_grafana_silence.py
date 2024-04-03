@@ -139,7 +139,6 @@ class GrafanaSilenceTest(TestCase):
                 {
                     "comment": "a testcomment",
                     "created_by": "me",
-                    "starts_at": "2029-07-29T08:45:45.000Z",
                     "ends_at": "2029-07-29T08:55:45.000Z",
                     "matchers": [
                         {
@@ -149,6 +148,7 @@ class GrafanaSilenceTest(TestCase):
                             "value": "test",
                         }
                     ],
+                    "starts_at": "2029-07-29T08:45:45.000Z",
                 },
                 sort_keys=True,
             ),
