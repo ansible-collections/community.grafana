@@ -61,6 +61,20 @@ def silence_created_resp():
     )
     return (MockedReponse(server_response), {"status": 200})
 
+def silence_get_resp():
+    server_response = json.dumps(
+        [], sort_keys=True
+    )
+    return (MockedReponse(server_response), {"status": 200})
+
+def get_silence_by_id_resp():
+    server_response = json.dumps(
+        [], sort_keys=True
+    )
+    return (MockedReponse(server_response), {"status": 200})
+
+def get_version_resp():
+    return {"major": 10, "minor": 0, "rev": 0}
 
 class GrafanaSilenceTest(TestCase):
     def setUp(self):
@@ -73,9 +87,12 @@ class GrafanaSilenceTest(TestCase):
 
     # create a new silence
     @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
+    )
+    @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
     )
-    def test_create_silence_new_silence(self, mock_fetch_url):
+    def test_create_silence_new_silence(self, mock_fetch_url, mock_get_version):
         set_module_args(
             {
                 "url": "https://grafana.example.com",
@@ -97,6 +114,7 @@ class GrafanaSilenceTest(TestCase):
             }
         )
         module = grafana_silence.setup_module_object()
+        mock_get_version.return_value = get_version_resp()
         mock_fetch_url.return_value = silence_created_resp()
 
         grafana_iface = grafana_silence.GrafanaSilenceInterface(module)
@@ -143,9 +161,12 @@ class GrafanaSilenceTest(TestCase):
         self.assertEquals(result, {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"})
 
     @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
+    )
+    @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
     )
-    def test_delete_silence(self, mock_fetch_url):
+    def test_delete_silence(self, mock_fetch_url, mock_get_version):
         set_module_args(
             {
                 "url": "https://grafana.example.com",
@@ -168,6 +189,7 @@ class GrafanaSilenceTest(TestCase):
         )
         module = grafana_silence.setup_module_object()
         mock_fetch_url.return_value = silence_deleted_resp()
+        mock_get_version.return_value = get_version_resp()
 
         grafana_iface = grafana_silence.GrafanaSilenceInterface(module)
         silence_id = "470b7116-8f06-4bb6-9e6c-6258aa92218e"
