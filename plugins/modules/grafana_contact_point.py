@@ -301,7 +301,7 @@ class GrafanaContactPointInterface(object):
         # }}}
         self.contact_point = self.grafana_check_contact_point_match(module.params)
 
-    def grafana_api_provisioning(self, data):
+    def grafana_handle_api_provisioning(self, data):
         if not self.contact_point or (
             not self.contact_point.get("provenance") and not data.get("provisioning")
         ):
@@ -311,6 +311,7 @@ class GrafanaContactPointInterface(object):
                 msg="Unable to update contact point '%s': provisioning cannot be disabled if it's already enabled"
                 % data["uid"]
             )
+        # TODO: else
 
     def grafana_organization_by_name(self, data, org_name):
         r, info = fetch_url(
@@ -356,7 +357,7 @@ class GrafanaContactPointInterface(object):
             return contact_point
         elif info["status"] == 404:
             self._module.fail_json(
-                msg="Unable to get contact point: API endpoint not found"
+                msg="Unable to get contact point: API endpoint not found" # TODO: versionshinweis?!
             )
         else:
             raise GrafanaAPIException(
@@ -367,7 +368,7 @@ class GrafanaContactPointInterface(object):
         payload = grafana_contact_point_payload(data)
 
         if data["state"] == "present":
-            self.grafana_api_provisioning(data)
+            self.grafana_handle_api_provisioning(data)
             if self.contact_point:
                 return self.grafana_update_contact_point(data, payload)
             else:
@@ -668,3 +669,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# TODO: check api messages
