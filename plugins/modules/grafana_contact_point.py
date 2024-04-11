@@ -1038,31 +1038,31 @@ def main():
             ],
         ),
         uid=dict(type="str"),
-        # type: alertmanager
+        # alertmanager
         alertmanager_password=dict(type="str", no_log=True),
         alertmanager_url=dict(type="str"),
         alertmanager_username=dict(type="str"),
-        # type: dingding
+        # dingding
         dingding_message=dict(type="str"),
         dingding_message_type=dict(type="str"),
         dingding_title=dict(type="str"),
         dingding_url=dict(type="str"),
-        # type: discord
+        # discord
         discord_avatar_url=dict(type="str"),
         discord_message=dict(type="str"),
         discord_title=dict(type="str"),
         discord_url=dict(type="str", no_log=True),
         discord_use_username=dict(type="bool", default=False),
-        # type: email
+        # email
         email_addresses=dict(type="list", elements="str"),
         email_message=dict(type="str"),
         email_single=dict(type="bool", default=False),
         email_subject=dict(type="str"),
-        # type: googlechat
+        # googlechat
         googlechat_url=dict(type="str", no_log=True),
         googlechat_message=dict(type="str"),
         googlechat_title=dict(type="str"),
-        # type: kafka
+        # kafka
         kafka_api_version=dict(type="str", default="v2"),
         kafka_cluster_id=dict(type="str"),
         kafka_description=dict(type="str"),
@@ -1071,11 +1071,11 @@ def main():
         kafka_rest_proxy_url=dict(type="str", no_log=True),
         kafka_topic=dict(type="str"),
         kafka_username=dict(type="str"),
-        # type: line
+        # line
         line_description=dict(type="str"),
         line_title=dict(type="str"),
         line_token=dict(type="str", no_log=True),
-        # type: opsgenie
+        # opsgenie
         opsgenie_api_key=dict(type="str", no_log=True),
         opsgenie_auto_close=dict(type="bool"),
         opsgenie_description=dict(type="str"),
@@ -1084,7 +1084,7 @@ def main():
         opsgenie_responders=dict(type="list", elements="dict"),
         opsgenie_send_tags_as=dict(type="str"),
         opsgenie_url=dict(type="str"),
-        # type: pagerduty
+        # pagerduty
         pagerduty_class=dict(type="str"),
         pagerduty_client=dict(type="str"),
         pagerduty_client_url=dict(type="str"),
@@ -1097,7 +1097,7 @@ def main():
         ),
         pagerduty_source=dict(type="str"),
         pagerduty_summary=dict(type="str"),
-        # type: pushover
+        # pushover
         pushover_api_token=dict(type="str", no_log=True),
         pushover_devices=dict(type="list", elements="str"),
         pushover_expire=dict(type="int"),
@@ -1110,7 +1110,7 @@ def main():
         pushover_title=dict(type="str"),
         pushover_upload_image=dict(type="bool", default=True),
         pushover_user_key=dict(type="str", no_log=True),
-        # type: sensugo
+        # sensugo
         sensugo_api_key=dict(type="str", no_log=True),
         sensugo_url=dict(type="str"),
         sensugo_check=dict(type="str"),
@@ -1118,7 +1118,7 @@ def main():
         sensugo_handler=dict(type="str"),
         sensugo_message=dict(type="str"),
         sensugo_namespace=dict(type="str"),
-        # type: slack
+        # slack
         slack_endpoint_url=dict(type="str"),
         slack_icon_emoji=dict(type="str"),
         slack_icon_url=dict(type="str"),
@@ -1131,12 +1131,12 @@ def main():
         slack_token=dict(type="str", no_log=True),
         slack_url=dict(type="str", no_log=True),
         slack_username=dict(type="str"),
-        # type: teams
+        # teams
         teams_message=dict(type="str"),
         teams_section_title=dict(type="str"),
         teams_title=dict(type="str"),
         teams_url=dict(type="str", no_log=True),
-        # type: telegram
+        # telegram
         telegram_chat_id=dict(type="str"),
         telegram_disable_notifications=dict(type="bool"),
         telegram_message=dict(type="str"),
@@ -1144,23 +1144,23 @@ def main():
         telegram_protect_content=dict(type="bool"),
         telegram_token=dict(type="str", no_log=True),
         telegram_web_page_view=dict(type="bool"),
-        # type: threema
+        # threema
         threema_api_secret=dict(type="str", no_log=True),
         threema_description=dict(type="str"),
         threema_gateway_id=dict(type="str"),
         threema_recipient_id=dict(type="str"),
         threema_title=dict(type="str"),
-        # type: victorops
+        # victorops
         victorops_description=dict(type="str"),
         victorops_message_type=dict(type="str", choices=["CRITICAL", "RECOVERY"]),
         victorops_title=dict(type="str"),
         victorops_url=dict(type="str"),
-        # type: webex
+        # webex
         webex_api_url=dict(type="str"),
         webex_message=dict(type="str"),
         webex_room_id=dict(type="str"),
         webex_token=dict(type="str", no_log=True),
-        # type: webhook
+        # webhook
         webhook_authorization_credentials=dict(type="str", no_log=True),
         webhook_authorization_scheme=dict(type="str"),
         webhook_http_method=dict(type="str", choices=["POST", "PUT"]),
@@ -1170,7 +1170,7 @@ def main():
         webhook_title=dict(type="str"),
         webhook_url=dict(type="str"),
         webhook_username=dict(type="str"),
-        # type: wecom
+        # wecom
         wecom_agent_id=dict(type="str"),
         wecom_corp_id=dict(type="str"),
         wecom_message=dict(type="str"),
