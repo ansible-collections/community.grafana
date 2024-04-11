@@ -870,10 +870,7 @@ class GrafanaContactPointInterface(object):
                 % data["uid"]
             )
         else:
-            self._module.fail_json(
-                msg="Unable to update contact point '%s': error while handling provisioning"
-                % data["uid"]
-            )
+            pass
 
     def grafana_organization_by_name(self, data, org_name):
         r, info = fetch_url(
