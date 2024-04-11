@@ -28,7 +28,565 @@ version_added: "1.9.0"
 short_description: Manage Grafana Contact Points
 description:
   - Create/Update/Delete Grafana Contact Points via API.
-
+options:
+  disable_resolve_message:
+    description:
+      - desc_text
+    type: bool
+    default: false
+  include_image:
+    description:
+      - desc_text
+    type: bool
+    default: false
+  name:
+    description:
+      - desc_text
+    type: str
+  org_id:
+    description:
+      - desc_text
+    type: int
+    default: 1
+  org_name:
+    description:
+      - desc_text
+    type: str
+  provisioning:
+    description:
+      - desc_text
+    type: bool
+    default: true
+  type:
+    description:
+      - desc_text
+    type: str
+    choices:
+      - alertmanager
+      - dingding
+      - discord
+      - email
+      - googlechat
+      - kafka
+      - line
+      - opsgenie
+      - pagerduty
+      - pushover
+      - sensugo
+      - slack
+      - teams
+      - telegram
+      - threema
+      - victorops
+      - webex
+      - webhook
+      - wecom
+  uid:
+    description:
+      - desc_text
+    type: str
+  alertmanager_password:
+    description:
+      - desc_text
+    type: str
+  alertmanager_url:
+    description:
+      - desc_text
+    type: str
+  alertmanager_username:
+    description:
+      - desc_text
+    type: str
+  dingding_message:
+    description:
+      - desc_text
+    type: str
+  dingding_message_type:
+    description:
+      - desc_text
+    type: str
+  dingding_title:
+    description:
+      - desc_text
+    type: str
+  dingding_url:
+    description:
+      - desc_text
+    type: str
+  discord_avatar_url:
+    description:
+      - desc_text
+    type: str
+  discord_message:
+    description:
+      - desc_text
+    type: str
+  discord_title:
+    description:
+      - desc_text
+    type: str
+  discord_url:
+    description:
+      - desc_text
+    type: str
+  discord_use_username:
+    description:
+      - desc_text
+    type: bool
+    default: false
+  email_addresses:
+    description:
+      - desc_text
+    type: list
+    elements: str
+  email_message:
+    description:
+      - desc_text
+    type: str
+  email_single:
+    description:
+      - desc_text
+    type: bool
+    default: false
+  email_subject:
+    description:
+      - desc_text
+    type: str
+  googlechat_url:
+    description:
+      - desc_text
+    type: str
+  googlechat_message:
+    description:
+      - desc_text
+    type: str
+  googlechat_title:
+    description:
+      - desc_text
+    type: str
+  kafka_api_version:
+    description:
+      - desc_text
+    type: str
+    default: v2
+  kafka_cluster_id:
+    description:
+      - desc_text
+    type: str
+  kafka_description:
+    description:
+      - desc_text
+    type: str
+  kafka_details:
+    description:
+      - desc_text
+    type: str
+  kafka_password:
+    description:
+      - desc_text
+    type: str
+  kafka_rest_proxy_url:
+    description:
+      - desc_text
+    type: str
+  kafka_topic:
+    description:
+      - desc_text
+    type: str
+  kafka_username:
+    description:
+      - desc_text
+    type: str
+  line_description:
+    description:
+      - desc_text
+    type: str
+  line_title:
+    description:
+      - desc_text
+    type: str
+  line_token:
+    description:
+      - desc_text
+    type: str
+  opsgenie_api_key:
+    description:
+      - desc_text
+    type: str
+  opsgenie_auto_close:
+    description:
+      - desc_text
+    type: bool
+  opsgenie_description:
+    description:
+      - desc_text
+    type: str
+  opsgenie_message:
+    description:
+      - desc_text
+    type: str
+  opsgenie_override_priority:
+    description:
+      - desc_text
+    type: bool
+  opsgenie_responders:
+    description:
+      - desc_text
+    type: list
+    elements: dict
+  opsgenie_send_tags_as:
+    description:
+      - desc_text
+    type: str
+  opsgenie_url:
+    description:
+      - desc_text
+    type: str
+  pagerduty_class:
+    description:
+      - desc_text
+    type: str
+  pagerduty_client:
+    description:
+      - desc_text
+    type: str
+  pagerduty_client_url:
+    description:
+      - desc_text
+    type: str
+  pagerduty_component:
+    description:
+      - desc_text
+    type: str
+  pagerduty_details:
+    description:
+      - desc_text
+    type: list
+    elements: dict
+  pagerduty_group:
+    description:
+      - desc_text
+    type: str
+  pagerduty_integration_key:
+    description:
+      - desc_text
+    type: str
+  pagerduty_severity:
+    description:
+      - desc_text
+    type: str
+    choices:
+      - critical
+      - error
+      - warning
+      - info
+  pagerduty_source:
+    description:
+      - desc_text
+    type: str
+  pagerduty_summary:
+    description:
+      - desc_text
+    type: str
+  pushover_api_token:
+    description:
+      - desc_text
+    type: str
+  pushover_devices:
+    description:
+      - desc_text
+    type: list
+    elements: str
+  pushover_expire:
+    description:
+      - desc_text
+    type: int
+  pushover_message:
+    description:
+      - desc_text
+    type: str
+  pushover_ok_priority:
+    description:
+      - desc_text
+    type: int
+  pushover_ok_sound:
+    description:
+      - desc_text
+    type: str
+  pushover_priority:
+    description:
+      - desc_text
+    type: int
+  pushover_retry:
+    description:
+      - desc_text
+    type: int
+  pushover_sound:
+    description:
+      - desc_text
+    type: str
+  pushover_title:
+    description:
+      - desc_text
+    type: str
+  pushover_upload_image:
+    description:
+      - desc_text
+    type: bool
+    default: true
+  pushover_user_key:
+    description:
+      - desc_text
+    type: str
+  sensugo_api_key:
+    description:
+      - desc_text
+    type: str
+  sensugo_url:
+    description:
+      - desc_text
+    type: str
+  sensugo_check:
+    description:
+      - desc_text
+    type: str
+  sensugo_entity:
+    description:
+      - desc_text
+    type: str
+  sensugo_handler:
+    description:
+      - desc_text
+    type: str
+  sensugo_message:
+    description:
+      - desc_text
+    type: str
+  sensugo_namespace:
+    description:
+      - desc_text
+    type: str
+  slack_endpoint_url:
+    description:
+      - desc_text
+    type: str
+  slack_icon_emoji:
+    description:
+      - desc_text
+    type: str
+  slack_icon_url:
+    description:
+      - desc_text
+    type: str
+  slack_mention_channel:
+    description:
+      - desc_text
+    type: str
+    choices:
+      - here
+      - channel
+  slack_mention_groups:
+    description:
+      - desc_text
+    type: list
+  slack_mention_users:
+    description:
+      - desc_text
+    type: list
+  slack_recipient:
+    description:
+      - desc_text
+    type: str
+  slack_text:
+    description:
+      - desc_text
+    type: str
+  slack_title:
+    description:
+      - desc_text
+    type: str
+  slack_token:
+    description:
+      - desc_text
+    type: str
+  slack_url:
+    description:
+      - desc_text
+    type: str
+  slack_username:
+    description:
+      - desc_text
+    type: str
+  teams_message:
+    description:
+      - desc_text
+    type: str
+  teams_section_title:
+    description:
+      - desc_text
+    type: str
+  teams_title:
+    description:
+      - desc_text
+    type: str
+  teams_url:
+    description:
+      - desc_text
+    type: str
+  telegram_chat_id:
+    description:
+      - desc_text
+    type: str
+  telegram_disable_notifications:
+    description:
+      - desc_text
+    type: bool
+  telegram_message:
+    description:
+      - desc_text
+    type: str
+  telegram_parse_mode:
+    description:
+      - desc_text
+    type: str
+  telegram_protect_content:
+    description:
+      - desc_text
+    type: bool
+  telegram_token:
+    description:
+      - desc_text
+    type: str
+  telegram_web_page_view:
+    description:
+      - desc_text
+    type: bool
+  threema_api_secret:
+    description:
+      - desc_text
+    type: str
+  threema_description:
+    description:
+      - desc_text
+    type: str
+  threema_gateway_id:
+    description:
+      - desc_text
+    type: str
+  threema_recipient_id:
+    description:
+      - desc_text
+    type: str
+  threema_title:
+    description:
+      - desc_text
+    type: str
+  victorops_description:
+    description:
+      - desc_text
+    type: str
+  victorops_message_type:
+    description:
+      - desc_text
+    type: str
+    choices:
+      - CRITICAL
+      - RECOVERY
+  victorops_title:
+    description:
+      - desc_text
+    type: str
+  victorops_url:
+    description:
+      - desc_text
+    type: str
+  webex_api_url:
+    description:
+      - desc_text
+    type: str
+  webex_message:
+    description:
+      - desc_text
+    type: str
+  webex_room_id:
+    description:
+      - desc_text
+    type: str
+  webex_token:
+    description:
+      - desc_text
+    type: str
+  webhook_authorization_credentials:
+    description:
+      - desc_text
+    type: str
+  webhook_authorization_scheme:
+    description:
+      - desc_text
+    type: str
+  webhook_http_method:
+    description:
+      - desc_text
+    type: str
+    choices:
+      - POST
+      - PUT
+  webhook_max_alerts:
+    description:
+      - desc_text
+    type: int
+  webhook_message:
+    description:
+      - desc_text
+    type: str
+  webhook_password:
+    description:
+      - desc_text
+    type: str
+  webhook_title:
+    description:
+      - desc_text
+    type: str
+  webhook_url:
+    description:
+      - desc_text
+    type: str
+  webhook_username:
+    description:
+      - desc_text
+    type: str
+  wecom_agent_id:
+    description:
+      - desc_text
+    type: str
+  wecom_corp_id:
+    description:
+      - desc_text
+    type: str
+  wecom_message:
+    description:
+      - desc_text
+    type: str
+  wecom_msg_type:
+    description:
+      - desc_text
+    type: str
+  wecom_secret:
+    description:
+      - desc_text
+    type: str
+  wecom_title:
+    description:
+      - desc_text
+    type: str
+  wecom_to_user:
+    description:
+      - desc_text
+    type: list
+  wecom_url:
+    description:
+      - desc_text
+    type: str
 extends_documentation_fragment:
   - community.grafana.basic_auth
   - community.grafana.api_key
