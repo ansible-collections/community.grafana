@@ -9,7 +9,7 @@
 
 - name: Include contact point task files
   ansible.builtin.include_tasks: "{{ item }}.yml"
-  when: "result.msg | default('') != 'Unable to get contact point: API endpoint not found'"
+  when: "result.msg | default('') != 'Unable to get contact point: API endpoint not found - please check your Grafana version'"
   loop:
     - alertmanager
     - dingding
