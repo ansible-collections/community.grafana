@@ -57,6 +57,14 @@ options:
       - desc_text
     type: bool
     default: true
+  state:
+    description:
+      - Status of the contact point
+    type: str
+    default: present
+    choices:
+      - present
+      - absent
   type:
     description:
       - desc_text
@@ -389,10 +397,12 @@ options:
     description:
       - desc_text
     type: list
+    elements: str
   slack_mention_users:
     description:
       - desc_text
     type: list
+    elements: str
   slack_recipient:
     description:
       - desc_text
@@ -583,6 +593,7 @@ options:
     description:
       - desc_text
     type: list
+    elements: str
   wecom_url:
     description:
       - desc_text
@@ -618,6 +629,7 @@ RETURN = """
 contact_point:
   description: Contact point created or updated by the module.
   returned: changed
+  type: dict
 """
 
 import json
@@ -1123,8 +1135,8 @@ def main():
         slack_icon_emoji=dict(type="str"),
         slack_icon_url=dict(type="str"),
         slack_mention_channel=dict(type="str", choices=["here", "channel"]),
-        slack_mention_groups=dict(type="list"),
-        slack_mention_users=dict(type="list"),
+        slack_mention_groups=dict(type="list", elements="str"),
+        slack_mention_users=dict(type="list", elements="str"),
         slack_recipient=dict(type="str"),
         slack_text=dict(type="str"),
         slack_title=dict(type="str"),
@@ -1177,7 +1189,7 @@ def main():
         wecom_msg_type=dict(type="str"),
         wecom_secret=dict(type="str", no_log=True),
         wecom_title=dict(type="str"),
-        wecom_to_user=dict(type="list"),
+        wecom_to_user=dict(type="list", elements="str"),
         wecom_url=dict(type="str", no_log=True),
     )
 
