@@ -25,7 +25,7 @@ if __name__ == "__main__":
     by_major = {}
 
     for release in releases:
-        if release.get("prerelease"):
+        if release.get("prerelease") or any(char in release.get("tag_name") for char in "-+"):
             continue
         major, version, as_tuple = get_by_major(release.get("tag_name"))
         if major not in by_major.keys() or by_major[major]["as_tuple"] < as_tuple:
