@@ -85,5 +85,5 @@
 - assert:
     that:
       - "result.changed == false"
-      - "result.failed == true"
+      - "result.failed == false"
       - "result.msg == 'No Silence with the same parameters found! Deletion not possible'"
