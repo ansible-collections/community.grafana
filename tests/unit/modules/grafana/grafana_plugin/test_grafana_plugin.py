@@ -21,7 +21,7 @@ Restart grafana after installing plugins . <service grafana-server restart>
 def run_command_install_zip():
     STDERR = ""
     STDOUT = """
-installing alexanderzobnin-grafana-zabbix @ 
+installing alexanderzobnin-grafana-zabbix @
 from: /home/grafana//alexanderzobnin-grafana-zabbix-v3.10.5-1-g2219691.zip
 into: /var/lib/grafana/plugins
 

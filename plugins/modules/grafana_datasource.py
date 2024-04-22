@@ -400,6 +400,23 @@ EXAMPLES = """
     time_interval: ">10s"
     tls_ca_cert: "/etc/ssl/certs/ca.pem"
 
+- name: Create influxdbv2 datasource using fluxql
+  community.grafana.grafana_datasource:
+    name: "datasource-influxdb-flux"
+    grafana_url: "https://grafana.company.com"
+    grafana_user: "admin"
+    grafana_password: "xxxxxx"
+    org_id: "1"
+    ds_type: "influxdb"
+    ds_url: "https://influx.company.com:8086"
+    additional_json_data:
+      version: "Flux"
+      organization: "organization"
+      defaultBucket: "bucket"
+      tlsSkipVerify: false
+    additional_secure_json_data:
+      token: "token"
+
 - name: Create postgres datasource
   community.grafana.grafana_datasource:
     name: "datasource-postgres"

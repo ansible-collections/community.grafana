@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function fail() {
-    cat << EOF
+	cat <<EOF
     Dear contributor,
 
     Thank you for you Pull Request !
@@ -10,7 +10,7 @@ function fail() {
     It will help your change be released faster !
     Thank you !
 EOF
-    exit 1
+	exit 1
 }
 
 FRAGMENTS=$(git fetch && git diff --name-only --diff-filter=ACMRT origin/main..HEAD | grep "changelogs")
