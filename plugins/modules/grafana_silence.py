@@ -360,7 +360,7 @@ def main():
             module.exit_json(
                 failed=False,
                 changed=changed,
-                msg="No silence with the same parameters found! Deletion not possible",
+                msg="Silence does not exist",
             )
     module.exit_json(failed=failed, changed=changed, silence=silence)
 
