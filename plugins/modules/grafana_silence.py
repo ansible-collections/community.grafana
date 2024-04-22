@@ -23,7 +23,7 @@ DOCUMENTATION = """
 module: grafana_silence
 author:
   - flkhndlr (@flkhndlr)
-version_added: "1.6.0"
+version_added: "1.8.0"
 short_description: Manage Grafana Silences
 description:
   - Create/delete Grafana Silences through the Alertmanager Silence API.
@@ -225,9 +225,7 @@ class GrafanaSilenceInterface(object):
             )
         elif status_code == 403:
             self._module.fail_json(failed=True, msg="Permission Denied")
-        elif status_code == 202:
-            return self._module.from_json(resp.read())
-        elif status_code == 200:
+        elif status_code in [200, 202]:
             return self._module.from_json(resp.read())
         elif status_code == 400:
             self._module.fail_json(failed=True, msg=info)
