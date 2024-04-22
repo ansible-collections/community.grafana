@@ -58,7 +58,7 @@ options:
     required: true
   state:
     description:
-      - Delete the first occurrence of a silence with the same settings.
+      - Delete the first occurrence of a silence with the same settings. Can be "absent" or "present".
     default: present
     type: str
     choices: ["present", "absent"]
@@ -110,54 +110,54 @@ EXAMPLES = """
 RETURN = """
 ---
 silence:
-    description: Information about the Silence
+    description: Information about the silence
     returned: On success
     type: complex
     contains:
         id:
-            description: The id of the Silence
+            description: The id of the silence
             returned: success
             type: str
             sample:
                 - ec27df6b-ac3c-412f-ae0b-6e3e1f41c9c3
         comment:
-            description: The comment of the Silence
+            description: The comment of the silence
             returned: success
             type: str
             sample:
                 - this is a test
         createdBy:
-            description: The author of the Silence
+            description: The author of the silence
             returned: success
             type: str
             sample:
                 - me
         startsAt:
-            description: The begin timestamp of the Silence
+            description: The begin timestamp of the silence
             returned: success
             type: str
             sample:
                 - "2029-07-29T08:45:45.000Z"
         endsAt:
-            description: The end timestamp of the Silence
+            description: The end timestamp of the silence
             returned: success
             type: str
             sample:
                 - "2029-07-29T08:55:45.000Z"
         matchers:
-            description: The matchers of the Silence
+            description: The matchers of the silence
             returned: success
             type: list
             sample:
                 - [{"isEqual": true, "isRegex": true, "name": "environment", "value": "test"}]
         status:
-            description: The status of the Silence
+            description: The status of the silence
             returned: success
             type: dict
             sample:
                 - {"state": "pending"}
         updatedAt:
-            description: The timestamp of the last update for the Silence
+            description: The timestamp of the last update for the silence
             returned: success
             type: str
             sample:
@@ -275,8 +275,6 @@ class GrafanaSilenceInterface(object):
                 and response["matchers"] == matchers
             ):
                 return response
-            else:
-                return None
         return None
 
     def get_silence_by_id(self, silence_id):
@@ -360,9 +358,9 @@ def main():
             changed = True
         else:
             module.exit_json(
-                failed=True,
+                failed=False,
                 changed=changed,
-                msg="No Silence with the same parameters found! Deletion not possible",
+                msg="No silence with the same parameters found! Deletion not possible",
             )
     module.exit_json(failed=failed, changed=changed, silence=silence)
 
