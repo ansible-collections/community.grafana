@@ -1,0 +1,2 @@
+major_changes:
+- grafana_silence ; adding new module to create and delete silences through the API

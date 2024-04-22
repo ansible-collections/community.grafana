@@ -11,3 +11,4 @@ action_groups:
     - grafana_plugin
     - grafana_team
     - grafana_user
+    - grafana_silence
