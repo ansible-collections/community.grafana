@@ -31,6 +31,7 @@ Click on the name of a plugin or module to view that content's documentation:
     - [grafana_plugin](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_plugin_module.html)
     - [grafana_team](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
     - [grafana_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)
+    - [grafana_silence](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_silence_module.html)
 
 ## Supported Grafana versions
 
