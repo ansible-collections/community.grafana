@@ -177,10 +177,8 @@ silence:
         - "2023-07-27T13:27:33.042Z"
 """
 
-import json
-
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible.module_utils.urls import basic_auth_header
 from ansible.module_utils._text import to_text
 from ansible_collections.community.grafana.plugins.module_utils import base
 
@@ -225,34 +223,6 @@ class GrafanaSilenceInterface(object):
                     msg="Silences API is available starting with Grafana v8",
                 )
 
-    def _send_request(self, url, data=None, headers=None, method="GET"):
-        if data is not None:
-            data = json.dumps(data)
-        if not headers:
-            headers = []
-
-        full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(
-            self._module, full_url, data=data, headers=headers, method=method
-        )
-        status_code = info["status"]
-        if status_code == 404:
-            return None
-        elif status_code == 401:
-            self._module.fail_json(
-                failed=True,
-                msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url),
-            )
-        elif status_code == 403:
-            self._module.fail_json(failed=True, msg="Permission Denied")
-        elif status_code in [200, 202]:
-            return self._module.from_json(resp.read())
-        elif status_code == 400:
-            self._module.fail_json(failed=True, msg=info)
-        self._module.fail_json(
-            failed=True, msg="Grafana Silences API answered with HTTP %d" % status_code
-        )
-
     def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
         self._send_request(url, headers=self.headers, method="POST")
@@ -270,8 +240,13 @@ class GrafanaSilenceInterface(object):
 
     def get_version(self):
         url = "/api/health"
-        response = self._send_request(
-            url, data=None, headers=self.headers, method="GET"
+        response = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
         )
         version = response.get("version")
         if version is not None:
@@ -288,8 +263,14 @@ class GrafanaSilenceInterface(object):
             matchers=matchers,
             startsAt=starts_at,
         )
-        response = self._send_request(
-            url, data=silence, headers=self.headers, method="POST"
+        response = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            data=silence,
+            method="POST",
         )
         if self.get_version()["major"] == 8:
             response["silenceID"] = response["id"]
@@ -299,7 +280,14 @@ class GrafanaSilenceInterface(object):
     def get_silence(self, comment, created_by, starts_at, ends_at, matchers):
         url = "/api/alertmanager/grafana/api/v2/silences"
 
-        responses = self._send_request(url, headers=self.headers, method="GET")
+        responses = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
 
         for response in responses:
             if (
@@ -316,20 +304,38 @@ class GrafanaSilenceInterface(object):
         url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
             SilenceId=silence_id
         )
-        response = self._send_request(url, headers=self.headers, method="GET")
-        return response
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
 
     def get_silences(self):
         url = "/api/alertmanager/grafana/api/v2/silences"
-        response = self._send_request(url, headers=self.headers, method="GET")
-        return response
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
 
     def delete_silence(self, silence_id):
         url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
             SilenceId=silence_id
         )
-        response = self._send_request(url, headers=self.headers, method="DELETE")
-        return response
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="DELETE",
+        )
 
 
 def setup_module_object():

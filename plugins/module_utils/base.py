@@ -17,7 +17,9 @@
 # Copyright: (c) 2019, Rémi REY (@rrey)
 
 from __future__ import absolute_import, division, print_function
-from ansible.module_utils.urls import url_argument_spec
+from ansible.module_utils.urls import url_argument_spec, fetch_url
+
+import json
 
 __metaclass__ = type
 
@@ -52,3 +54,37 @@ def grafana_required_together():
 
 def grafana_mutually_exclusive():
     return [["url_username", "grafana_api_key"]]
+
+def grafana_send_request(
+    self, module, url, grafana_url, data=None, headers=None, method="GET"
+):
+    self.module = module
+    if data is not None:
+        data = json.dumps(data, sort_keys=True)
+    if not headers:
+        headers = []
+
+    full_url = "{grafana_url}{path}".format(grafana_url=grafana_url, path=url)
+    resp, info = fetch_url(
+        module=self.module, url=full_url, data=data, headers=headers, method=method
+    )
+    status_code = info["status"]
+    if status_code == 404:
+        return None
+    elif status_code == 401:
+        return self._module.fail_json(
+            failed=True,
+            msg="Unauthorized to perform action '%s' on '%s' header: %s"
+            % (method, full_url, self.headers),
+        )
+    elif status_code == 403:
+        self._module.fail_json(failed=True, msg="Permission Denied")
+    elif status_code < 0:
+        self._module.fail_json(failed=True, msg=info["msg"])
+    elif status_code == 200:
+        return self._module.from_json(resp.read())
+    self._module.fail_json(
+        failed=True,
+        msg="Grafana API answered with HTTP %d" % status_code,
+        body=self._module.from_json(resp.read()),
+    )
