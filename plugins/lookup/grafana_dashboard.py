@@ -41,6 +41,13 @@ options:
     description: optional filter for dashboard search.
     env:
       - name: GRAFANA_DASHBOARD_SEARCH
+  validate_certs:
+    description: flag to control SSL certificate validation
+    type: boolean
+    default: true
+  ca_path:
+    description: string of the file system path to CA cert bundle to use for validation
+    type: string
 """
 
 EXAMPLES = """
@@ -51,13 +58,25 @@ EXAMPLES = """
 - name: get all grafana dashboards
   set_fact:
     grafana_dashboards: "{{ lookup('grafana_dashboard', 'grafana_url=http://grafana.company.com grafana_api_key=' ~ grafana_api_key) }}"
+
+- name: get project foo grafana dashboards (validate SSL certificates of the instance with custom CA Certificate Bundle)
+  set_fact:
+    grafana_dashboards: |
+        {{
+            lookup(
+              'grafana_dashboard',
+              'grafana_url=https://grafana.company.com grafana_user=admin grafana_password=admin search=foo',
+              validate_certs=true,
+              ca_path='/path/to/chain.crt'
+            )
+        }}
 """
 
 import json
 import os
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils.urls import basic_auth_header, open_url
+from ansible.module_utils.urls import basic_auth_header, open_url, SSLValidationError
 from ansible.module_utils._text import to_native
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.utils.display import Display
@@ -96,13 +115,15 @@ class GrafanaAPIException(Exception):
 
 
 class GrafanaAPI:
-    def __init__(self, **kwargs):
+    def __init__(self, validate_certs, ca_path, **kwargs):
         self.grafana_url = kwargs.get("grafana_url", ANSIBLE_GRAFANA_URL)
         self.grafana_api_key = kwargs.get("grafana_api_key", ANSIBLE_GRAFANA_API_KEY)
         self.grafana_user = kwargs.get("grafana_user", ANSIBLE_GRAFANA_USER)
         self.grafana_password = kwargs.get("grafana_password", ANSIBLE_GRAFANA_PASSWORD)
         self.grafana_org_id = kwargs.get("grafana_org_id", ANSIBLE_GRAFANA_ORG_ID)
         self.search = kwargs.get("search", ANSIBLE_GRAFANA_DASHBOARD_SEARCH)
+        self.validate_certs = validate_certs
+        self.ca_path = ca_path
 
     def grafana_switch_organisation(self, headers):
         try:
@@ -110,11 +131,18 @@ class GrafanaAPI:
                 "%s/api/user/using/%s" % (self.grafana_url, self.grafana_org_id),
                 headers=headers,
                 method="POST",
+                validate_certs=self.validate_certs,
+                ca_path=self.ca_path,
             )
         except HTTPError as e:
             raise GrafanaAPIException(
                 "Unable to switch to organization %s : %s"
                 % (self.grafana_org_id, to_native(e))
+            )
+        except SSLValidationError as e:
+            raise GrafanaAPIException(
+                "Unable to validate server's certificate with %s: %s"
+                % (self.ca_path, to_native(e))
             )
         if r.getcode() != 200:
             raise GrafanaAPIException(
@@ -153,13 +181,24 @@ class GrafanaAPI:
                     "%s/api/search?query=%s" % (self.grafana_url, self.search),
                     headers=headers,
                     method="GET",
+                    validate_certs=self.validate_certs,
+                    ca_path=self.ca_path,
                 )
             else:
                 r = open_url(
-                    "%s/api/search/" % self.grafana_url, headers=headers, method="GET"
+                    "%s/api/search/" % self.grafana_url,
+                    headers=headers,
+                    method="GET",
+                    validate_certs=self.validate_certs,
+                    ca_path=self.ca_path,
                 )
         except HTTPError as e:
             raise GrafanaAPIException("Unable to search dashboards : %s" % to_native(e))
+        except SSLValidationError as e:
+            raise GrafanaAPIException(
+                "Unable to validate server's certificate with %s: %s"
+                % (self.ca_path, to_native(e))
+            )
         if r.getcode() == 200:
             try:
                 dashboard_list = json.loads(r.read())
@@ -175,6 +214,7 @@ class GrafanaAPI:
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
         grafana_args = terms[0].split(" ")
         grafana_dict = {}
         ret = []
@@ -189,7 +229,11 @@ class LookupModule(LookupBase):
                 )
             grafana_dict[key] = value
 
-        grafana = GrafanaAPI(**grafana_dict)
+        grafana = GrafanaAPI(
+            **grafana_dict,
+            validate_certs=self.get_option("validate_certs"),
+            ca_path=self.get_option("ca_path"),
+        )
 
         ret = grafana.grafana_list_dashboards()
 
