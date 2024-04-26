@@ -55,6 +55,7 @@ def grafana_required_together():
 def grafana_mutually_exclusive():
     return [["url_username", "grafana_api_key"]]
 
+
 def grafana_send_request(
     self, module, url, grafana_url, data=None, headers=None, method="GET"
 ):
