@@ -81,7 +81,7 @@ def grafana_send_request(
         self._module.fail_json(failed=True, msg="Permission Denied")
     elif status_code < 0:
         self._module.fail_json(failed=True, msg=info["msg"])
-    elif status_code == 200:
+    elif status_code in [200, 202]:
         return self._module.from_json(resp.read())
     self._module.fail_json(
         failed=True,
