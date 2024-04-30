@@ -553,6 +553,9 @@ def compare_datasources(new, current, compareSecureData=True):
         del current["password"]
     if "basicAuthPassword" in current:
         del current["basicAuthPassword"]
+    if current["type"] == "grafana-postgresql-datasource" and new["type"] == "postgres":
+        del current["type"]
+        del new["type"]
 
     # check if secureJsonData should be compared
     if not compareSecureData:
