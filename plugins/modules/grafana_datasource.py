@@ -945,6 +945,9 @@ def main():
         if ds is None:
             grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)
+            if ds.get("isDefault") != module.params["is_default"]:
+                grafana_iface.update_datasource(ds.get("id"), payload)
+                ds = grafana_iface.datasource_by_name(name)
             module.exit_json(
                 changed=True, datasource=ds, msg="Datasource %s created" % name
             )
