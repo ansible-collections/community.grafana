@@ -281,10 +281,9 @@ releases:
     release_date: '2024-02-21'
   1.9.0:
     changes:
-      major_changes:
-      - grafana_silence ; adding new module to create and delete silences through
-        the API
       minor_changes:
+      - Add new module `grafana_silence` to create and delete silences through the
+        API
       - lookup - grafana_dashboards - add `validate_certs` and `ca_path` options to
         plugin for custom certs validation
       removed_features:
@@ -294,5 +293,5 @@ releases:
     - 354-fix-find-grafana-versions.yml
     - 355-rm-dashboard-message-argument.yml
     - 356-lookup-dashboards-add-custom-certs-verification-logic.yml
-    - add grafana_silence module.yml
+    - 357-module-grafana-silence.yml
     release_date: '2024-04-30'
