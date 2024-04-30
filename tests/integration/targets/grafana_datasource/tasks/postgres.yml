@@ -56,7 +56,7 @@
       - result.datasource.jsonData.timescaledb == true
       - result.datasource.name == 'datasource-postgres'
       - result.datasource.orgId == 1
-      - result.datasource.type == 'postgres'
+      - result.datasource.type in ['postgres', 'grafana-postgresql-datasource']
       - result.datasource.url == 'postgres.company.com:5432'
       - result.datasource.user == 'postgres'
       - result.datasource.withCredentials == false
