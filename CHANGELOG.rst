@@ -7,14 +7,10 @@ Grafana Collection Release Notes
 v1.9.0
 ======
 
-Major Changes
--------------
-
-- grafana_silence ; adding new module to create and delete silences through the API
-
 Minor Changes
 -------------
 
+- Add new module `grafana_silence` to create and delete silences through the API
 - lookup - grafana_dashboards - add `validate_certs` and `ca_path` options to plugin for custom certs validation
 
 Removed Features (previously deprecated)
