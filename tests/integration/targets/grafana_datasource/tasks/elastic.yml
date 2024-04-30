@@ -286,6 +286,32 @@
       - result.datasource.secureJsonFields.secureTest == true
       - result.diff.after.secureJsonData is defined
 
+- name: Delete elasticsearch legacy datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource/elasticLegacy
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+
+- name: Delete elasticsearch legacy datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource/elasticLegacy
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+
 - name: Delete elasticsearch datasource
   register: result
   community.grafana.grafana_datasource:
