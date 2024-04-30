@@ -4,6 +4,23 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+v1.9.0
+======
+
+Major Changes
+-------------
+
+- grafana_silence ; adding new module to create and delete silences through the API
+
+Minor Changes
+-------------
+
+- lookup - grafana_dashboards - add `validate_certs` and `ca_path` options to plugin for custom certs validation
+
+Removed Features (previously deprecated)
+----------------------------------------
+
+- removed deprecated `message` argument in `grafana_dashboard`
 
 v1.8.0
 ======
@@ -288,4 +305,3 @@ Release Summary
 ---------------
 
 Initial migration of Grafana content from Ansible core (2.9/devel)
-
