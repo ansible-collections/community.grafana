@@ -11,6 +11,7 @@ Minor Changes
 -------------
 
 - Add new module `grafana_silence` to create and delete silences through the API
+- Add role components for `grafana_silence` module
 - lookup - grafana_dashboards - add `validate_certs` and `ca_path` options to plugin for custom certs validation
 
 Removed Features (previously deprecated)
