@@ -48,12 +48,12 @@
     grafana_silences:
       - comment: molecule test
         created_by: ansible
-        ends_at: 2029-12-31T00:00:00.000Z
+        ends_at: "2030-01-01T00:00:00.000Z"
         matchers:
           - isEqual: true
             isRegex: false
             name: environment
             value: test
-        starts_at: 2029-12-31T23:23:59.000Z
+        starts_at: "2029-12-31T23:23:59.000Z"
 
   roles: [{role: community.grafana.grafana}]
