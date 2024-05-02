@@ -19,6 +19,11 @@ Removed Features (previously deprecated)
 
 - removed deprecated `message` argument in `grafana_dashboard`
 
+Bugfixes
+--------
+
+- Set umask for `grafana_plugin` command
+
 v1.8.0
 ======
 
