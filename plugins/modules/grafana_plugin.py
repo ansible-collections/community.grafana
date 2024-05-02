@@ -223,7 +223,7 @@ def grafana_plugin(module, params):
     else:
         cmd = "{0} uninstall {1}".format(grafana_cli, params["name"])
 
-    rc, stdout, stderr = module.run_command(cmd)
+    rc, stdout, stderr = module.run_command(cmd, umask=0o0022)
     if rc == 0:
         stdout_lines = stdout.split("\n")
         for line in stdout_lines:
