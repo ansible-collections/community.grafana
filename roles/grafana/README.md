@@ -163,6 +163,13 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | webhook_password | no |
 | webhook_url | no |
 | webhook_username | no |
+| [**grafana_silence**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_silence_module.html) |
+| comment | yes |
+| created_by | yes |
+| ends_at | yes |
+| matchers | yes |
+| starts_at | yes |
+| state | no |
 
 ## Example Playbook
 
