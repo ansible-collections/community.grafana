@@ -201,3 +201,15 @@
       loop: "{{ grafana_dashboards }}"
       loop_control: {loop_var: dashboard}
       tags: [dashboard, molecule-idempotence-notest]
+
+    - name: Manage silence
+      community.grafana.grafana_silence:
+        comment: "{{ silence.comment }}"
+        created_by: "{{ silence.created_by }}"
+        starts_at: "{{ silence.starts_at }}"
+        ends_at: "{{ silence.ends_at }}"
+        matchers: "{{ silence.matchers }}"
+        state: "{{ silence.state | default(omit) }}"
+      loop: "{{ grafana_silences }}"
+      loop_control: {loop_var: silence}
+      tags: silence
