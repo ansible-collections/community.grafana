@@ -78,90 +78,90 @@ EXAMPLES = """
 ---
 - name: Create a silence
   community.grafana.grafana_silence:
-      grafana_url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      comment: "a testcomment"
-      created_by: "me"
-      starts_at: "2029-07-29T08:45:45.000Z"
-      ends_at: "2029-07-29T08:55:45.000Z"
-      matchers:
-          - isEqual: true
-            isRegex: true
-            name: environment
-            value: test
-      state: present
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a testcomment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    ends_at: "2029-07-29T08:55:45.000Z"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    state: present
 
 - name: Delete a silence
   community.grafana.grafana_silence:
-      grafana_url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      comment: "a testcomment"
-      created_by: "me"
-      starts_at: "2029-07-29T08:45:45.000Z"
-      ends_at: "2029-07-29T08:55:45.000Z"
-      matchers:
-          - isEqual: true
-            isRegex: true
-            name: environment
-            value: test
-      state: absent
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a testcomment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    ends_at: "2029-07-29T08:55:45.000Z"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    state: absent
 """
 
 RETURN = """
 ---
 silence:
-    description: Information about the silence
-    returned: On success
-    type: complex
-    contains:
-        id:
-            description: The id of the silence
-            returned: success
-            type: str
-            sample:
-                - ec27df6b-ac3c-412f-ae0b-6e3e1f41c9c3
-        comment:
-            description: The comment of the silence
-            returned: success
-            type: str
-            sample:
-                - this is a test
-        createdBy:
-            description: The author of the silence
-            returned: success
-            type: str
-            sample:
-                - me
-        startsAt:
-            description: The begin timestamp of the silence
-            returned: success
-            type: str
-            sample:
-                - "2029-07-29T08:45:45.000Z"
-        endsAt:
-            description: The end timestamp of the silence
-            returned: success
-            type: str
-            sample:
-                - "2029-07-29T08:55:45.000Z"
-        matchers:
-            description: The matchers of the silence
-            returned: success
-            type: list
-            sample:
-                - [{"isEqual": true, "isRegex": true, "name": "environment", "value": "test"}]
-        status:
-            description: The status of the silence
-            returned: success
-            type: dict
-            sample:
-                - {"state": "pending"}
-        updatedAt:
-            description: The timestamp of the last update for the silence
-            returned: success
-            type: str
-            sample:
-                - "2023-07-27T13:27:33.042Z"
+  description: Information about the silence
+  returned: On success
+  type: complex
+  contains:
+    id:
+      description: The id of the silence
+      returned: success
+      type: str
+      sample:
+        - ec27df6b-ac3c-412f-ae0b-6e3e1f41c9c3
+    comment:
+      description: The comment of the silence
+      returned: success
+      type: str
+      sample:
+        - this is a test
+    createdBy:
+      description: The author of the silence
+      returned: success
+      type: str
+      sample:
+        - me
+    startsAt:
+      description: The begin timestamp of the silence
+      returned: success
+      type: str
+      sample:
+        - "2029-07-29T08:45:45.000Z"
+    endsAt:
+      description: The end timestamp of the silence
+      returned: success
+      type: str
+      sample:
+        - "2029-07-29T08:55:45.000Z"
+    matchers:
+      description: The matchers of the silence
+      returned: success
+      type: list
+      sample:
+        - [{"isEqual": true, "isRegex": true, "name": "environment", "value": "test"}]
+    status:
+      description: The status of the silence
+      returned: success
+      type: dict
+      sample:
+        - {"state": "pending"}
+    updatedAt:
+      description: The timestamp of the last update for the silence
+      returned: success
+      type: str
+      sample:
+        - "2023-07-27T13:27:33.042Z"
 """
 
 import json
