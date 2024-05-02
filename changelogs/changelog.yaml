@@ -281,6 +281,8 @@ releases:
     release_date: '2024-02-21'
   1.9.0:
     changes:
+      bugfixes:
+      - Set umask for `grafana_plugin` command
       minor_changes:
       - Add new module `grafana_silence` to create and delete silences through the
         API
@@ -296,4 +298,5 @@ releases:
     - 356-lookup-dashboards-add-custom-certs-verification-logic.yml
     - 357-module-grafana-silence.yml
     - 358-role-grafana-silence.yml
+    - 362-plugin-umask.yml
     release_date: '2024-04-30'
