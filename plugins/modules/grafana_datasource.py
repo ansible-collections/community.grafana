@@ -553,6 +553,9 @@ def compare_datasources(new, current, compareSecureData=True):
         del current["password"]
     if "basicAuthPassword" in current:
         del current["basicAuthPassword"]
+    if current["type"] == "grafana-postgresql-datasource" and new["type"] == "postgres":
+        del current["type"]
+        del new["type"]
 
     # check if secureJsonData should be compared
     if not compareSecureData:
@@ -945,6 +948,9 @@ def main():
         if ds is None:
             grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)
+            if ds.get("isDefault") != module.params["is_default"]:
+                grafana_iface.update_datasource(ds.get("id"), payload)
+                ds = grafana_iface.datasource_by_name(name)
             module.exit_json(
                 changed=True, datasource=ds, msg="Datasource %s created" % name
             )
