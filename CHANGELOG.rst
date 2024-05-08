@@ -22,6 +22,8 @@ Removed Features (previously deprecated)
 Bugfixes
 --------
 
+- Handling of desired default state for first `grafana_datasource`
+- Ignore `type` argument for diff comparison if `grafana-postgresq-datasource` alias `postgres` is used
 - Set umask for `grafana_plugin` command
 
 v1.8.0

@@ -282,6 +282,9 @@ releases:
   1.9.0:
     changes:
       bugfixes:
+      - Handling of desired default state for first `grafana_datasource`
+      - Ignore `type` argument for diff comparison if `grafana-postgresq-datasource`
+        alias `postgres` is used
       - Set umask for `grafana_plugin` command
       minor_changes:
       - Add new module `grafana_silence` to create and delete silences through the
@@ -299,4 +302,5 @@ releases:
     - 357-module-grafana-silence.yml
     - 358-role-grafana-silence.yml
     - 362-plugin-umask.yml
+    - 364-first-datasource-default.yml
     release_date: '2024-04-30'
