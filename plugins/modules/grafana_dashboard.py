@@ -81,6 +81,8 @@ options:
     description:
       - Set a commit message for the version history.
       - Only used when C(state) is C(present).
+      - C(message) alias is deprecated in Ansible 2.10, since it is used internally by Ansible Core Engine.
+    aliases: [ 'message' ]
     type: str
 extends_documentation_fragment:
 - community.grafana.basic_auth
@@ -618,7 +620,15 @@ def main():
         dashboard_id=dict(type="str"),
         dashboard_revision=dict(type="str", default="1"),
         overwrite=dict(type="bool", default=False),
-        commit_message=dict(type="str"),
+        commit_message=dict(
+            type="str",
+            aliases=["message"],
+            deprecated_aliases=[
+                dict(
+                    name="message", version="2.0.0", collection_name="community.grafana"
+                )
+            ],
+        ),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -636,6 +646,11 @@ def main():
     )
 
     module.params["url"] = clean_url(module.params["url"])
+
+    if "message" in module.params:
+        module.fail_json(
+            msg="'message' is reserved keyword, please change this parameter to 'commit_message'"
+        )
 
     try:
         if module.params["state"] == "present":
