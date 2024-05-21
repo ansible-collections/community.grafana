@@ -4,6 +4,14 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+v1.9.1
+======
+
+Bugfixes
+--------
+
+- undo removed deprecated `message` argument in `grafana_dashboard`
+
 v1.9.0
 ======
 
