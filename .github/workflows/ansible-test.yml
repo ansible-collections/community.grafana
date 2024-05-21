@@ -86,7 +86,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --no-cache-dir --upgrade pip
-          pip install "git+https://github.com/ansible/ansible@${{ matrix.ansible_version }}" molecule molecule-docker
+          pip install "git+https://github.com/ansible/ansible@${{ matrix.ansible_version }}" molecule molecule-plugins[docker] 'requests<2.32.0'
 
       - name: Test with molecule
         run: |
