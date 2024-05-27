@@ -168,6 +168,8 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | created_by | yes |
 | ends_at | yes |
 | matchers | yes |
+| org_id | no |
+| org_name | no |
 | starts_at | yes |
 | state | no |
 
