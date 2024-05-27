@@ -252,6 +252,21 @@ class GrafanaSilenceInterface(object):
             failed=True, msg="Grafana Silences API answered with HTTP %d" % status_code
         )
 
+    def switch_organization(self, org_id):
+        url = "/api/user/using/%d" % org_id
+        self._send_request(url, headers=self.headers, method="POST")
+
+    def organization_by_name(self, org_name):
+        url = "/api/user/orgs"
+        organizations = self._send_request(url, headers=self.headers, method="GET")
+        orga = next((org for org in organizations if org["name"] == org_name))
+        if orga:
+            return orga["orgId"]
+
+        return self._module.fail_json(
+            failed=True, msg="Current user isn't member of organization: %s" % org_name
+        )
+
     def get_version(self):
         url = "/api/health"
         response = self._send_request(
