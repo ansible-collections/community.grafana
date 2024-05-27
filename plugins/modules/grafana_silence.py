@@ -193,9 +193,10 @@ class GrafanaError(Exception):
 class GrafanaSilenceInterface(object):
     def __init__(self, module):
         self._module = module
+        self.grafana_url = base.clean_url(module.params.get("url"))
+        self.org_id = None
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        module.params["force_basic_auth"] = True
         if module.params.get("grafana_api_key", None):
             self.headers["Authorization"] = (
                 "Bearer %s" % module.params["grafana_api_key"]
@@ -204,8 +205,14 @@ class GrafanaSilenceInterface(object):
             self.headers["Authorization"] = basic_auth_header(
                 module.params["url_username"], module.params["url_password"]
             )
+            self.org_id = (
+                self.organization_by_name(module.params["org_name"])
+                if module.params["org_name"]
+                else module.params["org_id"]
+            )
+            self.switch_organization(self.org_id)
         # }}}
-        self.grafana_url = base.clean_url(module.params.get("url"))
+
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()
