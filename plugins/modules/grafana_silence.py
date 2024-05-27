@@ -30,6 +30,19 @@ description:
 requirements:
   - The Alertmanager API is only available starting Grafana 8 and the module will fail if the server version is lower than version 8.
 options:
+  org_id:
+    description:
+      - The Grafana organization ID where the silence will be created or deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
+      - Mutually exclusive with C(org_name).
+    default: 1
+    type: int
+  org_name:
+    description:
+      - The Grafana organization name where the silence will be created or deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
+      - Mutually exclusive with C(org_id).
+    type: str
   comment:
     description:
       - The comment that describes the silence.
@@ -181,9 +194,10 @@ class GrafanaError(Exception):
 class GrafanaSilenceInterface(object):
     def __init__(self, module):
         self._module = module
+        self.grafana_url = base.clean_url(module.params.get("url"))
+        self.org_id = None
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        module.params["force_basic_auth"] = True
         if module.params.get("grafana_api_key", None):
             self.headers["Authorization"] = (
                 "Bearer %s" % module.params["grafana_api_key"]
@@ -192,8 +206,14 @@ class GrafanaSilenceInterface(object):
             self.headers["Authorization"] = basic_auth_header(
                 module.params["url_username"], module.params["url_password"]
             )
+            self.org_id = (
+                self.organization_by_name(module.params["org_name"])
+                if module.params["org_name"]
+                else module.params["org_id"]
+            )
+            self.switch_organization(self.org_id)
         # }}}
-        self.grafana_url = base.clean_url(module.params.get("url"))
+
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()
@@ -231,6 +251,21 @@ class GrafanaSilenceInterface(object):
             self._module.fail_json(failed=True, msg=info)
         self._module.fail_json(
             failed=True, msg="Grafana Silences API answered with HTTP %d" % status_code
+        )
+
+    def switch_organization(self, org_id):
+        url = "/api/user/using/%d" % org_id
+        self._send_request(url, headers=self.headers, method="POST")
+
+    def organization_by_name(self, org_name):
+        url = "/api/user/orgs"
+        organizations = self._send_request(url, headers=self.headers, method="GET")
+        orga = next((org for org in organizations if org["name"] == org_name))
+        if orga:
+            return orga["orgId"]
+
+        return self._module.fail_json(
+            failed=True, msg="Current user isn't member of organization: %s" % org_name
         )
 
     def get_version(self):
@@ -310,23 +345,24 @@ def setup_module_object():
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     comment=dict(type="str", required=True),
-    state=dict(type="str", choices=["present", "absent"], default="present"),
     created_by=dict(type="str", required=True),
-    starts_at=dict(type="str", required=True),
     ends_at=dict(type="str", required=True),
     matchers=dict(type="list", elements="dict", required=True),
+    org_id=dict(default=1, type="int"),
+    org_name=dict(type="str"),
     skip_version_check=dict(type="bool", default=False),
+    starts_at=dict(type="str", required=True),
+    state=dict(type="str", choices=["present", "absent"], default="present"),
 )
 
 
 def main():
-
     module = setup_module_object()
     comment = module.params["comment"]
     created_by = module.params["created_by"]
-    starts_at = module.params["starts_at"]
     ends_at = module.params["ends_at"]
     matchers = module.params["matchers"]
+    starts_at = module.params["starts_at"]
     state = module.params["state"]
 
     changed = False
@@ -338,7 +374,6 @@ def main():
     )
 
     if state == "present":
-
         if not silence:
             silence = grafana_iface.create_silence(
                 comment, created_by, starts_at, ends_at, matchers
@@ -362,6 +397,7 @@ def main():
                 changed=changed,
                 msg="Silence does not exist",
             )
+
     module.exit_json(failed=failed, changed=changed, silence=silence)
 
 

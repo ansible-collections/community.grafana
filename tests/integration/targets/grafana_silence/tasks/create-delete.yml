@@ -1,0 +1,83 @@
+---
+- module_defaults:
+    community.grafana.grafana_silence:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+  block:
+    - name: Create new silence
+      community.grafana.grafana_silence:
+        comment: "a testcomment"
+        created_by: "me"
+        starts_at: "2029-07-29T08:45:45.000Z"
+        ends_at: "2029-07-29T08:55:45.000Z"
+        matchers:
+          - isEqual: true
+            isRegex: true
+            name: environment
+            value: test
+        state: present
+      register: result
+    - assert:
+        that:
+          - "result.changed == true"
+          - "result.failed == false"
+          - "result.silence.id != ''"
+    
+    - name: Check idempotency on silence creation
+      community.grafana.grafana_silence:
+        comment: "a testcomment"
+        created_by: "me"
+        starts_at: "2029-07-29T08:45:45.000Z"
+        ends_at: "2029-07-29T08:55:45.000Z"
+        matchers:
+            - isEqual: true
+              isRegex: true
+              name: environment
+              value: test
+        state: present
+      register: result
+    - assert:
+        that:
+          - "result.changed == false"
+          - "result.msg != ''"
+    
+    - name: Delete the silence
+      community.grafana.grafana_silence:
+        comment: "a testcomment"
+        created_by: "me"
+        starts_at: "2029-07-29T08:45:45.000Z"
+        ends_at: "2029-07-29T08:55:45.000Z"
+        matchers:
+            - isEqual: true
+              isRegex: true
+              name: environment
+              value: test
+        state: absent
+      register: result
+    - assert:
+        that:
+          - "result.changed == true"
+          - "result.failed == false"
+          - "result.silence.id != ''"
+          - - "result.silence.createdBy != 'me'"
+    
+    - name: Check idempotency on silence deletion
+      community.grafana.grafana_silence:
+        comment: "a testcomment"
+        created_by: "me"
+        starts_at: "2029-07-29T08:45:45.000Z"
+        ends_at: "2029-07-29T08:55:45.000Z"
+        matchers:
+          - isEqual: true
+            isRegex: true
+            name: environment
+            value: test
+        state: absent
+      register: result
+      ignore_errors: yes
+    - assert:
+        that:
+          - "result.changed == false"
+          - "result.failed == false"
+          - "result.msg == 'Silence does not exist'"
