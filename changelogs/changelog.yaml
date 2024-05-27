@@ -304,3 +304,11 @@ releases:
     - 362-plugin-umask.yml
     - 364-first-datasource-default.yml
     release_date: '2024-04-30'
+  1.9.1:
+    changes:
+      bugfixes:
+      - undo removed deprecated `message` argument in `grafana_dashboard`
+    fragments:
+    - 367-dashboard-undo-breaing-change-message.yml
+    - 368-molecule-pin-requests.yml
+    release_date: '2024-05-21'
