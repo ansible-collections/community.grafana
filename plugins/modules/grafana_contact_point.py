@@ -628,8 +628,75 @@ EXAMPLES = """
 RETURN = """
 contact_point:
   description: Contact point created or updated by the module.
-  returned: changed
+  returned: success
+  type: complex
+  contains:
+    uid:
+      description: The uid of the contact point.
+      returned: success
+      type: str
+      sample:
+        - ddmyrs0f74t8hc
+    name:
+      description: The name of the contact point.
+      returned: success
+      type: str
+      sample:
+        - supportmail
+    type:
+      description: The type of the contact point.
+      returned: success
+      type: str
+      sample:
+        - email
+    disableResolveMessage:
+      description: Is the resolve message of the contact point disabled.
+      returned: success
+      type: bool
+      sample:
+        - false
+    settings:
+      description: The type specific settings of the contact point.
+      returned: success
+      type: dict
+      sample:
+        - addresses: "support@example.com"
+          singleEmail: false
+    secureFields:
+      description: The secure fields config of the contact point.
+      returned: success
+      type: dict
+diff:
+  description: Difference between previous and updated contact point.
+  return: changed
   type: dict
+  contains:
+    before:
+      description: Previous contact point.
+      return: changed
+      type: complex
+      sample:
+        - uid: ddmyrs0f74t8hc
+          name: supportmail
+          type: email
+          disableResolveMessage: false
+          settings:
+            addresses: support@example.com
+            singleEmail: false
+          secureFields: {}
+    after:
+      description: Current contact point.
+      return: changed
+      type: complex
+      sample:
+        - uid: ddmyrs0f74t8hc
+          name: supportmail
+          type: email
+          disableResolveMessage: true
+          settings:
+            addresses: support123@example.com
+            singleEmail: false
+          secureFields: {}
 """
 
 import json
@@ -963,7 +1030,6 @@ class GrafanaContactPointInterface(object):
             contact_point = json.loads(to_text(r.read()))
             return {
                 "changed": True,
-                "state": data["state"],
                 "contact_point": contact_point,
             }
         else:
@@ -985,7 +1051,7 @@ class GrafanaContactPointInterface(object):
                 del contact_point["provenance"]
 
             if self.contact_point == contact_point:
-                return {"changed": False}
+                return {"changed": False, "contact_point": contact_point}
             else:
                 return {
                     "changed": True,
@@ -1006,7 +1072,7 @@ class GrafanaContactPointInterface(object):
         )
 
         if info["status"] == 202:
-            return {"state": "absent", "changed": True}
+            return {"changed": True, "contact_point": contact_point}
         elif info["status"] == 404:
             return {"changed": False}
         else:
