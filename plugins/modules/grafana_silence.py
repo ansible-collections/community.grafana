@@ -30,6 +30,18 @@ description:
 requirements:
   - The Alertmanager API is only available starting Grafana 8 and the module will fail if the server version is lower than version 8.
 options:
+  org_id:
+    description:
+      - The Grafana organization ID where the silence will be created or deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
+      - Mutually exclusive with C(org_name).
+    default: 1
+    type: int
+  org_name:
+    description:
+      - The Grafana organization name where the silence will be created or deleted.
+      - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
+      - Mutually exclusive with C(org_id).
   comment:
     description:
       - The comment that describes the silence.
