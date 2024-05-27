@@ -1072,7 +1072,7 @@ class GrafanaContactPointInterface(object):
         )
 
         if info["status"] == 202:
-            return {"changed": True, "contact_point": contact_point}
+            return {"changed": True, "contact_point": self.contact_point}
         elif info["status"] == 404:
             return {"changed": False}
         else:
