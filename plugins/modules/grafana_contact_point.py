@@ -668,12 +668,12 @@ contact_point:
       type: dict
 diff:
   description: Difference between previous and updated contact point.
-  return: changed
+  returned: changed
   type: dict
   contains:
     before:
       description: Previous contact point.
-      return: changed
+      returned: changed
       type: complex
       sample:
         - uid: ddmyrs0f74t8hc
@@ -686,7 +686,7 @@ diff:
           secureFields: {}
     after:
       description: Current contact point.
-      return: changed
+      returned: changed
       type: complex
       sample:
         - uid: ddmyrs0f74t8hc
