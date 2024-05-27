@@ -31,35 +31,35 @@ description:
 options:
   disable_resolve_message:
     description:
-      - desc_text
+      - Disables the resolve message.
     type: bool
     default: false
   include_image:
     description:
-      - desc_text
+      - Whether to include an image in the notification.
     type: bool
     default: false
   name:
     description:
-      - desc_text
+      - The name of the contact point.
     type: str
   org_id:
     description:
-      - desc_text
+      - The organization ID.
     type: int
     default: 1
   org_name:
     description:
-      - desc_text
+      - The name of the organization.
     type: str
   provisioning:
     description:
-      - desc_text
+      - Indicates if provisioning is enabled.
     type: bool
     default: true
   state:
     description:
-      - Status of the contact point
+      - Status of the contact point.
     type: str
     default: present
     choices:
@@ -67,7 +67,7 @@ options:
       - absent
   type:
     description:
-      - desc_text
+      - The type of the contact point.
     type: str
     choices:
       - alertmanager
@@ -91,197 +91,197 @@ options:
       - wecom
   uid:
     description:
-      - desc_text
+      - The unique ID of the contact point.
     type: str
   alertmanager_password:
     description:
-      - desc_text
+      - Password for accessing Alertmanager.
     type: str
   alertmanager_url:
     description:
-      - desc_text
+      - URL for accessing Alertmanager.
     type: str
   alertmanager_username:
     description:
-      - desc_text
+      - Username for accessing Alertmanager.
     type: str
   dingding_message:
     description:
-      - desc_text
+      - The message to send via DingDing.
     type: str
   dingding_message_type:
     description:
-      - desc_text
+      - The type of message to send via DingDing.
     type: str
   dingding_title:
     description:
-      - desc_text
+      - The title of the DingDing message.
     type: str
   dingding_url:
     description:
-      - desc_text
+      - The URL for DingDing webhook.
     type: str
   discord_avatar_url:
     description:
-      - desc_text
+      - The avatar URL for Discord messages.
     type: str
   discord_message:
     description:
-      - desc_text
+      - The message to send via Discord.
     type: str
   discord_title:
     description:
-      - desc_text
+      - The title of the Discord message.
     type: str
   discord_url:
     description:
-      - desc_text
+      - The URL for Discord webhook.
     type: str
   discord_use_username:
     description:
-      - desc_text
+      - Whether to use a custom username in Discord.
     type: bool
     default: false
   email_addresses:
     description:
-      - desc_text
+      - List of email addresses to send the message to.
     type: list
     elements: str
   email_message:
     description:
-      - desc_text
+      - The content of the email message.
     type: str
   email_single:
     description:
-      - desc_text
+      - Whether to send a single email or individual emails.
     type: bool
     default: false
   email_subject:
     description:
-      - desc_text
+      - The subject of the email.
     type: str
   googlechat_url:
     description:
-      - desc_text
+      - The URL for Google Chat webhook.
     type: str
   googlechat_message:
     description:
-      - desc_text
+      - The message to send via Google Chat.
     type: str
   googlechat_title:
     description:
-      - desc_text
+      - The title of the Google Chat message.
     type: str
   kafka_api_version:
     description:
-      - desc_text
+      - The API version for Kafka.
     type: str
     default: v2
   kafka_cluster_id:
     description:
-      - desc_text
+      - The cluster ID for Kafka.
     type: str
   kafka_description:
     description:
-      - desc_text
+      - The description for the Kafka configuration.
     type: str
   kafka_details:
     description:
-      - desc_text
+      - Additional details for Kafka.
     type: str
   kafka_password:
     description:
-      - desc_text
+      - Password for accessing Kafka.
     type: str
   kafka_rest_proxy_url:
     description:
-      - desc_text
+      - URL for Kafka REST Proxy.
     type: str
   kafka_topic:
     description:
-      - desc_text
+      - Kafka topic to publish to.
     type: str
   kafka_username:
     description:
-      - desc_text
+      - Username for accessing Kafka.
     type: str
   line_description:
     description:
-      - desc_text
+      - Description for the Line message.
     type: str
   line_title:
     description:
-      - desc_text
+      - Title of the Line message.
     type: str
   line_token:
     description:
-      - desc_text
+      - Access token for Line.
     type: str
   opsgenie_api_key:
     description:
-      - desc_text
+      - API key for OpsGenie.
     type: str
   opsgenie_auto_close:
     description:
-      - desc_text
+      - Whether to enable auto-closing of alerts in OpsGenie.
     type: bool
   opsgenie_description:
     description:
-      - desc_text
+      - Description of the OpsGenie alert.
     type: str
   opsgenie_message:
     description:
-      - desc_text
+      - Message to send via OpsGenie.
     type: str
   opsgenie_override_priority:
     description:
-      - desc_text
+      - Whether to override the priority in OpsGenie.
     type: bool
   opsgenie_responders:
     description:
-      - desc_text
+      - List of responders for OpsGenie alerts.
     type: list
     elements: dict
   opsgenie_send_tags_as:
     description:
-      - desc_text
+      - Format for sending tags in OpsGenie.
     type: str
   opsgenie_url:
     description:
-      - desc_text
+      - URL for OpsGenie webhook.
     type: str
   pagerduty_class:
     description:
-      - desc_text
+      - Class of the PagerDuty alert.
     type: str
   pagerduty_client:
     description:
-      - desc_text
+      - Client identifier for PagerDuty.
     type: str
   pagerduty_client_url:
     description:
-      - desc_text
+      - Client URL for PagerDuty.
     type: str
   pagerduty_component:
     description:
-      - desc_text
+      - Component involved in the PagerDuty alert.
     type: str
   pagerduty_details:
     description:
-      - desc_text
+      - List of additional details for PagerDuty.
     type: list
     elements: dict
   pagerduty_group:
     description:
-      - desc_text
+      - Group associated with the PagerDuty alert.
     type: str
   pagerduty_integration_key:
     description:
-      - desc_text
+      - Integration key for PagerDuty.
     type: str
   pagerduty_severity:
     description:
-      - desc_text
+      - Severity level of the PagerDuty alert.
     type: str
     choices:
       - critical
@@ -290,313 +290,313 @@ options:
       - info
   pagerduty_source:
     description:
-      - desc_text
+      - Source of the PagerDuty alert.
     type: str
   pagerduty_summary:
     description:
-      - desc_text
+      - Summary of the PagerDuty alert.
     type: str
   pushover_api_token:
     description:
-      - desc_text
+      - API token for Pushover.
     type: str
   pushover_devices:
     description:
-      - desc_text
+      - List of devices for Pushover notifications.
     type: list
     elements: str
   pushover_expire:
     description:
-      - desc_text
+      - Expiration time for Pushover notifications.
     type: int
   pushover_message:
     description:
-      - desc_text
+      - Message to send via Pushover.
     type: str
   pushover_ok_priority:
     description:
-      - desc_text
+      - Priority for OK messages in Pushover.
     type: int
   pushover_ok_sound:
     description:
-      - desc_text
+      - Sound for OK messages in Pushover.
     type: str
   pushover_priority:
     description:
-      - desc_text
+      - Priority for Pushover messages.
     type: int
   pushover_retry:
     description:
-      - desc_text
+      - Retry interval for Pushover messages.
     type: int
   pushover_sound:
     description:
-      - desc_text
+      - Sound for Pushover notifications.
     type: str
   pushover_title:
     description:
-      - desc_text
+      - Title of the Pushover message.
     type: str
   pushover_upload_image:
     description:
-      - desc_text
+      - Whether to upload an image with Pushover notification.
     type: bool
     default: true
   pushover_user_key:
     description:
-      - desc_text
+      - User key for Pushover.
     type: str
   sensugo_api_key:
     description:
-      - desc_text
+      - API key for Sensu Go.
     type: str
   sensugo_url:
     description:
-      - desc_text
+      - URL for Sensu Go.
     type: str
   sensugo_check:
     description:
-      - desc_text
+      - Check name for Sensu Go.
     type: str
   sensugo_entity:
     description:
-      - desc_text
+      - Entity name for Sensu Go.
     type: str
   sensugo_handler:
     description:
-      - desc_text
+      - Handler for Sensu Go.
     type: str
   sensugo_message:
     description:
-      - desc_text
+      - Message to send via Sensu Go.
     type: str
   sensugo_namespace:
     description:
-      - desc_text
+      - Namespace for Sensu Go.
     type: str
   slack_endpoint_url:
     description:
-      - desc_text
+      - Endpoint URL for Slack webhook.
     type: str
   slack_icon_emoji:
     description:
-      - desc_text
+      - Icon emoji for Slack messages.
     type: str
   slack_icon_url:
     description:
-      - desc_text
+      - Icon URL for Slack messages.
     type: str
   slack_mention_channel:
     description:
-      - desc_text
+      - Channel mention for Slack messages.
     type: str
     choices:
       - here
       - channel
   slack_mention_groups:
     description:
-      - desc_text
+      - List of groups to mention in Slack messages.
     type: list
     elements: str
   slack_mention_users:
     description:
-      - desc_text
+      - List of users to mention in Slack messages.
     type: list
     elements: str
   slack_recipient:
     description:
-      - desc_text
+      - Recipient for Slack messages.
     type: str
   slack_text:
     description:
-      - desc_text
+      - Text content for Slack messages.
     type: str
   slack_title:
     description:
-      - desc_text
+      - Title of the Slack message.
     type: str
   slack_token:
     description:
-      - desc_text
+      - Token for Slack authentication.
     type: str
   slack_url:
     description:
-      - desc_text
+      - URL for Slack webhook.
     type: str
   slack_username:
     description:
-      - desc_text
+      - Username to use in Slack messages.
     type: str
   teams_message:
     description:
-      - desc_text
+      - Message to send via Microsoft Teams.
     type: str
   teams_section_title:
     description:
-      - desc_text
+      - Section title for Microsoft Teams messages.
     type: str
   teams_title:
     description:
-      - desc_text
+      - Title of the Microsoft Teams message.
     type: str
   teams_url:
     description:
-      - desc_text
+      - URL for Microsoft Teams webhook.
     type: str
   telegram_chat_id:
     description:
-      - desc_text
+      - Chat ID for Telegram.
     type: str
   telegram_disable_notifications:
     description:
-      - desc_text
+      - Whether to disable notifications for Telegram messages.
     type: bool
   telegram_message:
     description:
-      - desc_text
+      - Message to send via Telegram.
     type: str
   telegram_parse_mode:
     description:
-      - desc_text
+      - Parse mode for Telegram messages.
     type: str
   telegram_protect_content:
     description:
-      - desc_text
+      - Whether to protect content in Telegram messages.
     type: bool
   telegram_token:
     description:
-      - desc_text
+      - Token for Telegram authentication.
     type: str
   telegram_web_page_view:
     description:
-      - desc_text
+      - Whether to enable web page preview in Telegram messages.
     type: bool
   threema_api_secret:
     description:
-      - desc_text
+      - API secret for Threema.
     type: str
   threema_description:
     description:
-      - desc_text
+      - Description for Threema messages.
     type: str
   threema_gateway_id:
     description:
-      - desc_text
+      - Gateway ID for Threema.
     type: str
   threema_recipient_id:
     description:
-      - desc_text
+      - Recipient ID for Threema messages.
     type: str
   threema_title:
     description:
-      - desc_text
+      - Title of the Threema message.
     type: str
   victorops_description:
     description:
-      - desc_text
+      - Description for VictorOps messages.
     type: str
   victorops_message_type:
     description:
-      - desc_text
+      - Message type for VictorOps.
     type: str
     choices:
       - CRITICAL
       - RECOVERY
   victorops_title:
     description:
-      - desc_text
+      - Title of the VictorOps message.
     type: str
   victorops_url:
     description:
-      - desc_text
+      - URL for VictorOps webhook.
     type: str
   webex_api_url:
     description:
-      - desc_text
+      - API URL for Webex.
     type: str
   webex_message:
     description:
-      - desc_text
+      - Message to send via Webex.
     type: str
   webex_room_id:
     description:
-      - desc_text
+      - Room ID for Webex messages.
     type: str
   webex_token:
     description:
-      - desc_text
+      - Token for Webex authentication.
     type: str
   webhook_authorization_credentials:
     description:
-      - desc_text
+      - Authorization credentials for webhook.
     type: str
   webhook_authorization_scheme:
     description:
-      - desc_text
+      - Authorization scheme for webhook.
     type: str
   webhook_http_method:
     description:
-      - desc_text
+      - HTTP method for webhook.
     type: str
     choices:
       - POST
       - PUT
   webhook_max_alerts:
     description:
-      - desc_text
+      - Maximum number of alerts for webhook.
     type: int
   webhook_message:
     description:
-      - desc_text
+      - Message to send via webhook.
     type: str
   webhook_password:
     description:
-      - desc_text
+      - Password for webhook authentication.
     type: str
   webhook_title:
     description:
-      - desc_text
+      - Title of the webhook message.
     type: str
   webhook_url:
     description:
-      - desc_text
+      - URL for webhook.
     type: str
   webhook_username:
     description:
-      - desc_text
+      - Username for webhook authentication.
     type: str
   wecom_agent_id:
     description:
-      - desc_text
+      - Agent ID for WeCom.
     type: str
   wecom_corp_id:
     description:
-      - desc_text
+      - Corporate ID for WeCom.
     type: str
   wecom_message:
     description:
-      - desc_text
+      - Message to send via WeCom.
     type: str
   wecom_msg_type:
     description:
-      - desc_text
+      - Message type for WeCom.
     type: str
   wecom_secret:
     description:
-      - desc_text
+      - Secret for WeCom authentication.
     type: str
   wecom_title:
     description:
-      - desc_text
+      - Title of the WeCom message.
     type: str
   wecom_to_user:
     description:
-      - desc_text
+      - List of users to send the WeCom message to.
     type: list
     elements: str
   wecom_url:
     description:
-      - desc_text
+      - URL for WeCom webhook.
     type: str
 extends_documentation_fragment:
   - community.grafana.basic_auth
