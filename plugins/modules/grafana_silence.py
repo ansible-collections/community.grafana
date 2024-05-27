@@ -42,6 +42,7 @@ options:
       - The Grafana organization name where the silence will be created or deleted.
       - Not used when I(grafana_api_key) is set, because the grafana_api_key only belongs to one organization.
       - Mutually exclusive with C(org_id).
+    type: str
   comment:
     description:
       - The comment that describes the silence.
