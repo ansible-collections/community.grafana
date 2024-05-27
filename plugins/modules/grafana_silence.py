@@ -344,23 +344,24 @@ def setup_module_object():
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     comment=dict(type="str", required=True),
-    state=dict(type="str", choices=["present", "absent"], default="present"),
     created_by=dict(type="str", required=True),
-    starts_at=dict(type="str", required=True),
     ends_at=dict(type="str", required=True),
     matchers=dict(type="list", elements="dict", required=True),
+    org_id=dict(default=1, type="int"),
+    org_name=dict(type="str"),
     skip_version_check=dict(type="bool", default=False),
+    starts_at=dict(type="str", required=True),
+    state=dict(type="str", choices=["present", "absent"], default="present"),
 )
 
 
 def main():
-
     module = setup_module_object()
     comment = module.params["comment"]
     created_by = module.params["created_by"]
-    starts_at = module.params["starts_at"]
     ends_at = module.params["ends_at"]
     matchers = module.params["matchers"]
+    starts_at = module.params["starts_at"]
     state = module.params["state"]
 
     changed = False
@@ -372,7 +373,6 @@ def main():
     )
 
     if state == "present":
-
         if not silence:
             silence = grafana_iface.create_silence(
                 comment, created_by, starts_at, ends_at, matchers
@@ -396,6 +396,7 @@ def main():
                 changed=changed,
                 msg="Silence does not exist",
             )
+
     module.exit_json(failed=failed, changed=changed, silence=silence)
 
 
