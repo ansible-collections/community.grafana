@@ -1,0 +1,7 @@
+---
+- module_defaults:
+    community.grafana.grafana_silence:
+      org_name: Main Org.
+  block:
+    - name: Silence creation and deletion
+      ansible.builtin.include_tasks: create-delete.yml
