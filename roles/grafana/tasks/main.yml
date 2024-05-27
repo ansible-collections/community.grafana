@@ -206,9 +206,11 @@
       community.grafana.grafana_silence:
         comment: "{{ silence.comment }}"
         created_by: "{{ silence.created_by }}"
-        starts_at: "{{ silence.starts_at }}"
         ends_at: "{{ silence.ends_at }}"
         matchers: "{{ silence.matchers }}"
+        org_id: "{{ datasource.org_id | default(omit) }}"
+        org_name: "{{ datasource.org_name | default(omit) }}"
+        starts_at: "{{ silence.starts_at }}"
         state: "{{ silence.state | default(omit) }}"
       loop: "{{ grafana_silences }}"
       loop_control: {loop_var: silence}
