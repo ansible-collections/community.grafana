@@ -669,12 +669,12 @@ contact_point:
 diff:
   description: Difference between previous and updated contact point.
   returned: changed
-  type: dict
+  type: complex
   contains:
     before:
       description: Previous contact point.
       returned: changed
-      type: complex
+      type: dict
       sample:
         - uid: ddmyrs0f74t8hc
           name: supportmail
@@ -687,7 +687,7 @@ diff:
     after:
       description: Current contact point.
       returned: changed
-      type: complex
+      type: dict
       sample:
         - uid: ddmyrs0f74t8hc
           name: supportmail
