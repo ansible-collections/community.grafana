@@ -180,8 +180,8 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | org_name | no |
 | provisioning | no |
 | state | no |
-| type | yes |
-| uid | no |
+| type | no |
+| uid | yes |
 | alertmanager_password | no |
 | alertmanager_url | no |
 | alertmanager_username | no |
@@ -198,9 +198,9 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | email_message | no |
 | email_single | no |
 | email_subject | no |
-| googlechat_url | no |
 | googlechat_message | no |
 | googlechat_title | no |
+| googlechat_url | no |
 | kafka_api_version | no |
 | kafka_cluster_id | no |
 | kafka_description | no |
@@ -243,12 +243,12 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | pushover_upload_image | no |
 | pushover_user_key | no |
 | sensugo_api_key | no |
-| sensugo_url | no |
 | sensugo_check | no |
 | sensugo_entity | no |
 | sensugo_handler | no |
 | sensugo_message | no |
 | sensugo_namespace | no |
+| sensugo_url | no |
 | slack_endpoint_url | no |
 | slack_icon_emoji | no |
 | slack_icon_url | no |
