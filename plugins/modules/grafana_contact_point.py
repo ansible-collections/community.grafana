@@ -1161,7 +1161,7 @@ def main():
                 "wecom",
             ],
         ),
-        uid=dict(type="str"),
+        uid=dict(required=True, type="str"),
         # alertmanager
         alertmanager_password=dict(type="str", no_log=True),
         alertmanager_url=dict(type="str"),
@@ -1311,8 +1311,7 @@ def main():
         required_together=[["url_username", "url_password", "org_id"]],
         mutually_exclusive=[["url_username", "grafana_api_key"]],
         required_if=[
-            ["state", "present", ["uid", "name", "type"]],
-            ["state", "absent", ["uid"]],
+            ["state", "present", ["name", "type"]],
             ["type", "alertmanager", ["alertmanager_url"]],
             ["type", "dingding", ["dingding_url"]],
             ["type", "discord", ["discord_url"]],
