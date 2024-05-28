@@ -1052,7 +1052,11 @@ class GrafanaContactPointInterface(object):
                 del contact_point["provenance"]
 
             if self.contact_point == contact_point:
-                return {"changed": False, "contact_point": contact_point, "state": data["state"]}
+                return {
+                    "changed": False,
+                    "contact_point": contact_point,
+                    "state": data["state"],
+                }
             else:
                 return {
                     "changed": True,
@@ -1074,7 +1078,11 @@ class GrafanaContactPointInterface(object):
         )
 
         if info["status"] == 202:
-            return {"changed": True, "contact_point": self.contact_point, "state": data["state"]}
+            return {
+                "changed": True,
+                "contact_point": self.contact_point,
+                "state": data["state"],
+            }
         elif info["status"] == 404:
             return {"changed": False, "state": data["state"]}
         else:
