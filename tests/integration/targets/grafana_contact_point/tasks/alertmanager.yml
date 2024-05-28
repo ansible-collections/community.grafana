@@ -12,7 +12,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "alertmanager"
+      - result.contact_point.name == "alertmanager"
+      - result.contact_point.type == "prometheus-alertmanager"
 
 - name: Create alertmanager contact point (idempotency)
   register: result
@@ -27,7 +31,31 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "alertmanager"
+      - result.contact_point.name == "alertmanager"
+      - result.contact_point.type == "prometheus-alertmanager"
+
+- name: Update alertmanager contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: alertmanager
+    name: alertmanager
+    type: alertmanager
+    alertmanager_url: https://example-update.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "alertmanager"
+      - result.contact_point.name == "alertmanager"
+      - result.contact_point.type == "prometheus-alertmanager"
+      - result.diff is defined
 
 - name: Delete alertmanager contact point
   register: result
@@ -40,7 +68,9 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "alertmanager" 
 
 - name: Delete alertmanager contact point (idempotency)
   register: result
@@ -53,4 +83,5 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "absent"

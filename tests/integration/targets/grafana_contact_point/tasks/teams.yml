@@ -12,7 +12,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "teams"
+      - result.contact_point.name == "teams"
+      - result.contact_point.type == "teams"
 
 - name: Create teams contact point (idempotency)
   register: result
@@ -27,7 +31,31 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "teams"
+      - result.contact_point.name == "teams"
+      - result.contact_point.type == "teams"
+
+- name: Update teams contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: teams
+    name: teams
+    type: teams
+    teams_url: https://example-update.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "teams"
+      - result.contact_point.name == "teams"
+      - result.contact_point.type == "teams"
+      - result.diff is defined
 
 - name: Delete teams contact point
   register: result
@@ -40,7 +68,9 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "teams"
 
 - name: Delete teams contact point (idempotency)
   register: result
@@ -53,4 +83,5 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "absent"

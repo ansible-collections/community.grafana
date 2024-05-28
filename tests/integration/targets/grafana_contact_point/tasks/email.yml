@@ -14,7 +14,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "email"
+      - result.contact_point.name == "email"
+      - result.contact_point.type == "email"
 
 - name: Create email contact point (idempotency)
   register: result
@@ -31,9 +35,35 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "email"
+      - result.contact_point.name == "email"
+      - result.contact_point.type == "email"
 
-- name: Delete discord contact point
+- name: Update email contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: email
+    name: email
+    type: email
+    email_addresses:
+      - foo@example-update.org
+      - bar@example-update.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "email"
+      - result.contact_point.name == "email"
+      - result.contact_point.type == "email"
+      - result.diff is defined
+
+- name: Delete email contact point
   register: result
   community.grafana.grafana_contact_point:
     uid: email
@@ -44,10 +74,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
-      - result.state == 'absent'
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "email"
 
-- name: Delete discord contact point (idempotency)
+- name: Delete email contact point (idempotency)
   register: result
   community.grafana.grafana_contact_point:
     uid: email
@@ -58,4 +89,5 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "absent"
