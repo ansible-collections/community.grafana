@@ -1015,7 +1015,7 @@ class GrafanaContactPointInterface(object):
             if self.contact_point:
                 return self.grafana_delete_contact_point(data)
             else:
-                return {"changed": False}
+                return {"changed": False, "state": data["state"]}
 
     def grafana_create_contact_point(self, data, payload):
         r, info = fetch_url(
@@ -1031,6 +1031,7 @@ class GrafanaContactPointInterface(object):
             return {
                 "changed": True,
                 "contact_point": contact_point,
+                "state": data["state"],
             }
         else:
             raise GrafanaAPIException("Unable to create contact point: %s" % info)
@@ -1051,12 +1052,13 @@ class GrafanaContactPointInterface(object):
                 del contact_point["provenance"]
 
             if self.contact_point == contact_point:
-                return {"changed": False, "contact_point": contact_point}
+                return {"changed": False, "contact_point": contact_point, "state": data["state"]}
             else:
                 return {
                     "changed": True,
                     "diff": {"before": self.contact_point, "after": contact_point},
                     "contact_point": contact_point,
+                    "state": data["state"],
                 }
         else:
             raise GrafanaAPIException(
@@ -1072,9 +1074,9 @@ class GrafanaContactPointInterface(object):
         )
 
         if info["status"] == 202:
-            return {"changed": True, "contact_point": self.contact_point}
+            return {"changed": True, "contact_point": self.contact_point, "state": data["state"]}
         elif info["status"] == 404:
-            return {"changed": False}
+            return {"changed": False, "state": data["state"]}
         else:
             raise GrafanaAPIException(
                 "Unable to delete contact point '%s': %s" % (data["uid"], info)
