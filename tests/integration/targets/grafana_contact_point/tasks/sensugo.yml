@@ -13,7 +13,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "sensugo"
+      - result.contact_point.name == "sensugo"
+      - result.contact_point.type == "sensugo"
 
 - name: Create sensugo contact point
   register: result
@@ -29,7 +33,32 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "sensugo"
+      - result.contact_point.name == "sensugo"
+      - result.contact_point.type == "sensugo"
+
+- name: Update sensugo contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: sensugo
+    name: sensugo
+    type: sensugo
+    sensugo_url: https://example-update.org
+    sensugo_api_key: testapikey-update
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "sensugo"
+      - result.contact_point.name == "sensugo"
+      - result.contact_point.type == "sensugo"
+      - result.diff is defined
 
 - name: Delete sensugo contact point
   register: result
@@ -42,7 +71,9 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "sensugo"
 
 - name: Delete sensugo contact point (idempotency)
   register: result
@@ -55,4 +86,5 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "absent"

@@ -12,7 +12,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "webhook"
+      - result.contact_point.name == "webhook"
+      - result.contact_point.type == "webhook"
 
 - name: Create webhook contact point (idempotency)
   register: result
@@ -27,7 +31,31 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "webhook"
+      - result.contact_point.name == "webhook"
+      - result.contact_point.type == "webhook"
+
+- name: Update webhook contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: webhook
+    name: webhook
+    type: webhook
+    webhook_url: https://example-update.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "webhook"
+      - result.contact_point.name == "webhook"
+      - result.contact_point.type == "webhook"
+      - result.diff is defined
 
 - name: Delete webhook contact point
   register: result
@@ -40,7 +68,9 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "webhook"
 
 - name: Delete webhook contact point (idempotency)
   register: result
@@ -53,4 +83,5 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "absent"

@@ -14,7 +14,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "slack"
+      - result.contact_point.name == "slack"
+      - result.contact_point.type == "slack"
 
 - name: Check slack contact point (idempotency)
   register: result
@@ -31,7 +35,11 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "slack"
+      - result.contact_point.name == "slack"
+      - result.contact_point.type == "slack"
 
 - name: Update slack contact point
   register: result
@@ -39,16 +47,21 @@
     uid: slack
     name: slack
     type: slack
-    slack_url: https://hooks.slack.com/services/xxx/yyy/fff
-    slack_token: testapitoken
-    slack_recipient: foo
+    slack_url: https://hooks.slack.com/services/xxx/yyy/update
+    slack_token: testapitoken-update
+    slack_recipient: foo-update
 
 - ansible.builtin.debug:
     var: result
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "slack"
+      - result.contact_point.name == "slack"
+      - result.contact_point.type == "slack"
+      - result.diff is defined
 
 - name: Delete slack contact point
   register: result
@@ -61,7 +74,9 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == True
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "slack"
 
 - name: Delete slack contact point (idempotency)
   register: result
@@ -74,4 +89,5 @@
 
 - ansible.builtin.assert:
     that:
-      - result.changed == False
+      - not result.changed
+      - result.state == "absent"
