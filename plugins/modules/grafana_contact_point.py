@@ -100,6 +100,7 @@ options:
   alertmanager_url:
     description:
       - URL for accessing Alertmanager.
+      - Required when C(type) is C(alertmanager).
     type: str
   alertmanager_username:
     description:
@@ -120,6 +121,7 @@ options:
   dingding_url:
     description:
       - The URL for DingDing webhook.
+      - Required when C(type) is C(dingding).
     type: str
   discord_avatar_url:
     description:
@@ -136,6 +138,7 @@ options:
   discord_url:
     description:
       - The URL for Discord webhook.
+      - Required when C(type) is C(discord).
     type: str
   discord_use_username:
     description:
@@ -145,6 +148,7 @@ options:
   email_addresses:
     description:
       - List of email addresses to send the message to.
+      - Required when C(type) is C(email).
     type: list
     elements: str
   email_message:
@@ -163,6 +167,7 @@ options:
   googlechat_url:
     description:
       - The URL for Google Chat webhook.
+      - Required when C(type) is C(webhook).
     type: str
   googlechat_message:
     description:
@@ -196,10 +201,12 @@ options:
   kafka_rest_proxy_url:
     description:
       - URL for Kafka REST Proxy.
+      - Required when C(type) is C(kafka).
     type: str
   kafka_topic:
     description:
       - Kafka topic to publish to.
+      - Required when C(type) is C(kafka).
     type: str
   kafka_username:
     description:
@@ -216,10 +223,12 @@ options:
   line_token:
     description:
       - Access token for Line.
+      - Required when C(type) is C(line).
     type: str
   opsgenie_api_key:
     description:
       - API key for OpsGenie.
+      - Required when C(type) is C(opsgenie).
     type: str
   opsgenie_auto_close:
     description:
@@ -249,6 +258,7 @@ options:
   opsgenie_url:
     description:
       - URL for OpsGenie webhook.
+      - Required when C(type) is C(pagerduty).
     type: str
   pagerduty_class:
     description:
@@ -278,6 +288,7 @@ options:
   pagerduty_integration_key:
     description:
       - Integration key for PagerDuty.
+      - Required when C(type) is C(pagerduty).
     type: str
   pagerduty_severity:
     description:
@@ -299,6 +310,7 @@ options:
   pushover_api_token:
     description:
       - API token for Pushover.
+      - Required when C(type) is C(pushover).
     type: str
   pushover_devices:
     description:
@@ -345,14 +357,17 @@ options:
   pushover_user_key:
     description:
       - User key for Pushover.
+      - Required when C(type) is C(pushover).
     type: str
   sensugo_api_key:
     description:
       - API key for Sensu Go.
+      - Required when C(type) is C(pushover).
     type: str
   sensugo_url:
     description:
       - URL for Sensu Go.
+      - Required when C(type) is C(sensugo).
     type: str
   sensugo_check:
     description:
@@ -406,6 +421,7 @@ options:
   slack_recipient:
     description:
       - Recipient for Slack messages.
+      - Required when C(type) is C(slack).
     type: str
   slack_text:
     description:
@@ -418,10 +434,12 @@ options:
   slack_token:
     description:
       - Token for Slack authentication.
+      - Required when C(type) is C(slack).
     type: str
   slack_url:
     description:
       - URL for Slack webhook.
+      - Required when C(type) is C(slack).
     type: str
   slack_username:
     description:
@@ -442,10 +460,12 @@ options:
   teams_url:
     description:
       - URL for Microsoft Teams webhook.
+      - Required when C(type) is C(teams).
     type: str
   telegram_chat_id:
     description:
       - Chat ID for Telegram.
+      - Required when C(type) is C(telegram).
     type: str
   telegram_disable_notifications:
     description:
@@ -466,6 +486,7 @@ options:
   telegram_token:
     description:
       - Token for Telegram authentication.
+      - Required when C(type) is C(telegram).
     type: str
   telegram_web_page_view:
     description:
@@ -474,6 +495,7 @@ options:
   threema_api_secret:
     description:
       - API secret for Threema.
+      - Required when C(type) is C(threema).
     type: str
   threema_description:
     description:
@@ -482,10 +504,12 @@ options:
   threema_gateway_id:
     description:
       - Gateway ID for Threema.
+      - Required when C(type) is C(threema).
     type: str
   threema_recipient_id:
     description:
       - Recipient ID for Threema messages.
+      - Required when C(type) is C(threema).
     type: str
   threema_title:
     description:
@@ -509,6 +533,7 @@ options:
   victorops_url:
     description:
       - URL for VictorOps webhook.
+      - Required when C(type) is C(victorops).
     type: str
   webex_api_url:
     description:
@@ -521,10 +546,12 @@ options:
   webex_room_id:
     description:
       - Room ID for Webex messages.
+      - Required when C(type) is C(webex).
     type: str
   webex_token:
     description:
       - Token for Webex authentication.
+      - Required when C(type) is C(webex).
     type: str
   webhook_authorization_credentials:
     description:
@@ -560,6 +587,7 @@ options:
   webhook_url:
     description:
       - URL for webhook.
+      - Required when C(type) is C(webhook).
     type: str
   webhook_username:
     description:
@@ -568,10 +596,12 @@ options:
   wecom_agent_id:
     description:
       - Agent ID for WeCom.
+      - Required when C(type) is C(wecom).
     type: str
   wecom_corp_id:
     description:
       - Corporate ID for WeCom.
+      - Required when C(type) is C(wecom).
     type: str
   wecom_message:
     description:
@@ -584,6 +614,7 @@ options:
   wecom_secret:
     description:
       - Secret for WeCom authentication.
+      - Required when C(type) is C(wecom).
     type: str
   wecom_title:
     description:
@@ -597,6 +628,7 @@ options:
   wecom_url:
     description:
       - URL for WeCom webhook.
+      - Required when C(type) is C(wecom).
     type: str
 extends_documentation_fragment:
   - community.grafana.basic_auth
@@ -1284,7 +1316,7 @@ def main():
             ["type", "googlechat", ["googlechat_url"]],
             ["type", "kafka", ["kafka_rest_proxy_url", "kafka_topic"]],
             ["type", "line", ["line_token"]],
-            ["type", "opsgenie", ["opsgenie_api_key"]],
+            ["type", "opsgenie", ["opsgenie_api_key", "opsgenie_url"]],
             ["type", "pagerduty", ["pagerduty_integration_key"]],
             ["type", "pushover", ["pushover_api_token", "pushover_user_key"]],
             ["type", "sensugo", ["sensugo_api_key", "sensugo_url"]],
