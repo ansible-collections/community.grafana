@@ -42,6 +42,7 @@ options:
   name:
     description:
       - The name of the contact point.
+      - Required when C(state) is C(present).
     type: str
   org_id:
     description:
@@ -68,6 +69,7 @@ options:
   type:
     description:
       - The type of the contact point.
+      - Required when C(state) is C(present).
     type: str
     choices:
       - alertmanager
@@ -92,7 +94,9 @@ options:
   uid:
     description:
       - The unique ID of the contact point.
+      - Normally the uid is generated randomly, but it is required for handling the contact point via API.
     type: str
+    required: true
   alertmanager_password:
     description:
       - Password for accessing Alertmanager.
@@ -1307,7 +1311,7 @@ def main():
         required_together=[["url_username", "url_password", "org_id"]],
         mutually_exclusive=[["url_username", "grafana_api_key"]],
         required_if=[
-            ["state", "present", ["name", "type"]],
+            ["state", "present", ["uid", "name", "type"]],
             ["state", "absent", ["uid"]],
             ["type", "alertmanager", ["alertmanager_url"]],
             ["type", "dingding", ["dingding_url"]],
