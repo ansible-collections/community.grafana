@@ -1,0 +1,4 @@
+---
+trivial:
+  - bump python to 3.12 in ansible tests
+  - remove sanity ignore files
