@@ -152,10 +152,8 @@ class GrafanaAPI:
 
     def grafana_headers(self):
         headers = {"content-type": "application/json; charset=utf8"}
-        if module.params.get("grafana_api_key", None):
-            self.headers["Authorization"] = (
-                "Bearer %s" % module.params["grafana_api_key"]
-            )
+        if self.grafana_api_key.get("grafana_api_key", None):
+            headers["Authorization"] = "Bearer %s" % self.grafana_api_key
         else:
             headers["Authorization"] = basic_auth_header(
                 self.grafana_user, self.grafana_password
