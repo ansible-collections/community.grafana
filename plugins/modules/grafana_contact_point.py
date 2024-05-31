@@ -24,7 +24,7 @@ DOCUMENTATION = """
 module: grafana_contact_point
 author:
   - Moritz Pötschk (@nemental)
-version_added: "1.9.0"
+version_added: "2.0.0"
 short_description: Manage Grafana Contact Points
 description:
   - Create/Update/Delete Grafana Contact Points via API.
