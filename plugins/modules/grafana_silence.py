@@ -225,11 +225,25 @@ class GrafanaSilenceInterface(object):
 
     def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
-        self._send_request(url, headers=self.headers, method="POST")
+        organizations = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="POST",
+        )
 
     def organization_by_name(self, org_name):
         url = "/api/user/orgs"
-        organizations = self._send_request(url, headers=self.headers, method="GET")
+        organizations = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
         orga = next((org for org in organizations if org["name"] == org_name))
         if orga:
             return orga["orgId"]
