@@ -319,10 +319,17 @@ releases:
       - Add support of `grafana_contact_point` in grafana role
       - add org switch by `org_id` and `org_name` in `grafana_silence`
       removed_features:
+      - removed check and handling of mangled api key in `grafana_dashboard` lookup
       - removed deprecated `message` argument in `grafana_dashboard`
     fragments:
     - 352-module-contact-point.yml
     - 371-silence-org-switch.yml
     - 372-rm-dashboard-message-argument.yml
     - 373-cleanup-and-update-sanity.yml
+    - 374-ansible-required-version.yml
+    - 376-dashboard-lookup-api-key-deprecation.yml
+    modules:
+    - description: Manage Grafana Contact Points
+      name: grafana_contact_point
+      namespace: ''
     release_date: '2024-05-31'
