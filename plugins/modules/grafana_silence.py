@@ -23,7 +23,7 @@ DOCUMENTATION = """
 module: grafana_silence
 author:
   - flkhndlr (@flkhndlr)
-version_added: "1.8.0"
+version_added: "1.9.0"
 short_description: Manage Grafana Silences
 description:
   - Create/delete Grafana Silences through the Alertmanager Silence API.
