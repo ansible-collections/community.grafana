@@ -225,7 +225,7 @@ class GrafanaSilenceInterface(object):
 
     def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
-        organizations = base.grafana_send_request(
+        base.grafana_send_request(
             self,
             module=self._module,
             url=url,
