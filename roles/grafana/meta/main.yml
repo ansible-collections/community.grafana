@@ -4,7 +4,7 @@ galaxy_info:
   author: community
   description: Configure Grafana organizations, dashboards, folders, datasources, silences, teams and users
   license: GPLv3
-  min_ansible_version: "2.14"
+  min_ansible_version: "2.15"
   galaxy_tags: [grafana, monitoring]
   platforms:
     - {name: EL, versions: [all]}
