@@ -4,6 +4,21 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+v2.0.0
+======
+
+Minor Changes
+-------------
+
+- Add `grafana_contact_point` module
+- Add support of `grafana_contact_point` in grafana role
+- add org switch by `org_id` and `org_name` in `grafana_silence`
+
+Removed Features (previously deprecated)
+----------------------------------------
+
+- removed deprecated `message` argument in `grafana_dashboard`
+
 v1.9.1
 ======
 
