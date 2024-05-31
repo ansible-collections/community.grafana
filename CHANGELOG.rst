@@ -17,7 +17,13 @@ Minor Changes
 Removed Features (previously deprecated)
 ----------------------------------------
 
+- removed check and handling of mangled api key in `grafana_dashboard` lookup
 - removed deprecated `message` argument in `grafana_dashboard`
+
+New Modules
+-----------
+
+- community.grafana.grafana_contact_point - Manage Grafana Contact Points
 
 v1.9.1
 ======
