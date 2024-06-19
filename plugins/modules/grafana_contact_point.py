@@ -966,7 +966,9 @@ class GrafanaContactPointInterface(object):
                 module.params["url_username"], module.params["url_password"]
             )
             self.org_id = (
-                self.grafana_organization_by_name(module.params["org_name"])
+                self.grafana_organization_by_name(
+                    module.params, module.params["org_name"]
+                )
                 if module.params["org_name"]
                 else module.params["org_id"]
             )
