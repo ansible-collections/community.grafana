@@ -167,10 +167,8 @@ team:
                 - 1
 """
 
-import json
-
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible.module_utils.urls import basic_auth_header
 from ansible.module_utils._text import to_text
 from ansible_collections.community.grafana.plugins.module_utils import base
 from ansible.module_utils.six.moves.urllib.parse import quote
@@ -207,38 +205,15 @@ class GrafanaTeamInterface(object):
                     failed=True, msg="Teams API is available starting Grafana v5"
                 )
 
-    def _send_request(self, url, data=None, headers=None, method="GET"):
-        if data is not None:
-            data = json.dumps(data, sort_keys=True)
-        if not headers:
-            headers = []
-
-        full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(
-            self._module, full_url, data=data, headers=headers, method=method
-        )
-        status_code = info["status"]
-        if status_code == 404:
-            return None
-        elif status_code == 401:
-            self._module.fail_json(
-                failed=True,
-                msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url),
-            )
-        elif status_code == 403:
-            self._module.fail_json(failed=True, msg="Permission Denied")
-        elif status_code == 409:
-            self._module.fail_json(failed=True, msg="Team name is taken")
-        elif status_code == 200:
-            return self._module.from_json(resp.read())
-        self._module.fail_json(
-            failed=True, msg="Grafana Teams API answered with HTTP %d" % status_code
-        )
-
     def get_version(self):
         url = "/api/health"
-        response = self._send_request(
-            url, data=None, headers=self.headers, method="GET"
+        response = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
         )
         version = response.get("version")
         if version is not None:
@@ -249,14 +224,26 @@ class GrafanaTeamInterface(object):
     def create_team(self, name, email):
         url = "/api/teams"
         team = dict(email=email, name=name)
-        response = self._send_request(
-            url, data=team, headers=self.headers, method="POST"
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            data=team,
+            method="POST",
         )
-        return response
 
     def get_team(self, name):
         url = "/api/teams/search?name={team}".format(team=quote(name))
-        response = self._send_request(url, headers=self.headers, method="GET")
+        response = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
         if not response.get("totalCount") <= 1:
             raise AssertionError("Expected 1 team, got %d" % response["totalCount"])
 
@@ -267,37 +254,77 @@ class GrafanaTeamInterface(object):
     def update_team(self, team_id, name, email):
         url = "/api/teams/{team_id}".format(team_id=team_id)
         team = dict(email=email, name=name)
-        response = self._send_request(
-            url, data=team, headers=self.headers, method="PUT"
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            data=team,
+            method="PUT",
         )
-        return response
 
     def delete_team(self, team_id):
         url = "/api/teams/{team_id}".format(team_id=team_id)
-        response = self._send_request(url, headers=self.headers, method="DELETE")
-        return response
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="DELETE",
+        )
 
     def get_team_members(self, team_id):
         url = "/api/teams/{team_id}/members".format(team_id=team_id)
-        response = self._send_request(url, headers=self.headers, method="GET")
+        response = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
         members = [item.get("email") for item in response]
         return members
 
     def add_team_member(self, team_id, email):
         url = "/api/teams/{team_id}/members".format(team_id=team_id)
         data = {"userId": self.get_user_id_from_mail(email)}
-        self._send_request(url, data=data, headers=self.headers, method="POST")
+        base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            data=data,
+            method="POST",
+        )
 
     def delete_team_member(self, team_id, email):
         user_id = self.get_user_id_from_mail(email)
         url = "/api/teams/{team_id}/members/{user_id}".format(
             team_id=team_id, user_id=user_id
         )
-        self._send_request(url, headers=self.headers, method="DELETE")
+        base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="DELETE",
+        )
 
     def get_user_id_from_mail(self, email):
         url = "/api/users/lookup?loginOrEmail={email}".format(email=quote(email))
-        user = self._send_request(url, headers=self.headers, method="GET")
+        user = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
         if user is None:
             self._module.fail_json(failed=True, msg="User '%s' does not exists" % email)
         return user.get("id")

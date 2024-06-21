@@ -521,11 +521,9 @@ datasource:
         "withCredentials": false }
 """
 
-import json
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote
-from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible.module_utils.urls import basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
 
 
@@ -727,41 +725,27 @@ class GrafanaInterface(object):
             self.switch_organization(self.org_id)
         # }}}
 
-    def _send_request(self, url, data=None, headers=None, method="GET"):
-        if data is not None:
-            data = json.dumps(data, sort_keys=True)
-        if not headers:
-            headers = []
-
-        full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(
-            self._module, full_url, data=data, headers=headers, method=method
-        )
-        status_code = info["status"]
-        if status_code == 404:
-            return None
-        elif status_code == 401:
-            self._module.fail_json(
-                failed=True,
-                msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url),
-            )
-        elif status_code == 403:
-            self._module.fail_json(failed=True, msg="Permission Denied")
-        elif status_code == 200:
-            return self._module.from_json(resp.read())
-        self._module.fail_json(
-            failed=True,
-            msg="Grafana API answered with HTTP %d for url %s and data %s"
-            % (status_code, url, data),
-        )
-
     def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
-        self._send_request(url, headers=self.headers, method="POST")
+        base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="POST",
+        )
 
     def organization_by_name(self, org_name):
         url = "/api/user/orgs"
-        organizations = self._send_request(url, headers=self.headers, method="GET")
+        organizations = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
         orga = next((org for org in organizations if org["name"] == org_name))
         if orga:
             return orga["orgId"]
@@ -772,19 +756,49 @@ class GrafanaInterface(object):
 
     def datasource_by_name(self, name):
         url = "/api/datasources/name/%s" % quote(name, safe="")
-        return self._send_request(url, headers=self.headers, method="GET")
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
 
     def delete_datasource(self, name):
         url = "/api/datasources/name/%s" % quote(name, safe="")
-        self._send_request(url, headers=self.headers, method="DELETE")
+        base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="DELETE",
+        )
 
     def update_datasource(self, ds_id, data):
         url = "/api/datasources/%d" % ds_id
-        self._send_request(url, data=data, headers=self.headers, method="PUT")
+        base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            data=data,
+            method="PUT",
+        )
 
     def create_datasource(self, data):
         url = "/api/datasources"
-        self._send_request(url, data=data, headers=self.headers, method="POST")
+        base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            data=data,
+            method="POST",
+        )
 
 
 def setup_module_object():

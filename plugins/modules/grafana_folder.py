@@ -176,10 +176,8 @@ folder:
               - 1
 """
 
-import json
-
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible.module_utils.urls import basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
 from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils._text import to_text
@@ -223,45 +221,27 @@ class GrafanaFolderInterface(object):
                     failed=True, msg="Folders API is available starting Grafana v5"
                 )
 
-    def _send_request(self, url, data=None, headers=None, method="GET"):
-        if data is not None:
-            data = json.dumps(data, sort_keys=True)
-        if not headers:
-            headers = []
-
-        full_url = "{grafana_url}{path}".format(grafana_url=self.grafana_url, path=url)
-        resp, info = fetch_url(
-            self._module, full_url, data=data, headers=headers, method=method
-        )
-        status_code = info["status"]
-        if status_code == 404:
-            return None
-        elif status_code == 401:
-            self._module.fail_json(
-                failed=True,
-                msg="Unauthorized to perform action '%s' on '%s'" % (method, full_url),
-            )
-        elif status_code == 403:
-            self._module.fail_json(failed=True, msg="Permission Denied")
-        elif status_code == 412:
-            error_msg = resp.read()["message"]
-            self._module.fail_json(failed=True, msg=error_msg)
-        elif status_code == 200:
-            # XXX: Grafana folders endpoint stopped sending back json in response for delete operations
-            # see https://github.com/grafana/grafana/issues/77673
-            response = resp.read() or "{}"
-            return self._module.from_json(response)
-        self._module.fail_json(
-            failed=True, msg="Grafana Folders API answered with HTTP %d" % status_code
-        )
-
     def switch_organization(self, org_id):
         url = "/api/user/using/%d" % org_id
-        self._send_request(url, headers=self.headers, method="POST")
+        base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="POST",
+        )
 
     def organization_by_name(self, org_name):
         url = "/api/user/orgs"
-        organizations = self._send_request(url, headers=self.headers, method="GET")
+        organizations = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
         orga = next((org for org in organizations if org["name"] == org_name))
         if orga:
             return orga["orgId"]
@@ -272,8 +252,13 @@ class GrafanaFolderInterface(object):
 
     def get_version(self):
         url = "/api/health"
-        response = self._send_request(
-            url, data=None, headers=self.headers, method="GET"
+        response = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
         )
         version = response.get("version")
         if version is not None:
@@ -284,14 +269,26 @@ class GrafanaFolderInterface(object):
     def create_folder(self, title):
         url = "/api/folders"
         folder = dict(title=title)
-        response = self._send_request(
-            url, data=folder, headers=self.headers, method="POST"
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            data=folder,
+            method="POST",
         )
-        return response
 
     def get_folder(self, title):
         url = "/api/search?type=dash-folder&query={title}".format(title=quote(title))
-        response = self._send_request(url, headers=self.headers, method="GET")
+        response = base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
         for item in response:
             if item.get("title") == to_text(title):
                 return item
@@ -299,8 +296,14 @@ class GrafanaFolderInterface(object):
 
     def delete_folder(self, folder_uid):
         url = "/api/folders/{folder_uid}".format(folder_uid=folder_uid)
-        response = self._send_request(url, headers=self.headers, method="DELETE")
-        return response
+        return base.grafana_send_request(
+            self,
+            module=self._module,
+            url=url,
+            grafana_url=self.grafana_url,
+            headers=self.headers,
+            method="DELETE",
+        )
 
 
 def main():
