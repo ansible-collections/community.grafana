@@ -37,10 +37,18 @@ options:
     required: true
     type: str
     aliases: [ title ]
+  uid:
+    description:
+      - The folder UID.
+    type: str
+  parent_uid:
+    description:
+      - The parent folder UID.
+    type: str
   state:
     description:
       - Delete the members not found in the C(members) parameters from the
-      - list of members found on the Folder.
+      - list of members found on the folder.
     default: present
     type: str
     choices: ["present", "absent"]
