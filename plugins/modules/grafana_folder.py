@@ -331,13 +331,24 @@ def main():
     )
     state = module.params["state"]
     title = module.params["name"]
+    parent_uid = module.params["parent_uid"]
+    uid = module.params["uid"]
     module.params["url"] = base.clean_url(module.params["url"])
 
     grafana_iface = GrafanaFolderInterface(module)
 
     changed = False
-    if state == "present":
+
+    if uid and parent_uid:
+        folder = grafana_iface.get_folder(title, uid, parent_uid)
+    elif uid:
+        folder = grafana_iface.get_folder(title, uid)
+    elif parent_uid:
+        folder = grafana_iface.get_folder(title, parent_uid=parent_uid)
+    else:
         folder = grafana_iface.get_folder(title)
+
+    if state == "present":
         if folder is None:
             grafana_iface.create_folder(title)
             folder = grafana_iface.get_folder(title)
@@ -345,7 +356,6 @@ def main():
         folder = grafana_iface.get_folder(title)
         module.exit_json(changed=changed, folder=folder)
     elif state == "absent":
-        folder = grafana_iface.get_folder(title)
         if folder is None:
             module.exit_json(changed=False, message="No folder found")
         result = grafana_iface.delete_folder(folder.get("uid"))
