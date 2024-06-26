@@ -339,14 +339,7 @@ def main():
 
     changed = False
 
-    if uid and parent_uid:
-        folder = grafana_iface.get_folder(title, uid, parent_uid)
-    elif uid:
-        folder = grafana_iface.get_folder(title, uid)
-    elif parent_uid:
-        folder = grafana_iface.get_folder(title, parent_uid=parent_uid)
-    else:
-        folder = grafana_iface.get_folder(title)
+    folder = grafana_iface.get_folder(title, uid, parent_uid)
 
     if state == "present":
         if folder is None:
