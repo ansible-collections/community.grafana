@@ -290,15 +290,16 @@ class GrafanaFolderInterface(object):
         return response
 
     def get_folder(self, title):
-        url = "/api/search?type=dash-folder&query={title}".format(title=quote(title))
+        url = "/api/search?type=dash-folder&query=%s" % quote(title)
         response = self._send_request(url, headers=self.headers, method="GET")
-        for item in response:
-            if item.get("title") == to_text(title):
-                return item
+        folder = next((item for item in response if item["title"] == title))
+        if folder:
+            return folder
+
         return None
 
     def delete_folder(self, folder_uid):
-        url = "/api/folders/{folder_uid}".format(folder_uid=folder_uid)
+        url = "/api/folders/%s" % folder_uid
         response = self._send_request(url, headers=self.headers, method="DELETE")
         return response
 
