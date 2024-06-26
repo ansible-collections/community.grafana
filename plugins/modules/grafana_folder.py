@@ -281,9 +281,9 @@ class GrafanaFolderInterface(object):
             return {"major": int(major), "minor": int(minor), "rev": int(rev)}
         raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
-    def create_folder(self, title):
+    def create_folder(self, title, uid=None, parent_uid=None):
         url = "/api/folders"
-        folder = dict(title=title)
+        folder = dict(title=title, uid=uid, parentUid=parent_uid)
         response = self._send_request(
             url, data=folder, headers=self.headers, method="POST"
         )
@@ -343,10 +343,9 @@ def main():
 
     if state == "present":
         if folder is None:
-            grafana_iface.create_folder(title)
-            folder = grafana_iface.get_folder(title)
+            grafana_iface.create_folder(title, uid, parent_uid)
+            folder = grafana_iface.get_folder(title, uid, parent_uid)
             changed = True
-        folder = grafana_iface.get_folder(title)
         module.exit_json(changed=changed, folder=folder)
     elif state == "absent":
         if folder is None:
