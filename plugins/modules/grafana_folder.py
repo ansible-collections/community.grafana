@@ -289,17 +289,16 @@ class GrafanaFolderInterface(object):
         )
         return response
 
-    def get_folder(self, title):
-        url = "/api/search?type=dash-folder&query=%s" % quote(title)
+    def get_folder(self, title, uid=None, parent_uid=None):
+        url = "/api/folders%s" % ("?parentUid=%s" % parent_uid if parent_uid else "")
         response = self._send_request(url, headers=self.headers, method="GET")
-        folders = [item for item in response if item.get("title") == to_text(title)]
+        if uid:
+            folders = [item for item in response if item.get("uid") == uid]
+        else:
+            folders = [item for item in response if item.get("title") == to_text(title)]
 
-        if len(folders) == 1:
+        if folders:
             return folders[0]
-        elif len(folders) > 1:
-            raise GrafanaError(
-                f"Multiple folders found for name {title}. Please use uid."
-            )
 
         return None
 
