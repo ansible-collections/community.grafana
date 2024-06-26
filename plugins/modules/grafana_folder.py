@@ -308,10 +308,12 @@ def main():
     argument_spec = base.grafana_argument_spec()
     argument_spec.update(
         name=dict(type="str", aliases=["title"], required=True),
-        state=dict(type="str", default="present", choices=["present", "absent"]),
-        skip_version_check=dict(type="bool", default=False),
         org_id=dict(default=1, type="int"),
         org_name=dict(type="str"),
+        parent_uid=dict(type="str"),
+        skip_version_check=dict(type="bool", default=False),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        uid=dict(type="str"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
