@@ -73,10 +73,12 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | zabbix_user | no |
 | [**grafana_folders**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html) |
 | name | yes |
-| skip_version_check | no |
-| state | no |
 | org_id | no |
 | org_name | no |
+| parent_uid | no |
+| skip_version_check | no |
+| state | no |
+| uid | no |
 | [**grafana_dashboards**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html) |
 | commit_message | no |
 | dashboard_id | no |
