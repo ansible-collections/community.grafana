@@ -33,6 +33,10 @@ version_added: "1.1.0"
 short_description: Manage Grafana Notification Channels
 description:
   - Create/Update/Delete Grafana Notification Channels via API.
+deprecated:
+  removed_in: "3.0.0"
+  why: Legacy alerting is removed in Grafana version 11.
+  alternative: Use M(community.grafana.grafana_contact_point) instead.
 options:
   org_id:
     description:
