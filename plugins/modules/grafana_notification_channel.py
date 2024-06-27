@@ -100,6 +100,11 @@ options:
     default: false
     description:
       - Disable the resolve message.
+  skip_version_check:
+    description:
+      - Skip Grafana version check and try to reach api endpoint anyway.
+    type: bool
+    default: false
   reminder_frequency:
     type: str
     description:
@@ -627,6 +632,29 @@ class GrafanaNotificationChannelInterface(object):
             )
         # }}}
         self.grafana_url = clean_url(module.params.get("url"))
+        if module.params.get("skip_version_check") is False:
+            try:
+                grafana_version = self.get_version()
+            except GrafanaAPIException as e:
+                self._module.fail_json(failed=True, msg=to_text(e))
+            if grafana_version["major"] >= 11:
+                self._module.fail_json(
+                    failed=True,
+                    msg="Legacy Alerting API is available up to Grafana v11",
+                )
+
+    def get_version(self):
+        r, info = fetch_url(
+            self._module,
+            "%s/api/health" % self.grafana_url,
+            headers=self.headers,
+            method="GET",
+        )
+        version = r.get("version")
+        if version is not None:
+            major, minor, rev = version.split(".")
+            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+        raise GrafanaAPIException("Failed to retrieve version: %s" % info)
 
     def grafana_switch_organisation(self, grafana_url, org_id):
         r, info = fetch_url(
@@ -761,6 +789,7 @@ def main():
         is_default=dict(type="bool", default=False),
         include_image=dict(type="bool", default=False),
         disable_resolve_message=dict(type="bool", default=False),
+        skip_version_check=dict(type="bool", default=False),
         reminder_frequency=dict(type="str"),
         dingding_url=dict(type="str"),
         dingding_message_type=dict(
