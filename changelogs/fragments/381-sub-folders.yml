@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - `grafana_folder` manage subfolders and specify uid
