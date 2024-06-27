@@ -4,6 +4,9 @@
   register: result
   ignore_errors: true
   community.grafana.grafana_notification_channel:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
     title: apitest
     state: absent
 
