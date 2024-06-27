@@ -1,0 +1,3 @@
+---
+deprecated_features:
+  - Deprecate `grafana_notification_channel` with removal in version 3.0.0
