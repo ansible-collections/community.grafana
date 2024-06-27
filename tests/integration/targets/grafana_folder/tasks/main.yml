@@ -4,3 +4,6 @@
 
 - name: Folder creation and deletion for organization
   ansible.builtin.include_tasks: org.yml
+
+- name: Folder creation and deletion for subfolders
+  ansible.builtin.include_tasks: sub.yml
