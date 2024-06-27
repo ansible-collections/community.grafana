@@ -640,7 +640,7 @@ class GrafanaNotificationChannelInterface(object):
             if grafana_version["major"] >= 11:
                 self._module.fail_json(
                     failed=True,
-                    msg="Legacy Alerting API is available up to Grafana v11",
+                    msg="Legacy Alerting API is available up to Grafana v10",
                 )
 
     def get_version(self):
