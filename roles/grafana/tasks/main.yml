@@ -277,10 +277,12 @@
     - name: Manage folder  # noqa: args[module]
       community.grafana.grafana_folder:
         name: "{{ folder.name }}"
-        skip_version_check: "{{ folder.skip_version_check | default(omit) }}"
-        state: "{{ folder.state | default(omit) }}"
         org_id: "{{ folder.org_id | default(omit) }}"
         org_name: "{{ folder.org_name | default(omit) }}"
+        parent_uid: "{{ folder.parent_uid | default(omit) }}"
+        skip_version_check: "{{ folder.skip_version_check | default(omit) }}"
+        state: "{{ folder.state | default(omit) }}"
+        uid: "{{ folder.uid | default(omit) }}"
       loop: "{{ grafana_folders }}"
       loop_control: {loop_var: folder}
       tags: folder
