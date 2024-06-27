@@ -116,6 +116,12 @@ folder:
             type: str
             sample:
               - "nErXDvCkzz"
+        orgId:
+            description: The organization id
+            returned: always
+            type: int
+            sample:
+              - 1
         title:
             description: The Folder title
             returned: always
@@ -182,6 +188,12 @@ folder:
             type: int
             sample:
               - 1
+        parentUid:
+            description: The parent folders uid
+            returned: always as subfolder
+            type: str
+            sample:
+              - "76HjcBH2"
 """
 
 import json
@@ -189,7 +201,6 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
-from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils._text import to_text
 
 __metaclass__ = type
