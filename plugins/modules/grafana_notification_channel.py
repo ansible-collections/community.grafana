@@ -650,11 +650,13 @@ class GrafanaNotificationChannelInterface(object):
             headers=self.headers,
             method="GET",
         )
-        version = r.get("version")
-        if version is not None:
-            major, minor, rev = version.split(".")
-            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
-        raise GrafanaAPIException("Failed to retrieve version: %s" % info)
+        if info["status"] == 200:
+            version = json.loads(to_text(r.read())).get("version")
+            if version is not None:
+                major, minor, rev = version.split(".")
+                return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+        else:
+            raise GrafanaAPIException("Failed to retrieve version: %s" % info)
 
     def grafana_switch_organisation(self, grafana_url, org_id):
         r, info = fetch_url(
