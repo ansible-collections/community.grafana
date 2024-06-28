@@ -7,7 +7,7 @@
     grafana_url: "{{ grafana_url }}"
     grafana_user: "{{ grafana_username }}"
     grafana_password: "{{ grafana_password }}"
-    title: apitest
+    name: apitest
     state: absent
 
 - name: Include notification channel task files
