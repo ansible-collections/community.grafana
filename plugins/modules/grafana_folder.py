@@ -44,6 +44,7 @@ options:
   parent_uid:
     description:
       - The parent folder UID.
+      - Available with subfolder feature of Grafana 11.
     type: str
   state:
     description:
