@@ -25,15 +25,15 @@ module: grafana_folder
 author:
   - Rémi REY (@rrey)
 version_added: "1.0.0"
-short_description: Manage Grafana Folders
+short_description: Manage Grafana folders
 description:
-  - Create/update/delete Grafana Folders through the Folders API.
+  - Create/update/delete Grafana folders through the folders API.
 requirements:
-  - The Folders API is only available starting Grafana 5 and the module will fail if the server version is lower than version 5.
+  - The folders API is only available starting Grafana 5 and the module will fail if the server version is lower than version 5.
 options:
   name:
     description:
-      - The title of the Grafana Folder.
+      - The title of the Grafana folder.
     required: true
     type: str
     aliases: [ title ]
@@ -101,18 +101,18 @@ EXAMPLES = """
 RETURN = """
 ---
 folder:
-    description: Information about the Folder
+    description: Information about the folder
     returned: On success
     type: complex
     contains:
         id:
-            description: The Folder identifier
+            description: The folder identifier
             returned: always
             type: int
             sample:
               - 42
         uid:
-            description: The Folder uid
+            description: The folder uid
             returned: always
             type: str
             sample:
@@ -124,13 +124,13 @@ folder:
             sample:
               - 1
         title:
-            description: The Folder title
+            description: The folder title
             returned: always
             type: str
             sample:
               - "Department ABC"
         url:
-            description: The Folder url
+            description: The folder url
             returned: always
             type: str
             sample:
@@ -240,7 +240,7 @@ class GrafanaFolderInterface(object):
                 self._module.fail_json(failed=True, msg=to_text(e))
             if grafana_version["major"] < 5:
                 self._module.fail_json(
-                    failed=True, msg="Folders API is available starting Grafana v5"
+                    failed=True, msg="folders API is available starting Grafana v5"
                 )
             if grafana_version["major"] < 11 and module.params["parent_uid"]:
                 self._module.fail_json(
@@ -276,7 +276,7 @@ class GrafanaFolderInterface(object):
             response = resp.read() or "{}"
             return self._module.from_json(response)
         self._module.fail_json(
-            failed=True, msg="Grafana Folders API answered with HTTP %d" % status_code
+            failed=True, msg="Grafana folders API answered with HTTP %d" % status_code
         )
 
     def switch_organization(self, org_id):
