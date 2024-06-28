@@ -241,6 +241,10 @@ class GrafanaFolderInterface(object):
                 self._module.fail_json(
                     failed=True, msg="Folders API is available starting Grafana v5"
                 )
+            if grafana_version["major"] < 11 and module.params["parent_uid"]:
+                self._module.fail_json(
+                    failed=True, msg="Subfolder API is available starting Grafana v11"
+                )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -311,13 +315,16 @@ class GrafanaFolderInterface(object):
     def get_folder(self, title, uid=None, parent_uid=None):
         url = "/api/folders%s" % ("?parentUid=%s" % parent_uid if parent_uid else "")
         response = self._send_request(url, headers=self.headers, method="GET")
-        if uid:
-            folders = [item for item in response if item.get("uid") == uid]
-        else:
-            folders = [item for item in response if item.get("title") == to_text(title)]
+        if response is not None:
+            if uid:
+                folders = [item for item in response if item.get("uid") == uid]
+            else:
+                folders = [
+                    item for item in response if item.get("title") == to_text(title)
+                ]
 
-        if folders:
-            return folders[0]
+            if folders:
+                return folders[0]
 
         return None
 
