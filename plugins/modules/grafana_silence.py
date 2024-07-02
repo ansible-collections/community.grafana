@@ -61,8 +61,13 @@ options:
   ends_at:
     description:
       - ISO 8601 Timestamp with milliseconds  e.g. "2029-07-29T08:45:45.000Z" when the silence will end.
+      - Mutually exclusive with C(duration).
     type: str
-    required: true
+  duration:
+    description:
+      - Duration for the silence in ISO 8601 duration format e.g. "PT10M" for 10 minutes.
+      - Mutually exclusive with C(ends_at).
+    type: str
   matchers:
     description:
       - List of matchers to select which alerts are affected by the silence.
@@ -75,6 +80,10 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
+  id:
+    description:
+      - The id of the silence.
+    type: str
   skip_version_check:
     description:
       - Skip Grafana version check and try to reach api endpoint anyway.
