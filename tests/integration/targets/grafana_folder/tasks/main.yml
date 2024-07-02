@@ -1,6 +1,21 @@
 ---
-- name: Folder creation and deletion
-  ansible.builtin.include_tasks: create-delete.yml
+- name: Include folder task files
+  ansible.builtin.include_tasks: "{{ item }}.yml"
+  loop:
+    - create-delete
+    - org
 
-- name: Folder creation and deletion for organization
-  ansible.builtin.include_tasks: org.yml
+- name: Check for support of API endpoint
+  register: result
+  ignore_errors: true
+  community.grafana.grafana_folder:
+    url: "{{ grafana_url }}"
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    title: apitest
+    parent_uid: "parent"
+    state: absent
+
+- name: Include folder task file for subfolders
+  ansible.builtin.include_tasks: sub.yml
+  when: "result.msg | default('') != 'Subfolder API is available starting Grafana v11'"
