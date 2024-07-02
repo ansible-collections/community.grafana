@@ -393,7 +393,9 @@ argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     comment=dict(type="str", required=True),
     created_by=dict(type="str", required=True),
-    ends_at=dict(type="str", required=True),
+    duration=dict(type="str"),
+    ends_at=dict(type="str"),
+    id=dict(type="str"),
     matchers=dict(type="list", elements="dict", required=True),
     org_id=dict(default=1, type="int"),
     org_name=dict(type="str"),
@@ -407,8 +409,10 @@ def main():
     module = setup_module_object()
     comment = module.params["comment"]
     created_by = module.params["created_by"]
-    ends_at = module.params["ends_at"]
+    duration = module.params.get("duration")
+    ends_at = module.params.get("ends_at")
     matchers = module.params["matchers"]
+    silence_id = module.params.get("id")
     starts_at = module.params["starts_at"]
     state = module.params["state"]
 
