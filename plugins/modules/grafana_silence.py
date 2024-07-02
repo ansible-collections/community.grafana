@@ -98,14 +98,14 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 ---
-- name: Create a silence
+- name: Create a silence with duration
   community.grafana.grafana_silence:
     grafana_url: "https://grafana.example.com"
     grafana_api_key: "{{ some_api_token_value }}"
     comment: "a testcomment"
     created_by: "me"
     starts_at: "2029-07-29T08:45:45.000Z"
-    ends_at: "2029-07-29T08:55:45.000Z"
+    duration: "PT10M"
     matchers:
       - isEqual: true
         isRegex: true
@@ -113,7 +113,37 @@ EXAMPLES = """
         value: test
     state: present
 
-- name: Delete a silence
+- name: Delete silence with duration without specifying id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a testcomment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    duration: "PT10M"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    state: absent
+
+- name: Delete silence without specifying id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a testcomment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    starts_at: "2029-07-29T08:55:45.000Z"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    state: absent
+
+- name: Create a silence with specified id
   community.grafana.grafana_silence:
     grafana_url: "https://grafana.example.com"
     grafana_api_key: "{{ some_api_token_value }}"
@@ -126,6 +156,14 @@ EXAMPLES = """
         isRegex: true
         name: environment
         value: test
+    id: "custom-silence-id"
+    state: present
+
+- name: Delete a silence by id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    id: "custom-silence-id"
     state: absent
 """
 
