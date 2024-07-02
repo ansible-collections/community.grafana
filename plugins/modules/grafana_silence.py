@@ -61,8 +61,13 @@ options:
   ends_at:
     description:
       - ISO 8601 Timestamp with milliseconds  e.g. "2029-07-29T08:45:45.000Z" when the silence will end.
+      - Mutually exclusive with C(duration).
     type: str
-    required: true
+  duration:
+    description:
+      - Duration for the silence in ISO 8601 duration format e.g. "PT10M" for 10 minutes.
+      - Mutually exclusive with C(ends_at).
+    type: str
   matchers:
     description:
       - List of matchers to select which alerts are affected by the silence.
@@ -75,6 +80,10 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
+  id:
+    description:
+      - The id of the silence.
+    type: str
   skip_version_check:
     description:
       - Skip Grafana version check and try to reach api endpoint anyway.
@@ -89,14 +98,14 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 ---
-- name: Create a silence
+- name: Create a silence with duration
   community.grafana.grafana_silence:
     grafana_url: "https://grafana.example.com"
     grafana_api_key: "{{ some_api_token_value }}"
-    comment: "a testcomment"
+    comment: "a test comment"
     created_by: "me"
     starts_at: "2029-07-29T08:45:45.000Z"
-    ends_at: "2029-07-29T08:55:45.000Z"
+    duration: "PT10M"
     matchers:
       - isEqual: true
         isRegex: true
@@ -104,11 +113,26 @@ EXAMPLES = """
         value: test
     state: present
 
-- name: Delete a silence
+- name: Delete silence with duration without specifying id
   community.grafana.grafana_silence:
     grafana_url: "https://grafana.example.com"
     grafana_api_key: "{{ some_api_token_value }}"
-    comment: "a testcomment"
+    comment: "a test comment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    duration: "PT10M"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    state: absent
+
+- name: Delete silence without specifying id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a test comment"
     created_by: "me"
     starts_at: "2029-07-29T08:45:45.000Z"
     ends_at: "2029-07-29T08:55:45.000Z"
@@ -117,6 +141,29 @@ EXAMPLES = """
         isRegex: true
         name: environment
         value: test
+    state: absent
+
+- name: Create a silence with specified id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a test comment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    ends_at: "2029-07-29T08:55:45.000Z"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    id: "custom-silence-id"
+    state: present
+
+- name: Delete a silence by id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    id: "custom-silence-id"
     state: absent
 """
 
@@ -346,7 +393,9 @@ argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     comment=dict(type="str", required=True),
     created_by=dict(type="str", required=True),
-    ends_at=dict(type="str", required=True),
+    duration=dict(type="str"),
+    ends_at=dict(type="str"),
+    id=dict(type="str"),
     matchers=dict(type="list", elements="dict", required=True),
     org_id=dict(default=1, type="int"),
     org_name=dict(type="str"),
@@ -360,8 +409,10 @@ def main():
     module = setup_module_object()
     comment = module.params["comment"]
     created_by = module.params["created_by"]
-    ends_at = module.params["ends_at"]
+    duration = module.params.get("duration")
+    ends_at = module.params.get("ends_at")
     matchers = module.params["matchers"]
+    silence_id = module.params.get("id")
     starts_at = module.params["starts_at"]
     state = module.params["state"]
 
