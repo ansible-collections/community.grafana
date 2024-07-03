@@ -316,7 +316,7 @@ class GrafanaFolderInterface(object):
     def get_folder(self, title, uid=None, parent_uid=None):
         url = "/api/folders%s" % ("?parentUid=%s" % parent_uid if parent_uid else "")
         response = self._send_request(url, headers=self.headers, method="GET")
-        if response is not None:
+        if response:
             if uid:
                 folders = [item for item in response if item.get("uid") == uid]
             else:
