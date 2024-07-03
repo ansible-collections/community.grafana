@@ -4,6 +4,24 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+v2.1.0
+======
+
+Minor Changes
+-------------
+
+- Manage subfolders for `grafana_folder` and specify uid
+
+Deprecated Features
+-------------------
+
+- Deprecate `grafana_notification_channel` with removal in version 3.0.0
+
+Bugfixes
+--------
+
+- Add missing function argument in `grafana_contact_point` for org handling
+
 v2.0.0
 ======
 
