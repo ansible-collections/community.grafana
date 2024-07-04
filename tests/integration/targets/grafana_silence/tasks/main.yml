@@ -1,6 +1,7 @@
 ---
 - name: Silence creation and deletion
-  ansible.builtin.include_tasks: create-delete.yml
-
-- name: Silence creation and deletion for organization
-  ansible.builtin.include_tasks: org.yml
+  ansible.builtin.include_tasks: "{{ item ~ '.yml' }}"
+  loop:
+    - create-delete
+    - org
+    - duration
