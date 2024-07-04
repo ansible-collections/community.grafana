@@ -225,6 +225,7 @@ silence:
 """
 
 import json
+from datetime import datetime, timedelta
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
@@ -393,6 +394,18 @@ argument_spec.update(
 )
 
 
+def parse_iso8601_duration(duration):
+    # Remove the leading 'P' and split days ('D'), hours ('H'), minutes ('M')
+    duration = duration[1:]  # Remove 'P'
+    days, time = duration.split("T") if "T" in duration else (None, duration)
+
+    days = int(days[:-1]) if days and "D" in days else 0
+    hours = int(time.split("H")[0][:-1]) if "H" in time else 0
+    minutes = int(time.split("M")[0][-1:]) if "M" in time else 0
+
+    return timedelta(days=days, hours=hours, minutes=minutes)
+
+
 def main():
     module = setup_module_object()
     grafana_iface = GrafanaSilenceInterface(module)
@@ -407,14 +420,27 @@ def main():
         "silenceID": module.params.get("silence_id"),
     }
 
+    state = module.params.get("state")
+
     if module.params.get("ends_at"):
         silence_payload["endsAt"] = module.params.get("ends_at")
     elif module.params.get("duration"):
-        silence_payload["duration"] = module.params.get("duration")
+        starts_at = module.params.get("starts_at")
+        duration = module.params.get("duration")
+
+        # Parse starts_at into datetime object
+        starts_at_dt = datetime.strptime(starts_at, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+        # Parse ISO 8601 duration into timedelta
+        duration_timedelta = parse_iso8601_duration(duration)
+
+        # Calculate ends_at
+        ends_at_dt = starts_at_dt + duration_timedelta
+
+        # Format ends_at as ISO 8601
+        silence_payload["endsAt"] = ends_at_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     silence = grafana_iface.get_silence(silence_payload)
-
-    state = module.params.get("state")
 
     if state == "present":
         if not silence:
