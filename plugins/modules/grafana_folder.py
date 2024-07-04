@@ -25,22 +25,31 @@ module: grafana_folder
 author:
   - Rémi REY (@rrey)
 version_added: "1.0.0"
-short_description: Manage Grafana Folders
+short_description: Manage Grafana folders
 description:
-  - Create/update/delete Grafana Folders through the Folders API.
+  - Create/update/delete Grafana folders through the folders API.
 requirements:
-  - The Folders API is only available starting Grafana 5 and the module will fail if the server version is lower than version 5.
+  - The folders API is only available starting Grafana 5 and the module will fail if the server version is lower than version 5.
 options:
   name:
     description:
-      - The title of the Grafana Folder.
+      - The title of the Grafana folder.
     required: true
     type: str
     aliases: [ title ]
+  uid:
+    description:
+      - The folder UID.
+    type: str
+  parent_uid:
+    description:
+      - The parent folder UID.
+      - Available with subfolder feature of Grafana 11.
+    type: str
   state:
     description:
       - Delete the members not found in the C(members) parameters from the
-      - list of members found on the Folder.
+      - list of members found on the folder.
     default: present
     type: str
     choices: ["present", "absent"]
@@ -92,30 +101,36 @@ EXAMPLES = """
 RETURN = """
 ---
 folder:
-    description: Information about the Folder
+    description: Information about the folder
     returned: On success
     type: complex
     contains:
         id:
-            description: The Folder identifier
+            description: The folder identifier
             returned: always
             type: int
             sample:
               - 42
         uid:
-            description: The Folder uid
+            description: The folder uid
             returned: always
             type: str
             sample:
               - "nErXDvCkzz"
+        orgId:
+            description: The organization id
+            returned: always
+            type: int
+            sample:
+              - 1
         title:
-            description: The Folder title
+            description: The folder title
             returned: always
             type: str
             sample:
               - "Department ABC"
         url:
-            description: The Folder url
+            description: The folder url
             returned: always
             type: str
             sample:
@@ -174,6 +189,12 @@ folder:
             type: int
             sample:
               - 1
+        parentUid:
+            description: The parent folders uid
+            returned: always as subfolder
+            type: str
+            sample:
+              - "76HjcBH2"
 """
 
 import json
@@ -181,7 +202,6 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
-from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils._text import to_text
 
 __metaclass__ = type
@@ -220,7 +240,11 @@ class GrafanaFolderInterface(object):
                 self._module.fail_json(failed=True, msg=to_text(e))
             if grafana_version["major"] < 5:
                 self._module.fail_json(
-                    failed=True, msg="Folders API is available starting Grafana v5"
+                    failed=True, msg="folders API is available starting Grafana v5"
+                )
+            if grafana_version["major"] < 11 and module.params["parent_uid"]:
+                self._module.fail_json(
+                    failed=True, msg="Subfolder API is available starting Grafana v11"
                 )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
@@ -252,7 +276,7 @@ class GrafanaFolderInterface(object):
             response = resp.read() or "{}"
             return self._module.from_json(response)
         self._module.fail_json(
-            failed=True, msg="Grafana Folders API answered with HTTP %d" % status_code
+            failed=True, msg="Grafana folders API answered with HTTP %d" % status_code
         )
 
     def switch_organization(self, org_id):
@@ -281,24 +305,32 @@ class GrafanaFolderInterface(object):
             return {"major": int(major), "minor": int(minor), "rev": int(rev)}
         raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
-    def create_folder(self, title):
+    def create_folder(self, title, uid=None, parent_uid=None):
         url = "/api/folders"
-        folder = dict(title=title)
+        folder = dict(title=title, uid=uid, parentUid=parent_uid)
         response = self._send_request(
             url, data=folder, headers=self.headers, method="POST"
         )
         return response
 
-    def get_folder(self, title):
-        url = "/api/search?type=dash-folder&query={title}".format(title=quote(title))
+    def get_folder(self, title, uid=None, parent_uid=None):
+        url = "/api/folders%s" % ("?parentUid=%s" % parent_uid if parent_uid else "")
         response = self._send_request(url, headers=self.headers, method="GET")
-        for item in response:
-            if item.get("title") == to_text(title):
-                return item
+        if response:
+            if uid:
+                folders = [item for item in response if item.get("uid") == uid]
+            else:
+                folders = [
+                    item for item in response if item.get("title") == to_text(title)
+                ]
+
+            if folders:
+                return folders[0]
+
         return None
 
     def delete_folder(self, folder_uid):
-        url = "/api/folders/{folder_uid}".format(folder_uid=folder_uid)
+        url = "/api/folders/%s" % folder_uid
         response = self._send_request(url, headers=self.headers, method="DELETE")
         return response
 
@@ -307,10 +339,12 @@ def main():
     argument_spec = base.grafana_argument_spec()
     argument_spec.update(
         name=dict(type="str", aliases=["title"], required=True),
-        state=dict(type="str", default="present", choices=["present", "absent"]),
-        skip_version_check=dict(type="bool", default=False),
         org_id=dict(default=1, type="int"),
         org_name=dict(type="str"),
+        parent_uid=dict(type="str"),
+        skip_version_check=dict(type="bool", default=False),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
+        uid=dict(type="str"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -324,21 +358,23 @@ def main():
     )
     state = module.params["state"]
     title = module.params["name"]
+    parent_uid = module.params["parent_uid"]
+    uid = module.params["uid"]
     module.params["url"] = base.clean_url(module.params["url"])
 
     grafana_iface = GrafanaFolderInterface(module)
 
     changed = False
+
+    folder = grafana_iface.get_folder(title, uid, parent_uid)
+
     if state == "present":
-        folder = grafana_iface.get_folder(title)
         if folder is None:
-            grafana_iface.create_folder(title)
-            folder = grafana_iface.get_folder(title)
+            grafana_iface.create_folder(title, uid, parent_uid)
+            folder = grafana_iface.get_folder(title, uid, parent_uid)
             changed = True
-        folder = grafana_iface.get_folder(title)
         module.exit_json(changed=changed, folder=folder)
     elif state == "absent":
-        folder = grafana_iface.get_folder(title)
         if folder is None:
             module.exit_json(changed=False, message="No folder found")
         result = grafana_iface.delete_folder(folder.get("uid"))

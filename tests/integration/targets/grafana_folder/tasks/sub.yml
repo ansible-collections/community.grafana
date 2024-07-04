@@ -1,0 +1,113 @@
+---
+- module_defaults:
+    community.grafana.grafana_folder:
+      url: "{{ grafana_url }}"
+      url_username: "{{ grafana_username }}"
+      url_password: "{{ grafana_password }}"
+      uid: "parent"
+  block:
+    - name: Create a parent Folder
+      community.grafana.grafana_folder:
+        title: grafana_working_group
+        state: present
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.changed == true
+          - result.folder.title == 'grafana_working_group'
+          - result.folder.uid == 'parent'
+      when: not ansible_check_mode
+
+    - name: Test folder parent creation idempotency
+      community.grafana.grafana_folder:
+        title: grafana_working_group
+        state: present
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.changed == false
+          - result.folder.title == 'grafana_working_group'
+          - result.folder.uid == 'parent'
+      when: not ansible_check_mode
+
+    - module_defaults:
+        community.grafana.grafana_folder:
+          url: "{{ grafana_url }}"
+          url_username: "{{ grafana_username }}"
+          url_password: "{{ grafana_password }}"
+          uid: "sub"
+          parent_uid: "parent"
+      block:
+        - name: Create a sub Folder
+          community.grafana.grafana_folder:
+            title: grafana_working_group
+            state: present
+          register: result
+
+        - ansible.builtin.assert:
+            that:
+              - result.changed == true
+              - result.folder.title == 'grafana_working_group'
+              - result.folder.uid == 'sub'
+              - result.folder.parentUid == 'parent'
+          when: not ansible_check_mode
+
+        - name: Test sub folder creation idempotency
+          community.grafana.grafana_folder:
+            title: grafana_working_group
+            state: present
+          register: result
+
+        - ansible.builtin.assert:
+            that:
+              - result.changed == false
+              - result.folder.title == 'grafana_working_group'
+              - result.folder.uid == 'sub'
+              - result.folder.parentUid == 'parent'
+          when: not ansible_check_mode
+
+        - name: Delete sub Folder
+          community.grafana.grafana_folder:
+            title: grafana_working_group
+            state: absent
+          register: result
+
+        - ansible.builtin.assert:
+            that:
+              - result.changed == true
+          when: not ansible_check_mode
+
+        - name: Test sub folder deletion idempotency
+          community.grafana.grafana_folder:
+            title: grafana_working_group
+            state: absent
+          register: result
+
+        - ansible.builtin.assert:
+            that:
+              - result.changed == false
+          when: not ansible_check_mode
+
+    - name: Delete a Folder
+      community.grafana.grafana_folder:
+        title: grafana_working_group
+        state: absent
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.changed == true
+      when: not ansible_check_mode
+
+    - name: Test folder deletion idempotency
+      community.grafana.grafana_folder:
+        title: grafana_working_group
+        state: absent
+      register: result
+
+    - ansible.builtin.assert:
+        that:
+          - result.changed == false
+      when: not ansible_check_mode
