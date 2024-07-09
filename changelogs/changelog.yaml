@@ -337,6 +337,7 @@ releases:
     changes:
       bugfixes:
       - Add missing function argument in `grafana_contact_point` for org handling
+      - Fix var prefixes in silence-task in role
       deprecated_features:
       - Deprecate `grafana_notification_channel` with removal in version 3.0.0
       minor_changes:
@@ -346,4 +347,5 @@ releases:
     - 379-contact-points-org-name-func-args.yml
     - 381-sub-folders.yml
     - 382-notification-channel-deprecation.yml
+    - patch-1.yaml
     release_date: '2024-07-03'

@@ -21,6 +21,7 @@ Bugfixes
 --------
 
 - Add missing function argument in `grafana_contact_point` for org handling
+- Fix var prefixes in silence-task in role
 
 v2.0.0
 ======
