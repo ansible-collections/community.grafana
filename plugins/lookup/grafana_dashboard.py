@@ -152,16 +152,8 @@ class GrafanaAPI:
 
     def grafana_headers(self):
         headers = {"content-type": "application/json; charset=utf8"}
-        if self.grafana_api_key:
-            api_key = self.grafana_api_key
-            if len(api_key) % 4 == 2:
-                display.deprecated(
-                    "Passing a mangled version of the API key to the grafana_dashboard lookup is no longer necessary and should not be done.",
-                    "2.0.0",
-                    collection_name="community.grafana",
-                )
-                api_key += "=="
-            headers["Authorization"] = "Bearer %s" % api_key
+        if self.grafana_api_key.get("grafana_api_key", None):
+            headers["Authorization"] = "Bearer %s" % self.grafana_api_key
         else:
             headers["Authorization"] = basic_auth_header(
                 self.grafana_user, self.grafana_password

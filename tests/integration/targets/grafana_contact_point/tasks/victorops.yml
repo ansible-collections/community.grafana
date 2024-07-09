@@ -1,0 +1,87 @@
+---
+- name: Create victorops contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: victorops
+    name: victorops
+    type: victorops
+    victorops_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "victorops"
+      - result.contact_point.name == "victorops"
+      - result.contact_point.type == "victorops"
+
+- name: Create victorops contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: victorops
+    name: victorops
+    type: victorops
+    victorops_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "victorops"
+      - result.contact_point.name == "victorops"
+      - result.contact_point.type == "victorops"
+
+- name: Update victorops contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: victorops
+    name: victorops
+    type: victorops
+    victorops_url: https://example-update.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "victorops"
+      - result.contact_point.name == "victorops"
+      - result.contact_point.type == "victorops"
+      - result.diff is defined
+
+- name: Delete victorops contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: victorops
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "victorops"
+
+- name: Delete victorops contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: victorops
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "absent"

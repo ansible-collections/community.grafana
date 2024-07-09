@@ -1,0 +1,93 @@
+---
+- name: Create threema contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    name: threema
+    type: threema
+    threema_gateway_id: "*xxxxxxx"
+    threema_recipient_id: yyyyyyyy
+    threema_api_secret: zzz
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "threema"
+      - result.contact_point.name == "threema"
+      - result.contact_point.type == "threema"
+
+- name: Create threema contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    name: threema
+    type: threema
+    threema_gateway_id: xxx
+    threema_recepient_id: yyy
+    threema_api_secret: zzz
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "threema"
+      - result.contact_point.name == "threema"
+      - result.contact_point.type == "threema"
+
+- name: Update threema contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    name: threema
+    type: threema
+    threema_gateway_id: "*xxxxxxx-update"
+    threema_recipient_id: yyyyyyyy-update
+    threema_api_secret: zzz-update
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "threema"
+      - result.contact_point.name == "threema"
+      - result.contact_point.type == "threema"
+      - result.diff is defined
+
+- name: Delete threema contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "threema"
+
+- name: Delete threema contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: threema
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "absent"

@@ -1,0 +1,90 @@
+---
+- name: Create opsgenie contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    name: opsgenie
+    type: opsgenie
+    opsgenie_url: https://example.org
+    opsgenie_api_key: xxx
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "opsgenie"
+      - result.contact_point.name == "opsgenie"
+      - result.contact_point.type == "opsgenie"
+
+- name: Create opsgenie contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    name: opsgenie
+    type: opsgenie
+    opsgenie_url: https://example.org
+    opsgenie_api_key: xxx
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "opsgenie"
+      - result.contact_point.name == "opsgenie"
+      - result.contact_point.type == "opsgenie"
+
+- name: Update opsgenie contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    name: opsgenie
+    type: opsgenie
+    opsgenie_url: https://example-update.org
+    opsgenie_api_key: xxx-update
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "opsgenie"
+      - result.contact_point.name == "opsgenie"
+      - result.contact_point.type == "opsgenie"
+      - result.diff is defined
+
+- name: Delete opsgenie contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "opsgenie"
+
+- name: Delete opsgenie contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: opsgenie
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "absent"

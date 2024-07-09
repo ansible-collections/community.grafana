@@ -1,34 +1,32 @@
 ---
-- block:
-    - ansible.builtin.include_tasks:
-        file: dingding.yml
-    - ansible.builtin.include_tasks:
-        file: discord.yml
-    - ansible.builtin.include_tasks:
-        file: email.yml
-    - ansible.builtin.include_tasks:
-        file: googlechat.yml
-    - ansible.builtin.include_tasks:
-        file: hipchat.yml
-    - ansible.builtin.include_tasks:
-        file: kafka.yml
-    - ansible.builtin.include_tasks:
-        file: teams.yml
-    - ansible.builtin.include_tasks:
-        file: opsgenie.yml
-    - ansible.builtin.include_tasks:
-        file: pagerduty.yml
-    - ansible.builtin.include_tasks:
-        file: prometheus.yml
-    - ansible.builtin.include_tasks:
-        file: pushover.yml
-    - ansible.builtin.include_tasks:
-        file: sensu.yml
-    - ansible.builtin.include_tasks:
-        file: slack-and-beyond.yml
-    - ansible.builtin.include_tasks:
-        file: telegram.yml
-    - ansible.builtin.include_tasks:
-        file: victorops.yml
-    - ansible.builtin.include_tasks:
-        file: webhook.yml
+
+- name: Check for support of API endpoint
+  register: result
+  ignore_errors: true
+  community.grafana.grafana_notification_channel:
+    grafana_url: "{{ grafana_url }}"
+    grafana_user: "{{ grafana_username }}"
+    grafana_password: "{{ grafana_password }}"
+    name: apitest
+    state: absent
+
+- name: Include notification channel task files
+  ansible.builtin.include_tasks: "{{ item }}.yml"
+  when: "result.msg | default('') != 'Legacy Alerting API is available up to Grafana v10'"
+  loop:
+    - dingding
+    - discord
+    - email
+    - googlechat
+    - hipchat
+    - kafka
+    - teams
+    - opsgenie
+    - pagerduty
+    - prometheus
+    - pushover
+    - sensu
+    - slack-and-beyond
+    - telegram
+    - victorops
+    - webhook

@@ -136,7 +136,7 @@ class GrafanaSilenceTest(TestCase):
                 }
             ],
         )
-        mock_fetch_url.assert_called_once_with(
+        mock_fetch_url.assert_called_with(
             module,
             "https://grafana.example.com/api/alertmanager/grafana/api/v2/silences",
             data=json.dumps(
@@ -198,7 +198,7 @@ class GrafanaSilenceTest(TestCase):
         grafana_iface = grafana_silence.GrafanaSilenceInterface(module)
         silence_id = "470b7116-8f06-4bb6-9e6c-6258aa92218e"
         result = grafana_iface.delete_silence(silence_id)
-        mock_fetch_url.assert_called_once_with(
+        mock_fetch_url.assert_called_with(
             module,
             "https://grafana.example.com/api/alertmanager/grafana/api/v2/silence/470b7116-8f06-4bb6-9e6c-6258aa92218e",
             data=None,

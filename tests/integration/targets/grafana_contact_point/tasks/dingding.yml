@@ -1,0 +1,87 @@
+---
+- name: Create dingding contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: dingding
+    name: dingding
+    type: dingding
+    dingding_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "dingding"
+      - result.contact_point.name == "dingding"
+      - result.contact_point.type == "dingding"
+
+- name: Create dingding contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: dingding
+    name: dingding
+    type: dingding
+    dingding_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "dingding"
+      - result.contact_point.name == "dingding"
+      - result.contact_point.type == "dingding"
+
+- name: Update dingding contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: dingding
+    name: dingding
+    type: dingding
+    dingding_url: https://example-update.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "dingding"
+      - result.contact_point.name == "dingding"
+      - result.contact_point.type == "dingding"
+      - result.diff is defined
+
+- name: Delete dingding contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: dingding
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "dingding"
+
+- name: Delete dingding contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: dingding
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "absent"

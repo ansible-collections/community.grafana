@@ -1,0 +1,87 @@
+---
+- name: Create googlechat contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    name: googlechat
+    type: googlechat
+    googlechat_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "googlechat"
+      - result.contact_point.name == "googlechat"
+      - result.contact_point.type == "googlechat"
+
+- name: Create googlechat contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    name: googlechat
+    type: googlechat
+    googlechat_url: https://example.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "googlechat"
+      - result.contact_point.name == "googlechat"
+      - result.contact_point.type == "googlechat"
+
+- name: Update googlechat contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    name: googlechat
+    type: googlechat
+    googlechat_url: https://example-update.org
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "googlechat"
+      - result.contact_point.name == "googlechat"
+      - result.contact_point.type == "googlechat"
+      - result.diff is defined
+
+- name: Delete googlechat contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "googlechat"
+
+- name: Delete googlechat contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: googlechat
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "absent"

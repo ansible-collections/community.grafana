@@ -1,0 +1,87 @@
+---
+- name: Create line contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: line
+    name: line
+    type: line
+    line_token: xxx
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "line"
+      - result.contact_point.name == "line"
+      - result.contact_point.type == "line"
+
+- name: Create line contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: line
+    name: line
+    type: line
+    line_token: xxx
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "line"
+      - result.contact_point.name == "line"
+      - result.contact_point.type == "line"
+
+- name: Update line contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: line
+    name: line
+    type: line
+    line_token: xxx-update
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "line"
+      - result.contact_point.name == "line"
+      - result.contact_point.type == "line"
+      - result.diff is defined
+
+- name: Delete line contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: line
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "line"
+
+- name: Delete line contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: line
+    state: absent
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "absent"

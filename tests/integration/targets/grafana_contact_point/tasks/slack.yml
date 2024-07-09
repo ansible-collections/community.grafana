@@ -1,0 +1,93 @@
+---
+- name: Create slack contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: slack
+    name: slack
+    type: slack
+    slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
+    slack_token: testapitoken
+    slack_recipient: foo
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "slack"
+      - result.contact_point.name == "slack"
+      - result.contact_point.type == "slack"
+
+- name: Check slack contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: slack
+    name: slack
+    type: slack
+    slack_url: https://hooks.slack.com/services/xxx/yyy/zzz
+    slack_token: testapitoken
+    slack_recipient: foo
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "slack"
+      - result.contact_point.name == "slack"
+      - result.contact_point.type == "slack"
+
+- name: Update slack contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    uid: slack
+    name: slack
+    type: slack
+    slack_url: https://hooks.slack.com/services/xxx/yyy/update
+    slack_token: testapitoken-update
+    slack_recipient: foo-update
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "present"
+      - result.contact_point.uid == "slack"
+      - result.contact_point.name == "slack"
+      - result.contact_point.type == "slack"
+      - result.diff is defined
+
+- name: Delete slack contact point
+  register: result
+  community.grafana.grafana_contact_point:
+    state: absent
+    uid: slack
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.state == "absent"
+      - result.contact_point.uid == "slack"
+
+- name: Delete slack contact point (idempotency)
+  register: result
+  community.grafana.grafana_contact_point:
+    state: absent
+    uid: slack
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.state == "absent"

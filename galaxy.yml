@@ -1,7 +1,7 @@
 ---
 namespace: community
 name: grafana
-version: 1.9.1
+version: 2.0.0
 readme: README.md
 authors:
   - Rémi REY (@rrey)

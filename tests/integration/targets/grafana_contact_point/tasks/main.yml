@@ -1,0 +1,28 @@
+---
+
+- name: Check for support of API endpoint
+  register: result
+  ignore_errors: true
+  community.grafana.grafana_contact_point:
+    uid: apitest
+    state: absent
+
+- name: Include contact point task files
+  ansible.builtin.include_tasks: "{{ item }}.yml"
+  when: "result.msg | default('') != 'Unable to get contact point: API endpoint not found - please check your Grafana version'"
+  loop:
+    - alertmanager
+    - dingding
+    - discord
+    - email
+    - googlechat
+    - kafka
+    - opsgenie
+    - pagerduty
+    - pushover
+    - sensugo
+    - slack
+    - teams
+    - telegram
+    - victorops
+    - webhook

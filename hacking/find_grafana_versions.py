@@ -33,7 +33,7 @@ if __name__ == "__main__":
         if major not in by_major.keys() or by_major[major]["as_tuple"] < as_tuple:
             by_major[major] = {"version": version, "as_tuple": as_tuple}
 
-    latest_3_majors = sorted(list(by_major.keys()))[:3]
+    latest_3_majors = sorted(list(by_major.keys()), reverse=True)[:3]
     latest_releases = [by_major[idx]["version"] for idx in latest_3_majors]
 
     print(json.dumps(latest_releases))
