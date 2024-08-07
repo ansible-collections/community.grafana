@@ -152,7 +152,7 @@ class GrafanaAPI:
 
     def grafana_headers(self):
         headers = {"content-type": "application/json; charset=utf8"}
-        if self.grafana_api_key.get("grafana_api_key", None):
+        if self.grafana_api_key:
             headers["Authorization"] = "Bearer %s" % self.grafana_api_key
         else:
             headers["Authorization"] = basic_auth_header(
@@ -222,9 +222,9 @@ class LookupModule(LookupBase):
             grafana_dict[key] = value
 
         grafana = GrafanaAPI(
-            **grafana_dict,
             validate_certs=self.get_option("validate_certs"),
             ca_path=self.get_option("ca_path"),
+            **grafana_dict,
         )
 
         ret = grafana.grafana_list_dashboards()
