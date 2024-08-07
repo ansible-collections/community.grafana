@@ -22,6 +22,7 @@ Bugfixes
 
 - Add missing function argument in `grafana_contact_point` for org handling
 - Fix var prefixes in silence-task in role
+- Fixed check if grafana_api_key is defined for `grafana_dashboard` lookup
 
 v2.0.0
 ======
