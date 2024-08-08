@@ -15,7 +15,7 @@ Minor Changes
 Deprecated Features
 -------------------
 
-- Deprecate `grafana_notification_channel` with removal in version 3.0.0
+- Deprecate `grafana_notification_channel`. It will be removed in version 3.0.0
 
 Bugfixes
 --------
