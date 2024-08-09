@@ -245,6 +245,8 @@ options:
   alertmanager_handle_grafana_alerts:
     description:
     - Whether Grafana should sent alerts to this alertmanager.
+    type: bool
+    default: false
   aws_auth_type:
     description:
     - Type for AWS authentication for CloudWatch datasource type (authType of grafana
