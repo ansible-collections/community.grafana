@@ -1,2 +1,2 @@
 minor_changes:
-  - ``community.grafana.grafana_datasource`` supports alertmanager.
+  - Support `alertmanager` as type for `grafana_datasource`
