@@ -836,7 +836,6 @@ def setup_module_object():
                 "loki",
                 "tempo",
                 "quickwit-quickwit-datasource",
-                "loki",
                 "alertmanager",
             ]
         ),
