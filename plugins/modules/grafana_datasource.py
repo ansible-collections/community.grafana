@@ -542,6 +542,7 @@ def compare_datasources(new, current, compareSecureData=True):
         current.pop("uid", None)
 
     for field in [
+        "apiVersion",
         "basicAuthPassword",
         "id",
         "password",
