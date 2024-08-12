@@ -537,25 +537,30 @@ ES_VERSION_MAPPING = {
 
 
 def compare_datasources(new, current, compareSecureData=True):
-    if new["uid"] is None:
-        del current["uid"]
-        del new["uid"]
-    del current["typeLogoUrl"]
-    del current["id"]
-    if "version" in current:
-        del current["version"]
-    if "readOnly" in current:
-        del current["readOnly"]
-    if current["basicAuth"] is False:
-        if "basicAuthUser" in current:
-            del current["basicAuthUser"]
-    if "password" in current:
-        del current["password"]
-    if "basicAuthPassword" in current:
-        del current["basicAuthPassword"]
-    if current["type"] == "grafana-postgresql-datasource" and new["type"] == "postgres":
-        del current["type"]
-        del new["type"]
+    if new.get("uid") is None:
+        new.pop("uid", None)
+        current.pop("uid", None)
+
+    for field in [
+        "apiVersion",
+        "basicAuthPassword",
+        "id",
+        "password",
+        "readOnly",
+        "typeLogoUrl",
+        "version",
+    ]:
+        current.pop(field, None)
+
+    if not current.get("basicAuth", True):
+        current.pop("basicAuthUser", None)
+
+    if (
+        current.get("type") == "grafana-postgresql-datasource"
+        and new.get("type") == "postgres"
+    ):
+        new.pop("type", None)
+        current.pop("type", None)
 
     # check if secureJsonData should be compared
     if not compareSecureData:
