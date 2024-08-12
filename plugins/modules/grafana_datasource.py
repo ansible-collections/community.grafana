@@ -98,6 +98,10 @@ options:
       requests.
     type: bool
     default: false
+  tls_servername:
+    description:
+    - A Servername is used to verify the hostname on the returned certificate
+    type: str
   tls_client_cert:
     description:
     - The client TLS certificate.
@@ -620,12 +624,10 @@ def get_datasource_payload(data, org_id=None):
         json_data["tlsAuth"] = True
         if data.get("tls_ca_cert"):
             secure_json_data["tlsCACert"] = data["tls_ca_cert"]
-            secure_json_data["tlsClientCert"] = data["tls_client_cert"]
-            secure_json_data["tlsClientKey"] = data["tls_client_key"]
             json_data["tlsAuthWithCACert"] = True
-        else:
-            secure_json_data["tlsClientCert"] = data["tls_client_cert"]
-            secure_json_data["tlsClientKey"] = data["tls_client_key"]
+        json_data["serverName"] = data["tls_servername"]
+        secure_json_data["tlsClientCert"] = data["tls_client_cert"]
+        secure_json_data["tlsClientKey"] = data["tls_client_key"]
     else:
         json_data["tlsAuth"] = False
         json_data["tlsAuthWithCACert"] = False
@@ -821,6 +823,7 @@ def setup_module_object():
         basic_auth_user=dict(type="str"),
         basic_auth_password=dict(type="str", no_log=True),
         with_credentials=dict(default=False, type="bool"),
+        tls_servername=dict(type="str"),
         tls_client_cert=dict(type="str", no_log=True),
         tls_client_key=dict(type="str", no_log=True),
         tls_ca_cert=dict(type="str", no_log=True),
