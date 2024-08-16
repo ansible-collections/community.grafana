@@ -244,7 +244,7 @@ options:
     type: str
   alertmanager_handle_grafana_alerts:
     description:
-    - Whether Grafana should sent alerts to this alertmanager.
+    - Whether Grafana should send alerts to this alertmanager.
     type: bool
     default: false
   aws_auth_type:
