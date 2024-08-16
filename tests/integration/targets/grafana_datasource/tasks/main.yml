@@ -1,6 +1,8 @@
 ---
 - block:
     - ansible.builtin.include_tasks:
+        file: alertmanager.yml
+    - ansible.builtin.include_tasks:
         file: errors.yml
     - ansible.builtin.include_tasks:
         file: elastic.yml
