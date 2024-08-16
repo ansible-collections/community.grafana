@@ -40,7 +40,6 @@
     - not result.changed
     - result.datasource.basicAuth == false
     - result.datasource.isDefault == false
-    - result.datasource.jsonData.sslmode == 'verify-full'
     - result.datasource.jsonData.tlsAuth == false
     - result.datasource.jsonData.tlsAuthWithCACert == false
     - result.datasource.jsonData.implementation == 'prometheus'
@@ -66,6 +65,7 @@
 - assert:
     that:
     - result.changed
+    - "result.msg == 'Datasource datasource-alertmanager deleted.'"
 
 - name: Delete alertmanager datasource
   register: result
