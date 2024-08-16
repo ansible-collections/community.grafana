@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-cloudwatch
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: cloudwatch
     ds_url: http://monitoring.us-west-1.amazonaws.com
@@ -43,9 +40,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-cloudwatch
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: cloudwatch
     ds_url: http://monitoring.us-west-1.amazonaws.com
@@ -82,9 +76,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-cloudwatch
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.debug:
@@ -99,9 +90,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-cloudwatch
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.debug:

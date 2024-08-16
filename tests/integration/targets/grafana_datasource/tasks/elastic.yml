@@ -4,9 +4,6 @@
   community.grafana.grafana_datasource:
     name: datasource/elasticLegacy
     uid: myuid
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: elasticsearch
     ds_url: https://elastic.company.com:9200
@@ -50,9 +47,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elastic
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: elasticsearch
     ds_url: https://elastic.company.com:9200
@@ -96,9 +90,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elastic
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: elasticsearch
     ds_url: https://elastic.company.com:9200
@@ -141,9 +132,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elastic
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: elasticsearch
     ds_url: https://elastic.example.com:9200
@@ -186,9 +174,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elastic
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: elasticsearch
     ds_url: https://elastic.example.com:9200
@@ -237,9 +222,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elastic
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: elasticsearch
     ds_url: https://elastic.example.com:9200
@@ -290,9 +272,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elasticLegacy
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:
@@ -303,9 +282,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elasticLegacy
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:
@@ -316,9 +292,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elastic
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:
@@ -329,9 +302,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource/elastic
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:

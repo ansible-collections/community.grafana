@@ -4,9 +4,6 @@
   community.grafana.grafana_datasource:
     name: datasource-with-uid
     uid: uid1
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -27,9 +24,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-without-uid
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -51,9 +45,6 @@
   community.grafana.grafana_datasource:
     name: datasource-with-uid
     uid: uid1
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -84,9 +75,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-without-uid
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -118,9 +106,6 @@
   community.grafana.grafana_datasource:
     name: datasource-without-uid
     uid: uid3
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -152,9 +137,6 @@
   community.grafana.grafana_datasource:
     name: datasource-with-uid
     uid: uid2
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -186,9 +168,6 @@
   community.grafana.grafana_datasource:
     name: datasource-with-uid
     uid: uid1
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -209,9 +188,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-without-uid
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086
@@ -233,9 +209,6 @@
   community.grafana.grafana_datasource:
     name: datasource-with-uid
     uid: uid1
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: prometheus
     ds_url: https://prometheus.company.com:8086

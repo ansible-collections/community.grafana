@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-azure
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: grafana-azure-monitor-datasource
     ds_url: http://example.com
@@ -42,9 +39,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-azure
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: grafana-azure-monitor-datasource
     ds_url: http://example.com
@@ -80,9 +74,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-azure
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: grafana-azure-monitor-datasource
     ds_url: http://example.com
@@ -104,9 +95,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-azure
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: grafana-azure-monitor-datasource
     ds_url: http://example.com

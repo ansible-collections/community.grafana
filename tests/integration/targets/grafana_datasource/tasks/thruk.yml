@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-thruk
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: sni-thruk-datasource
     ds_url: https://thruk.company.com/sitename/thruk
@@ -24,9 +21,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-thruk
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: sni-thruk-datasource
     ds_url: https://thruk.company.com/sitename/thruk
@@ -53,9 +47,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-thruk
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.debug:
@@ -69,9 +60,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-thruk
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:
