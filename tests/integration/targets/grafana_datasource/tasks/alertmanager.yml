@@ -2,9 +2,6 @@
   register: result
   grafana_datasource:
     name: datasource-alertmanager
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: '1'
     ds_type: alertmanager
     ds_url: alertmanager.company.com:9093
@@ -23,9 +20,6 @@
   register: result
   grafana_datasource:
     name: datasource-alertmanager
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: '1'
     ds_type: alertmanager
     ds_url: alertmanager.company.com:9093
@@ -54,9 +48,6 @@
   register: result
   grafana_datasource:
     name: datasource-alertmanager
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - debug:
@@ -71,9 +62,6 @@
   register: result
   grafana_datasource:
     name: datasource-alertmanager
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - debug:

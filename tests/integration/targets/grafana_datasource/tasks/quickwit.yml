@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: Quickwit
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: quickwit-quickwit-datasource
     ds_url: http://localhost:7280/api/v1
@@ -40,9 +37,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: Quickwit
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: quickwit-quickwit-datasource
     ds_url: http://localhost:7280/api/v1
@@ -77,9 +71,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: Quickwit
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: quickwit-quickwit-datasource
     ds_url: http://quickwit-url:7280/api/v1
@@ -114,9 +105,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: Quickwit
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:
@@ -127,9 +115,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: Quickwit
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:

@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-influxdb
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: influxdb
     ds_url: https://influx.company.com:8086
@@ -25,9 +22,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-influxdb
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: influxdb
     ds_url: https://influx.company.com:8086
@@ -60,9 +54,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-influxdb
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.debug:
@@ -76,9 +67,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-influxdb
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.debug:

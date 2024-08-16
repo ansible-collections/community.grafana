@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-redis
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: redis-datasource
     ds_url: https://redis.company.com:6379
@@ -29,9 +26,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-redis
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: redis-datasource
     ds_url: https://redis.company.com:6379
@@ -54,9 +48,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-redis
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: redis-datasource
     ds_url: https://redisnew.company.com:6379
@@ -79,9 +70,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-redis
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:
@@ -92,9 +80,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-redis
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:

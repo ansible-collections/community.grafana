@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-zabbix
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: alexanderzobnin-zabbix-datasource
     ds_url: https://zabbix.company.com
@@ -33,9 +30,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-zabbix
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: alexanderzobnin-zabbix-datasource
     ds_url: https://zabbix.company.com
@@ -62,9 +56,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-zabbix
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: alexanderzobnin-zabbix-datasource
     ds_url: https://zabbix.example.com
@@ -92,9 +83,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-zabbix
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:
@@ -105,9 +93,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-zabbix
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.assert:

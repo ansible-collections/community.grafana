@@ -3,9 +3,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-tempo
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: tempo
     ds_url: tempo.company.com:3100
@@ -22,9 +19,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-tempo
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     org_id: "1"
     ds_type: tempo
     ds_url: tempo.company.com:3100
@@ -50,9 +44,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-tempo
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.debug:
@@ -66,9 +57,6 @@
   register: result
   community.grafana.grafana_datasource:
     name: datasource-tempo
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
 
 - ansible.builtin.debug:
