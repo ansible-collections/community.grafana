@@ -45,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        grafana_version: ["11.1.3", "10.4.6", "9.5.20"]
+        grafana_version: ["11.1.4", "10.4.7", "9.5.20"]
         ansible_version: ["stable-2.15", "stable-2.16", "devel"]
         python_version: ["3.11"]
     services:
@@ -67,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        grafana_version: ["11.1.3", "10.4.6", "9.5.20"]
+        grafana_version: ["11.1.4", "10.4.7", "9.5.20"]
         ansible_version: ["stable-2.15", "stable-2.16", "devel"]
         python_version: ["3.11"]
     services:
