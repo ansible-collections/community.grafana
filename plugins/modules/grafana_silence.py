@@ -73,7 +73,7 @@ options:
     description:
       - Which alertmanager datasource to target
     type: str
-    required false
+    required: false
     default: grafana
   state:
     description:
@@ -251,8 +251,8 @@ class GrafanaSilenceInterface(object):
                 )
         
         if module.params.get("alertmanager_datasource", None):
-            self.alertmanager_path = (
-                self.datasource_by_name(module.params["alertmanager_datasource"])
+            self.alertmanager_path = self.datasource_by_name(
+              module.params["alertmanager_datasource"]
             )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
