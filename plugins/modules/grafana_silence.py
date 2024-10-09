@@ -69,6 +69,12 @@ options:
     type: list
     elements: dict
     required: true
+  alertmanager_datasource:
+    description:
+      - Which alertmanager datasource to target
+    type: str
+    required: false
+    default: grafana
   state:
     description:
       - Delete the first occurrence of a silence with the same settings. Can be "absent" or "present".
@@ -102,6 +108,22 @@ EXAMPLES = """
         isRegex: true
         name: environment
         value: test
+    state: present
+
+- name: Create a silence against a specific datasource
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a testcomment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    ends_at: "2029-07-29T08:55:45.000Z"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    alertmanager_datasource: exampleDS
     state: present
 
 - name: Delete a silence
@@ -196,6 +218,8 @@ class GrafanaSilenceInterface(object):
         self._module = module
         self.grafana_url = base.clean_url(module.params.get("url"))
         self.org_id = None
+        # Default here because you can't look up "grafana" DS via API
+        self.alertmanager_path = "grafana"
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
         if module.params.get("grafana_api_key", None):
@@ -224,6 +248,11 @@ class GrafanaSilenceInterface(object):
                     failed=True,
                     msg="Silences API is available starting with Grafana v8",
                 )
+
+        if module.params.get("alertmanager_datasource", None):
+            self.alertmanager_path = self.datasource_by_name(
+                module.params["alertmanager_datasource"]
+            )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -268,6 +297,16 @@ class GrafanaSilenceInterface(object):
             failed=True, msg="Current user isn't member of organization: %s" % org_name
         )
 
+    def datasource_by_name(self, datasource_name):
+        url = f"/api/datasources/name/{datasource_name}"
+        datasource = self._send_request(url, headers=self.headers, method="GET")
+        if datasource:
+            return datasource["uid"]
+
+        return self._module.fail_json(
+            failed=True, msg=f"Datasource not found: {datasource_name}"
+        )
+
     def get_version(self):
         url = "/api/health"
         response = self._send_request(
@@ -280,7 +319,7 @@ class GrafanaSilenceInterface(object):
         raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
     def create_silence(self, comment, created_by, starts_at, ends_at, matchers):
-        url = "/api/alertmanager/grafana/api/v2/silences"
+        url = f"/api/alertmanager/{self.alertmanager_path}/api/v2/silences"
         silence = dict(
             comment=comment,
             createdBy=created_by,
@@ -297,7 +336,7 @@ class GrafanaSilenceInterface(object):
         return response
 
     def get_silence(self, comment, created_by, starts_at, ends_at, matchers):
-        url = "/api/alertmanager/grafana/api/v2/silences"
+        url = f"/api/alertmanager/{self.alertmanager_path}/api/v2/silences"
 
         responses = self._send_request(url, headers=self.headers, method="GET")
 
@@ -313,21 +352,17 @@ class GrafanaSilenceInterface(object):
         return None
 
     def get_silence_by_id(self, silence_id):
-        url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
-            SilenceId=silence_id
-        )
+        url = f"/api/alertmanager/{self.alertmanager_path}/api/v2/silence/{silence_id}"
         response = self._send_request(url, headers=self.headers, method="GET")
         return response
 
     def get_silences(self):
-        url = "/api/alertmanager/grafana/api/v2/silences"
+        url = f"/api/alertmanager/{self.alertmanager_path}/api/v2/silences"
         response = self._send_request(url, headers=self.headers, method="GET")
         return response
 
     def delete_silence(self, silence_id):
-        url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
-            SilenceId=silence_id
-        )
+        url = f"/api/alertmanager/{self.alertmanager_path}/api/v2/silence/{silence_id}"
         response = self._send_request(url, headers=self.headers, method="DELETE")
         return response
 
@@ -352,6 +387,7 @@ argument_spec.update(
     org_name=dict(type="str"),
     skip_version_check=dict(type="bool", default=False),
     starts_at=dict(type="str", required=True),
+    alertmanager_datasource=dict(type=str),
     state=dict(type="str", choices=["present", "absent"], default="present"),
 )
 
