@@ -74,6 +74,11 @@ def get_version_resp():
     return {"major": 10, "minor": 0, "rev": 0}
 
 
+def get_datasource_resp():
+    server_response = json.dumps({"uid": "AB981B38A76F"})
+    return (MockedReponse(server_response), {"status": 200})
+
+
 class GrafanaSilenceTest(TestCase):
     def setUp(self):
         self.authorization = basic_auth_header("admin", "changeme")
@@ -172,10 +177,17 @@ class GrafanaSilenceTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
     )
     @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
+    )
+    @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
     )
     def test_create_silence_new_silence_with_datasource(
-        self, mock_fetch_url, mock_get_version, mock_get_silence
+        self,
+        mock_fetch_url,
+        mock_get_version,
+        mock_get_silence,
+        mock_datasource_by_name,
     ):
         set_module_args(
             {
@@ -200,6 +212,7 @@ class GrafanaSilenceTest(TestCase):
         )
         module = grafana_silence.setup_module_object()
         mock_get_version.return_value = get_version_resp()
+        mock_datasource_by_name.return_value = get_datasource_resp()
         mock_fetch_url.return_value = silence_created_resp()
         mock_get_silence.return_value = silence_get_resp()
 
@@ -220,7 +233,7 @@ class GrafanaSilenceTest(TestCase):
         )
         mock_fetch_url.assert_called_with(
             module,
-            "https://grafana.example.com/api/alertmanager/testds/api/v2/silences",
+            "https://grafana.example.com/api/alertmanager/AB981B38A76F/api/v2/silences",
             data=json.dumps(
                 {
                     "comment": "a testcomment",
@@ -245,7 +258,6 @@ class GrafanaSilenceTest(TestCase):
             method="POST",
         )
         self.assertEquals(result, {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"})
-
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
@@ -297,9 +309,14 @@ class GrafanaSilenceTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
     )
     @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
+    )
+    @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
     )
-    def test_delete_silence_with_datasource(self, mock_fetch_url, mock_get_version):
+    def test_delete_silence_with_datasource(
+        self, mock_fetch_url, mock_get_version, mock_datasource_by_name
+    ):
         set_module_args(
             {
                 "url": "https://grafana.example.com",
@@ -324,13 +341,14 @@ class GrafanaSilenceTest(TestCase):
         module = grafana_silence.setup_module_object()
         mock_fetch_url.return_value = silence_deleted_resp()
         mock_get_version.return_value = get_version_resp()
+        mock_datasource_by_name.return_value = get_datasource_resp()
 
         grafana_iface = grafana_silence.GrafanaSilenceInterface(module)
         silence_id = "470b7116-8f06-4bb6-9e6c-6258aa92218e"
         result = grafana_iface.delete_silence(silence_id)
         mock_fetch_url.assert_called_with(
             module,
-            "https://grafana.example.com/api/alertmanager/testds/api/v2/silence/470b7116-8f06-4bb6-9e6c-6258aa92218e",
+            "https://grafana.example.com/api/alertmanager/AB981B38A76F/api/v2/silence/470b7116-8f06-4bb6-9e6c-6258aa92218e",
             data=None,
             headers={
                 "Content-Type": "application/json",
