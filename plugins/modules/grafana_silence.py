@@ -126,7 +126,6 @@ EXAMPLES = """
     alertmanager_datasource: exampleDS
     state: present
 
-
 - name: Delete a silence
   community.grafana.grafana_silence:
     grafana_url: "https://grafana.example.com"
