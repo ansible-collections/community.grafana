@@ -249,10 +249,10 @@ class GrafanaSilenceInterface(object):
                     failed=True,
                     msg="Silences API is available starting with Grafana v8",
                 )
-        
+
         if module.params.get("alertmanager_datasource", None):
             self.alertmanager_path = self.datasource_by_name(
-              module.params["alertmanager_datasource"]
+                module.params["alertmanager_datasource"]
             )
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
