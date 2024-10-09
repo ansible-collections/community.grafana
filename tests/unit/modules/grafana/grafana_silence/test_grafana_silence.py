@@ -171,13 +171,13 @@ class GrafanaSilenceTest(TestCase):
 
     # create a new silence with alertmanager datasource defined
     @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
+    )
+    @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_silence"
     )
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
-    )
-    @patch(
-        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
     )
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
@@ -306,10 +306,10 @@ class GrafanaSilenceTest(TestCase):
         self.assertEquals(result, {"message": "silence deleted"})
 
     @patch(
-        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
     )
     @patch(
-        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
     )
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
