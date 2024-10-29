@@ -162,7 +162,7 @@ class GrafanaSilenceTest(TestCase):
             },
             method="POST",
         )
-        self.assertEquals(result, {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"})
+        self.assertEqual(result, {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
@@ -208,4 +208,4 @@ class GrafanaSilenceTest(TestCase):
             },
             method="DELETE",
         )
-        self.assertEquals(result, {"message": "silence deleted"})
+        self.assertEqual(result, {"message": "silence deleted"})
