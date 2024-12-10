@@ -35,6 +35,13 @@ options:
     default: General
     version_added: "1.0.0"
     type: str
+  parent_uid:
+    description:
+      - The parent folder UID.
+      - Available with subfolder feature of Grafana 11.
+      - Allows creating dashboards in subfolders
+    version_added: "2.2.0"
+    type: str
   state:
     description:
       - State of the dashboard.
@@ -111,6 +118,15 @@ EXAMPLES = """
     grafana_url: http://grafana.company.com
     grafana_api_key: "{{ grafana_api_key }}"
     folder: public
+    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+
+- name: Import Grafana dashboard zabbix in a subfolder
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    # Can be retrieved from `community.grafana.grafana_folder` as `folder.uid`
+    parent_uid: "{{ parent_uid }}"
+    folder: myteam
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
 
 - name: Export dashboard
@@ -227,15 +243,17 @@ def get_grafana_version(module, grafana_url, headers):
     return int(grafana_version)
 
 
-def grafana_folder_exists(module, grafana_url, folder_name, headers):
+def grafana_folder_exists(module, grafana_url, folder_name, parent_uid, headers):
     # the 'General' folder is a special case, it's ID is always '0'
     if folder_name == "General":
         return True, 0
 
     try:
-        r, info = fetch_url(
-            module, "%s/api/folders" % grafana_url, headers=headers, method="GET"
-        )
+        url = "%s/api/folders" % grafana_url
+        if parent_uid:
+            url = "%s?parentUid=%s" % (url, parent_uid)
+
+        r, info = fetch_url(module, url, headers=headers, method="GET")
 
         if info["status"] != 200:
             raise GrafanaAPIException(
@@ -378,9 +396,14 @@ def grafana_create_dashboard(module, data):
 
     # test if the folder exists
     folder_exists = False
+    if data["parent_uid"] and grafana_version < 11:
+        module.fail_json(
+            failed=True, msg="Subfolder API is available starting Grafana v11"
+        )
+
     if grafana_version >= 5:
         folder_exists, folder_id = grafana_folder_exists(
-            module, data["url"], data["folder"], headers
+            module, data["url"], data["folder"], data["parent_uid"], headers
         )
         if folder_exists is False:
             raise GrafanaAPIException(
@@ -608,6 +631,7 @@ def main():
         org_id=dict(default=1, type="int"),
         org_name=dict(type="str"),
         folder=dict(type="str", default="General"),
+        parent_uid=dict(type="str"),
         uid=dict(type="str"),
         slug=dict(type="str"),
         path=dict(aliases=["dashboard_url"], type="str"),
