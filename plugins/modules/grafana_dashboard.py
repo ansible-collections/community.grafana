@@ -373,6 +373,7 @@ def grafana_create_dashboard(module, data):
     else:
         if data.get("uid"):
             uid = data["uid"]
+            payload["dashboard"]["uid"] = data["uid"]
         elif "uid" in payload["dashboard"]:
             uid = payload["dashboard"]["uid"]
         else:
