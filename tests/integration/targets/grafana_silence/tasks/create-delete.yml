@@ -23,7 +23,7 @@
           - "result.changed == true"
           - "result.failed == false"
           - "result.silence.id != ''"
-    
+
     - name: Check idempotency on silence creation
       community.grafana.grafana_silence:
         comment: "a testcomment"
@@ -41,7 +41,7 @@
         that:
           - "result.changed == false"
           - "result.msg != ''"
-    
+
     - name: Delete the silence
       community.grafana.grafana_silence:
         comment: "a testcomment"
@@ -60,8 +60,8 @@
           - "result.changed == true"
           - "result.failed == false"
           - "result.silence.id != ''"
-          - - "result.silence.createdBy != 'me'"
-    
+          - "result.silence.createdBy != 'me'"
+
     - name: Check idempotency on silence deletion
       community.grafana.grafana_silence:
         comment: "a testcomment"
