@@ -23,6 +23,7 @@
           - "result.changed == true"
           - "result.failed == false"
           - "result.silence.id != ''"
+          - "result.silence.createdBy == 'me'"
 
     - name: Check idempotency on silence creation
       community.grafana.grafana_silence:
@@ -60,7 +61,7 @@
           - "result.changed == true"
           - "result.failed == false"
           - "result.silence.id != ''"
-          - "result.silence.createdBy != 'me'"
+          - "result.silence.createdBy == 'me'"
 
     - name: Check idempotency on silence deletion
       community.grafana.grafana_silence:
