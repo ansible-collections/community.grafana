@@ -9,9 +9,6 @@
   register: result
   ignore_errors: true
   community.grafana.grafana_folder:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     title: apitest
     parent_uid: "parent"
     state: absent

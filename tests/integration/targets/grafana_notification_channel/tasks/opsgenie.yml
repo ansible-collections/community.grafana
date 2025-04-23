@@ -7,9 +7,6 @@
     type: opsgenie
     opsgenie_url: https://example.org
     opsgenie_api_key: xxx
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -29,9 +26,6 @@
     type: opsgenie
     opsgenie_url: https://example.org
     opsgenie_api_key: xxx
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -48,9 +42,6 @@
   community.grafana.grafana_notification_channel:
     uid: opsgenie
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -65,9 +56,6 @@
   community.grafana.grafana_notification_channel:
     uid: opsgenie
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result

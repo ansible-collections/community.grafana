@@ -8,9 +8,6 @@
     threema_gateway_id: "*xxxxxxx"
     threema_recipient_id: yyyyyyyy
     threema_api_secret: zzz
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -31,9 +28,6 @@
     threema_gateway_id: xxx
     threema_recepient_id: yyy
     threema_api_secret: zzz
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -50,9 +44,6 @@
   community.grafana.grafana_notification_channel:
     uid: threema
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -66,9 +57,6 @@
   community.grafana.grafana_notification_channel:
     uid: threema
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result

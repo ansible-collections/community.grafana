@@ -1,9 +1,6 @@
 ---
 - name: Create a Grafana organization
   community.grafana.grafana_organization:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: orgtest
     state: present
   register: result
@@ -17,9 +14,6 @@
 
 - name: Check idempotency Grafana organization
   community.grafana.grafana_organization:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: orgtest
     state: present
   register: result
@@ -33,9 +27,6 @@
 
 - name: Delete a Grafana organization
   community.grafana.grafana_organization:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: orgtest
     state: absent
   register: result
@@ -49,9 +40,6 @@
 
 - name: Check idempotency delete a Grafana organization
   community.grafana.grafana_organization:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: orgtest
     state: absent
   register: result

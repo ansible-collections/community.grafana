@@ -8,9 +8,6 @@
     email_addresses:
       - foo@example.org
       - bar@example.org
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -31,9 +28,6 @@
     email_addresses:
       - foo@example.org
       - bar@example.org
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -50,9 +44,6 @@
   community.grafana.grafana_notification_channel:
     uid: email
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -67,9 +58,6 @@
   community.grafana.grafana_notification_channel:
     uid: email
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result

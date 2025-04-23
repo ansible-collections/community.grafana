@@ -1,9 +1,6 @@
 ---
 - name: Create Dashboard from URL | check mode | dashboard does not exist
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
@@ -19,9 +16,6 @@
 
 - name: Create Dashboard from URL | run mode | dashboard does not exist
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
@@ -38,9 +32,6 @@
 
 - name: Create Dashboard from URL | check mode | dashboard exists
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
@@ -57,9 +48,6 @@
 
 - name: Create Dashboard from URL | run mode | dashboard exists
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: present
     commit_message: Updated by ansible
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download

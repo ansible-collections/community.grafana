@@ -5,9 +5,6 @@
   block:
     - name: Create Dashboard from file by org_name | check mode | dashboard does not exist
       community.grafana.grafana_dashboard:
-        grafana_url: "{{ grafana_url }}"
-        grafana_user: "{{ grafana_username }}"
-        grafana_password: "{{ grafana_password }}"
         state: present
         commit_message: Updated by ansible
         path: /tmp/dashboard.json
@@ -23,9 +20,6 @@
 
     - name: Create Dashboard from file by org_name | run mode | dashboard does not exist
       community.grafana.grafana_dashboard:
-        grafana_url: "{{ grafana_url }}"
-        grafana_user: "{{ grafana_username }}"
-        grafana_password: "{{ grafana_password }}"
         state: present
         commit_message: Updated by ansible
         path: /tmp/dashboard.json
@@ -42,9 +36,6 @@
 
     - name: Create Dashboard from file by org_name | check mode | dashboard exists
       community.grafana.grafana_dashboard:
-        grafana_url: "{{ grafana_url }}"
-        grafana_user: "{{ grafana_username }}"
-        grafana_password: "{{ grafana_password }}"
         state: present
         commit_message: Updated by ansible
         path: /tmp/dashboard.json
@@ -61,9 +52,6 @@
 
     - name: Create Dashboard from file by org_name | run mode | dashboard exists
       community.grafana.grafana_dashboard:
-        grafana_url: "{{ grafana_url }}"
-        grafana_user: "{{ grafana_username }}"
-        grafana_password: "{{ grafana_password }}"
         state: present
         commit_message: Updated by ansible
         path: /tmp/dashboard.json

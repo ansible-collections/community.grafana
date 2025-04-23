@@ -7,9 +7,6 @@
     type: kafka
     kafka_url: https://example.org
     kafka_topic: test
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -29,9 +26,6 @@
     type: kafka
     kafka_url: https://example.org
     kafka_topic: test
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -48,9 +42,6 @@
   community.grafana.grafana_notification_channel:
     uid: kafka
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -64,9 +55,6 @@
   community.grafana.grafana_notification_channel:
     uid: kafka
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result

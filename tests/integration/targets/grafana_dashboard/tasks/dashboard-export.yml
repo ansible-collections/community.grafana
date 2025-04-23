@@ -1,9 +1,6 @@
 ---
 - name: Export Dashboard | check mode | uid does not exist
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: export
     path: /tmp/dashboard_export.json
     overwrite: true
@@ -22,9 +19,6 @@
 
 - name: Export Dashboard | run mode | uid does not exist
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: export
     path: /tmp/dashboard_export.json
     overwrite: true
@@ -43,9 +37,6 @@
 
 - name: Export Dashboard | check mode | uid exists
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: export
     path: /tmp/dashboard_export.json
     overwrite: true
@@ -63,9 +54,6 @@
 
 - name: Export Dashboard | run mode | uid exists
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: export
     path: /tmp/dashboard_export.json
     overwrite: true

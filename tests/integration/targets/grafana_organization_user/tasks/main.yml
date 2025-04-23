@@ -1,9 +1,6 @@
 ---
 - name: Create test user (default org 1)
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: orgtest
     email: orgtest@example.com
     login: orgtest
@@ -13,9 +10,6 @@
 
 - name: Remove user from organization (default org 1)
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     login: orgtest
     state: absent
   register: result
@@ -27,9 +21,6 @@
 
 - name: Check idempotency on user removal from org
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     login: orgtest
     state: absent
   register: result
@@ -41,9 +32,6 @@
 
 - name: Add user to organization
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     login: orgtest
     role: viewer
     state: present
@@ -58,9 +46,6 @@
 
 - name: Update existing user role
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     login: orgtest
     role: editor
     state: present
@@ -75,9 +60,6 @@
 
 - name: Check idempotency on user update
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     login: orgtest
     role: editor
     state: present
@@ -90,18 +72,12 @@
 
 - name: Create a new organization
   community.grafana.grafana_organization:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: neworgtest
     state: present
   register: org
 
 - name: Add user to the new organization by org_id
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     org_id: "{{ org.org.id }}"
     login: orgtest
     role: admin
@@ -119,9 +95,6 @@
 
 - name: Remove user from new organization by org_id
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     org_id: "{{ org.org.id }}"
     login: orgtest
     state: absent
@@ -136,9 +109,6 @@
 
 - name: Add user to the new organization by org_name
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     org_name: "{{ org.org.name }}"
     login: orgtest
     role: admin
@@ -156,9 +126,6 @@
 
 - name: Remove user from new organization by org_name
   community.grafana.grafana_organization_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     org_name: "{{ org.org.name }}"
     login: orgtest
     state: absent

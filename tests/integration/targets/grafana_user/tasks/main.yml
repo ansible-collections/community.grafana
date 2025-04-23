@@ -1,9 +1,6 @@
 ---
 - name: Create new admin
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: Harley Quinn
     email: harley.quinn@gotham.city
     login: harley
@@ -22,9 +19,6 @@
 
 - name: Check idempotency on admin creation
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: Harley Quinn
     email: harley.quinn@gotham.city
     login: harley
@@ -60,9 +54,6 @@
 
 - name: Create a Grafana user without password (expect failure)
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: Bruce Wayne
     email: batman@gotham.city
     login: batman
@@ -78,9 +69,6 @@
 
 - name: Create a Grafana user
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: Bruce Wayne
     email: batman@gotham.city
     login: batman
@@ -97,9 +85,6 @@
 
 - name: Check idempotency on user creation (password not requiered)
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: Bruce Wayne
     email: batman@gotham.city
     login: batman
@@ -133,9 +118,6 @@
 
 - name: Update Grafana user
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: The Dark Knight
     email: thedarkknight@gotham.city
     login: batman
@@ -171,9 +153,6 @@
 
 - name: Delete a Grafana user
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     login: batman
     state: absent
   register: result
@@ -185,9 +164,6 @@
 
 - name: Check idempotency on user deletion
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     login: batman
     state: absent
   register: result
@@ -215,9 +191,6 @@
 
 - name: Create a Grafana user with character encoding
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: Bruce Wayne
     email: bruce+wayne@gotham.city
     login: bruce+wayne@gotham.city
@@ -234,9 +207,6 @@
 
 - name: Check idempotency on user creation (password not requiered)
   community.grafana.grafana_user:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: Bruce Wayne
     email: bruce+wayne@gotham.city
     login: bruce+wayne@gotham.city
