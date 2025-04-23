@@ -5,7 +5,7 @@ driver:
   name: docker
 platforms:
   - name: instance
-    image: rndmh3ro/docker-debian12-ansible:latest
+    image: ghcr.io/dev-sec/docker-debian12-ansible:latest
     command: ${MOLECULE_DOCKER_COMMAND:-/lib/systemd/systemd}
     env:
       container: docker
