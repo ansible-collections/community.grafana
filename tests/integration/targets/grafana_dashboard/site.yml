@@ -6,7 +6,6 @@
       grafana_url: "{{ grafana_url }}"
       grafana_user: "{{ grafana_username }}"
       grafana_password: "{{ grafana_password }}"
-  block:
   tasks:
     - ansible.builtin.include_role:
         name: ../../grafana_dashboard
