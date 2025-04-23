@@ -1,6 +1,11 @@
 ---
 - name: Run tests for grafana_team
   hosts: localhost
+  module_defaults:
+    community.grafana.grafana_team:
+      grafana_url: "{{ grafana_url }}"
+      grafana_user: "{{ grafana_username }}"
+      grafana_password: "{{ grafana_password }}"
   tasks:
     - ansible.builtin.include_role:
         name: ../../grafana_team
