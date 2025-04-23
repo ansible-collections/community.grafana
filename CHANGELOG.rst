@@ -4,6 +4,21 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+v2.2.0
+======
+
+Minor Changes
+-------------
+
+- Add argument `tls_servername` for `grafana_datasource`
+- Support `alertmanager` as type for `grafana_datasource`
+
+Bugfixes
+--------
+
+- Remove field `apiVersion` from return of current `grafana_datasource` for working diff
+- test: replace more deprecated `TestCase.assertEquals` to support Python 3.12
+
 v2.1.0
 ======
 
