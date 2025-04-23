@@ -93,7 +93,7 @@
       - result.datasource.isDefault == false
       - result.datasource.jsonData.tlsAuth == false
       - result.datasource.name == 'datasource-without-uid'
-      - result.datasource.uid
+      - result.datasource.uid is string
       - result.datasource.orgId == 1
       - ('password' not in result.datasource) or (result.datasource.password == '')
       - result.datasource.type == 'prometheus'
