@@ -1,6 +1,8 @@
 ---
 - name: Run tests for grafana_dashboard
   hosts: localhost
+  vars_files:
+    - defaults/main.yml
   module_defaults:
     community.grafana.grafana_dashboard:
       grafana_url: "{{ grafana_url }}"
