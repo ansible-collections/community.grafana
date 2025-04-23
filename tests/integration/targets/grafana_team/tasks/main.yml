@@ -1,9 +1,6 @@
 ---
 - name: Create a Team
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     state: present
@@ -28,9 +25,6 @@
 
 - name: Check idempotency on team creation
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     state: present
@@ -47,9 +41,6 @@
 
 - name: Check a team can be deleted
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     state: absent
@@ -63,9 +54,6 @@
 
 - name: Check idempotency on team deletion
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     state: absent
@@ -83,9 +71,6 @@
 
 - name: Create a Team with members
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     members:
@@ -109,9 +94,6 @@
 
 - name: Ensure a Team exists with member not enforced
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     members:
@@ -134,9 +116,6 @@
 
 - name: Ensure a Team exists with member enforced
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     members: "{{ enforced_members }}"
@@ -154,9 +133,6 @@
 
 - name: Ensure a Team exists with members omitted
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     state: present
@@ -173,9 +149,6 @@
 
 - name: Add new member to existing Team
   community.grafana.grafana_team:
-    url: "{{ grafana_url }}"
-    url_username: "{{ grafana_username }}"
-    url_password: "{{ grafana_password }}"
     name: grafana working group
     email: foo.bar@example.com
     members:

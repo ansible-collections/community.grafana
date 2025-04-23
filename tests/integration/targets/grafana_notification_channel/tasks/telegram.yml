@@ -7,9 +7,6 @@
     type: telegram
     telegram_bot_token: xxx
     telegram_chat_id: yyy
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -29,9 +26,6 @@
     type: telegram
     telegram_bot_token: xxx
     telegram_chat_id: yyy
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -48,9 +42,6 @@
   community.grafana.grafana_notification_channel:
     uid: telegram
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result
@@ -64,9 +55,6 @@
   community.grafana.grafana_notification_channel:
     uid: telegram
     state: absent
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
 
 - ansible.builtin.debug:
     var: result

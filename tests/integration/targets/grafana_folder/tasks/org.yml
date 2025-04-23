@@ -1,9 +1,6 @@
 ---
 - module_defaults:
     community.grafana.grafana_folder:
-      url: "{{ grafana_url }}"
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
       org_name: "Main Org."
   block:
     - name: Create a Folder

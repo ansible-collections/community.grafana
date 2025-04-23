@@ -1,9 +1,6 @@
 ---
 - name: Delete dashboard | check mode | dashboard exists
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
     uid: "{{ uid_to_delete }}"
   check_mode: true
@@ -16,9 +13,6 @@
 
 - name: Delete dashboard | run mode | dashboard exists
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
     uid: "{{ uid_to_delete }}"
   check_mode: false
@@ -31,9 +25,6 @@
 
 - name: Delete dashboard | check mode | dashboard does not exist
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
     uid: "{{ uid_to_delete }}"
   check_mode: true
@@ -46,9 +37,6 @@
 
 - name: Delete dashboard | run mode | dashboard does not exist
   community.grafana.grafana_dashboard:
-    grafana_url: "{{ grafana_url }}"
-    grafana_user: "{{ grafana_username }}"
-    grafana_password: "{{ grafana_password }}"
     state: absent
     uid: "{{ uid_to_delete }}"
   check_mode: false
