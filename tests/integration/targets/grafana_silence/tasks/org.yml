@@ -1,6 +1,9 @@
 ---
 - module_defaults:
     community.grafana.grafana_silence:
+      grafana_url: "{{ grafana_url }}"
+      grafana_user: "{{ grafana_username }}"
+      grafana_password: "{{ grafana_password }}"
       org_name: Main Org.
   block:
     - name: Silence creation and deletion
