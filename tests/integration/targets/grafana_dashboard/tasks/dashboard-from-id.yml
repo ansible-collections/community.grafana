@@ -29,7 +29,7 @@
       - dfi_result2.failed == false
       - dfi_result2.changed == true
       - dfi_result2.uid is defined
-      - dfi_result2.uid | type_debug == "AnsibleUnsafeText"
+      - dfi_result2.uid is string
       - dfi_result2.msg == 'Dashboard Zabbix Host Status created'
 
 - name: Create Dashboard from ID | check mode | dashboard exists
@@ -46,7 +46,7 @@
       - dfi_result3.failed == false
       - dfi_result3.changed == false
       - dfi_result3.uid is defined
-      - dfi_result3.uid | type_debug == "AnsibleUnsafeText"
+      - dfi_result3.uid is string
       - dfi_result3.msg == 'Dashboard Zabbix Host Status unchanged.'
 
 - name: Create Dashboard from ID | run mode | dashboard exists
@@ -63,7 +63,7 @@
       - dfi_result4.failed == false
       - dfi_result4.changed == false
       - dfi_result4.uid is defined
-      - dfi_result4.uid | type_debug == "AnsibleUnsafeText"
+      - dfi_result4.uid is string
       - dfi_result4.msg == 'Dashboard Zabbix Host Status unchanged.'
 
 - ansible.builtin.include_tasks:

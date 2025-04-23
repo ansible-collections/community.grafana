@@ -32,7 +32,7 @@
       - dff_result2.failed == false
       - dff_result2.changed == true
       - dff_result2.uid is defined
-      - dff_result2.uid | type_debug == "AnsibleUnsafeText"
+      - dff_result2.uid is string
       - dff_result2.msg == 'Dashboard test created'
 
 - name: Create Dashboard from file | check mode | dashboard exists
@@ -48,7 +48,7 @@
       - dff_result3.failed == false
       - dff_result3.changed == false
       - dff_result3.uid is defined
-      - dff_result3.uid | type_debug == "AnsibleUnsafeText"
+      - dff_result3.uid is string
       - dff_result3.msg == 'Dashboard test unchanged.'
 
 - name: Create Dashboard from file | run mode | dashboard exists
@@ -64,7 +64,7 @@
       - dff_result4.failed == false
       - dff_result4.changed == false
       - dff_result4.uid is defined
-      - dff_result4.uid | type_debug == "AnsibleUnsafeText"
+      - dff_result4.uid is string
       - dff_result4.msg == 'Dashboard test unchanged.'
 
 - ansible.builtin.include_tasks:

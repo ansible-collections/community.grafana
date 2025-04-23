@@ -31,7 +31,7 @@
           - dbo_result2.failed == false
           - dbo_result2.changed == true
           - dbo_result2.uid is defined
-          - dbo_result2.uid | type_debug == "AnsibleUnsafeText"
+          - dbo_result2.uid is string
           - dbo_result2.msg == 'Dashboard test created'
 
     - name: Create Dashboard from file by org_name | check mode | dashboard exists
@@ -47,7 +47,7 @@
           - dbo_result3.failed == false
           - dbo_result3.changed == false
           - dbo_result3.uid is defined
-          - dbo_result3.uid | type_debug == "AnsibleUnsafeText"
+          - dbo_result3.uid is string
           - dbo_result3.msg == 'Dashboard test unchanged.'
 
     - name: Create Dashboard from file by org_name | run mode | dashboard exists
@@ -63,7 +63,7 @@
           - dbo_result4.failed == false
           - dbo_result4.changed == false
           - dbo_result4.uid is defined
-          - dbo_result4.uid | type_debug == "AnsibleUnsafeText"
+          - dbo_result4.uid is string
           - dbo_result4.msg == 'Dashboard test unchanged.'
 
     - ansible.builtin.include_tasks:
