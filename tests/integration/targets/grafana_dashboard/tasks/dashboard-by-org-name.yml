@@ -1,6 +1,9 @@
 ---
 - module_defaults:
     community.grafana.grafana_dashboard:
+      grafana_url: "{{ grafana_url }}"
+      grafana_user: "{{ grafana_username }}"
+      grafana_password: "{{ grafana_password }}"
       org_name: Main Org.
   block:
     - name: Create Dashboard from file by org_name | check mode | dashboard does not exist

@@ -1,6 +1,9 @@
 ---
 - module_defaults:
     community.grafana.grafana_folder:
+      grafana_url: "{{ grafana_url }}"
+      grafana_user: "{{ grafana_username }}"
+      grafana_password: "{{ grafana_password }}"
       uid: "parent"
   block:
     - name: Create a parent Folder
@@ -31,6 +34,9 @@
 
     - module_defaults:
         community.grafana.grafana_folder:
+          grafana_url: "{{ grafana_url }}"
+          grafana_user: "{{ grafana_username }}"
+          grafana_password: "{{ grafana_password }}"
           uid: "sub"
           parent_uid: "parent"
       block:
