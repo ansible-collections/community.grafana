@@ -2,10 +2,12 @@
 - name: Run tests for grafana_organization_user
   hosts: localhost
   module_defaults:
-    community.grafana.grafana_organization_user:
+    community.grafana.grafana_organization_user: &grafana_module_defaults
       grafana_url: "{{ grafana_url }}"
       grafana_user: "{{ grafana_username }}"
       grafana_password: "{{ grafana_password }}"
+    community.grafana.grafana_organization: *grafana_module_defaults
+    community.grafana.grafana_user: *grafana_module_defaults
   tasks:
     - ansible.builtin.include_role:
         name: ../../grafana_organization_user
