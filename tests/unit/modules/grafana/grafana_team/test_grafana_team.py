@@ -5,8 +5,8 @@ from unittest.mock import patch
 from ansible_collections.community.grafana.plugins.modules import grafana_team
 from ansible.module_utils import basic
 from ansible.module_utils.urls import basic_auth_header
-import json
 from ansible.module_utils.testing import patch_module_args
+import json
 
 __metaclass__ = type
 
