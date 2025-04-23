@@ -1,6 +1,8 @@
 ---
 - name: Run tests for grafana_organization
   hosts: localhost
+  vars_files:
+    - defaults/main.yml
   module_defaults:
     community.grafana.grafana_organization:
       grafana_url: "{{ grafana_url }}"
