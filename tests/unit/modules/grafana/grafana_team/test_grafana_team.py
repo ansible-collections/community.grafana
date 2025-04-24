@@ -27,15 +27,16 @@ def set_module_args(args):
     basic._ANSIBLE_ARGS = to_bytes(args)
 
 
-def patch_module_args_compat(args: dict):
-    """Handle patching of module args with compatibility for Ansible 2.19 and later."""
+def patch_module_args_compat(args: dict, run_test_fn):
+    """Patches module arguments in a version-compatible way and executes the test logic."""
     if version.parse(ansible_version) > version.parse("2.18"):
         from ansible.module_utils.testing import patch_module_args
 
         with patch_module_args(args):
-            return
+            run_test_fn()
     else:
         set_module_args(args)
+        run_test_fn()
 
 
 def exit_json(*args, **kwargs):
@@ -157,48 +158,66 @@ class GrafanaTeamsTest(TestCase):
         self.addCleanup(self.mock_module_helper.stop)
 
     def test_module_setup_fails_without_params(self):
-        patch_module_args_compat({})
+        def run_test():
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+                err, arg_list = result.exception.args[0]["msg"].split(":")
+                self.assertEqual(err, "missing required arguments")
+                self.assertEqual(arg_list, ["name", "email", "url"])
 
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-            err, arg_list = result.exception.args[0]["msg"].split(":")
-            self.assertEqual(err, "missing required arguments")
-            self.assertEqual(arg_list, ["name", "email", "url"])
+        patch_module_args_compat({}, run_test)
 
     def test_module_setup_fails_without_name(self):
+        def run_test():
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+            self.assertEqual(
+                result.exception.args[0]["msg"], "missing required arguments: name"
+            )
+
         patch_module_args_compat(
-            {"email": "email@test.com", "url": "http://grafana.example.com"}
-        )
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-        self.assertEqual(
-            result.exception.args[0]["msg"], "missing required arguments: name"
+            {"email": "email@test.com", "url": "http://grafana.example.com"},
+            run_test,
         )
 
     def test_module_setup_fails_without_email(self):
+        def run_test():
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+            self.assertEqual(
+                result.exception.args[0]["msg"], "missing required arguments: email"
+            )
+
         patch_module_args_compat(
-            {"name": "MyTestTeam", "url": "http://grafana.example.com"}
-        )
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-        self.assertEqual(
-            result.exception.args[0]["msg"], "missing required arguments: email"
+            {"name": "MyTestTeam", "url": "http://grafana.example.com"},
+            run_test,
         )
 
     def test_module_setup_fails_without_url(self):
+        def run_test():
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+            self.assertEqual(
+                result.exception.args[0]["msg"], "missing required arguments: url"
+            )
+
         patch_module_args_compat(
             {
                 "name": "MyTestTeam",
                 "email": "email@test.com",
-            }
-        )
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-        self.assertEqual(
-            result.exception.args[0]["msg"], "missing required arguments: url"
+            },
+            run_test,
         )
 
     def test_module_setup_fails_with_mutually_exclusive_auth_methods(self):
+        def run_test():
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+            self.assertEqual(
+                result.exception.args[0]["msg"],
+                "parameters are mutually exclusive: url_username|grafana_api_key",
+            )
+
         patch_module_args_compat(
             {
                 "name": "MyTestTeam",
@@ -206,19 +225,24 @@ class GrafanaTeamsTest(TestCase):
                 "url": "http://grafana.example.com",
                 "grafana_user": "admin",
                 "grafana_api_key": "random_api_key",
-            }
-        )
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-        self.assertEqual(
-            result.exception.args[0]["msg"],
-            "parameters are mutually exclusive: url_username|grafana_api_key",
+            },
+            run_test,
         )
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
     )
     def test_module_fails_with_low_grafana_version(self, mock_get_version):
+        def run_test():
+            mock_get_version.return_value = get_low_version_resp()
+
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+            self.assertEqual(
+                result.exception.args[0]["msg"],
+                "Teams API is available starting Grafana v5",
+            )
+
         patch_module_args_compat(
             {
                 "name": "MyTestTeam",
@@ -226,15 +250,8 @@ class GrafanaTeamsTest(TestCase):
                 "url": "http://grafana.example.com",
                 "grafana_user": "admin",
                 "grafana_password": "admin",
-            }
-        )
-        mock_get_version.return_value = get_low_version_resp()
-
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-        self.assertEqual(
-            result.exception.args[0]["msg"],
-            "Teams API is available starting Grafana v5",
+            },
+            run_test,
         )
 
     # Continue applying the same change to the rest of the tests where set_module_args is used.
@@ -248,20 +265,25 @@ class GrafanaTeamsTest(TestCase):
     def test_module_failure_with_unauthorized_resp(
         self, mock_fetch_url, mock_get_version
     ):
+        def run_test():
+            mock_fetch_url.return_value = unauthorized_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+            self.assertTrue(
+                result.exception.args[0]["msg"].startswith(
+                    "Unauthorized to perform action"
+                )
+            )
+
         patch_module_args_compat(
             {
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        mock_fetch_url.return_value = unauthorized_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-        self.assertTrue(
-            result.exception.args[0]["msg"].startswith("Unauthorized to perform action")
+            },
+            run_test,
         )
 
     @patch(
@@ -273,19 +295,24 @@ class GrafanaTeamsTest(TestCase):
     def test_module_failure_with_permission_denied_resp(
         self, mock_fetch_url, mock_get_version
     ):
+        def run_test():
+            mock_fetch_url.return_value = permission_denied_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            with self.assertRaises(AnsibleFailJson) as result:
+                grafana_team.main()
+            self.assertTrue(
+                result.exception.args[0]["msg"].startswith("Permission Denied")
+            )
+
         patch_module_args_compat(
             {
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
+            },
+            run_test,
         )
-        mock_fetch_url.return_value = permission_denied_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        with self.assertRaises(AnsibleFailJson) as result:
-            grafana_team.main()
-        self.assertTrue(result.exception.args[0]["msg"].startswith("Permission Denied"))
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -294,31 +321,34 @@ class GrafanaTeamsTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url"
     )
     def test_get_team_method_with_existing_team(self, mock_fetch_url, mock_get_version):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = team_exists_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            res = grafana_iface.get_team("MyTestTeam")
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "http://grafana.example.com/api/teams/search?name=MyTestTeam",
+                data=None,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="GET",
+            )
+            self.assertEqual(res, {"email": "email@test.com", "name": "MyTestTeam"})
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = team_exists_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        res = grafana_iface.get_team("MyTestTeam")
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "http://grafana.example.com/api/teams/search?name=MyTestTeam",
-            data=None,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
             },
-            method="GET",
+            run_test,
         )
-        self.assertEqual(res, {"email": "email@test.com", "name": "MyTestTeam"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -329,31 +359,34 @@ class GrafanaTeamsTest(TestCase):
     def test_get_team_method_with_non_existing_team(
         self, mock_fetch_url, mock_get_version
     ):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = team_not_found_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            res = grafana_iface.get_team("MyTestTeam")
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "http://grafana.example.com/api/teams/search?name=MyTestTeam",
+                data=None,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="GET",
+            )
+            self.assertEqual(res, None)
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = team_not_found_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        res = grafana_iface.get_team("MyTestTeam")
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "http://grafana.example.com/api/teams/search?name=MyTestTeam",
-            data=None,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
             },
-            method="GET",
+            run_test,
         )
-        self.assertEqual(res, None)
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -362,34 +395,37 @@ class GrafanaTeamsTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url"
     )
     def test_create_team_method(self, mock_fetch_url, mock_get_version):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = team_created_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+
+            res = grafana_iface.create_team("MyTestTeam", "email@test.com")
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "http://grafana.example.com/api/teams",
+                data=json.dumps(
+                    {"email": "email@test.com", "name": "MyTestTeam"}, sort_keys=True
+                ),
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="POST",
+            )
+            self.assertEqual(res, {"message": "Team created", "teamId": 2})
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = team_created_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-
-        res = grafana_iface.create_team("MyTestTeam", "email@test.com")
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "http://grafana.example.com/api/teams",
-            data=json.dumps(
-                {"email": "email@test.com", "name": "MyTestTeam"}, sort_keys=True
-            ),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
             },
-            method="POST",
+            run_test,
         )
-        self.assertEqual(res, {"message": "Team created", "teamId": 2})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -398,33 +434,36 @@ class GrafanaTeamsTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url"
     )
     def test_update_team_method(self, mock_fetch_url, mock_get_version):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = team_updated_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            res = grafana_iface.update_team(2, "MyTestTeam", "email@test.com")
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "http://grafana.example.com/api/teams/2",
+                data=json.dumps(
+                    {"email": "email@test.com", "name": "MyTestTeam"}, sort_keys=True
+                ),
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="PUT",
+            )
+            self.assertEqual(res, {"message": "Team updated"})
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = team_updated_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        res = grafana_iface.update_team(2, "MyTestTeam", "email@test.com")
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "http://grafana.example.com/api/teams/2",
-            data=json.dumps(
-                {"email": "email@test.com", "name": "MyTestTeam"}, sort_keys=True
-            ),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
             },
-            method="PUT",
+            run_test,
         )
-        self.assertEqual(res, {"message": "Team updated"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -433,31 +472,34 @@ class GrafanaTeamsTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url"
     )
     def test_delete_team_method(self, mock_fetch_url, mock_get_version):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = team_deleted_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            res = grafana_iface.delete_team(2)
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "http://grafana.example.com/api/teams/2",
+                data=None,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="DELETE",
+            )
+            self.assertEqual(res, {"message": "Team deleted"})
+
         patch_module_args_compat(
             {
                 "state": "absent",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = team_deleted_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        res = grafana_iface.delete_team(2)
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "http://grafana.example.com/api/teams/2",
-            data=None,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
             },
-            method="DELETE",
+            run_test,
         )
-        self.assertEqual(res, {"message": "Team deleted"})
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -466,31 +508,34 @@ class GrafanaTeamsTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url"
     )
     def test_get_team_members_method(self, mock_fetch_url, mock_get_version):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = team_members_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            res = grafana_iface.get_team_members(2)
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "http://grafana.example.com/api/teams/2/members",
+                data=None,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="GET",
+            )
+            self.assertEqual(res, ["user1@email.com", "user2@email.com"])
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = team_members_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        res = grafana_iface.get_team_members(2)
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "http://grafana.example.com/api/teams/2/members",
-            data=None,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
             },
-            method="GET",
+            run_test,
         )
-        self.assertEqual(res, ["user1@email.com", "user2@email.com"])
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -501,31 +546,34 @@ class GrafanaTeamsTest(TestCase):
     def test_get_team_members_method_no_members_returned(
         self, mock_fetch_url, mock_get_version
     ):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = team_members_no_members_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            res = grafana_iface.get_team_members(2)
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "http://grafana.example.com/api/teams/2/members",
+                data=None,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="GET",
+            )
+            self.assertEqual(res, [])
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
-        )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = team_members_no_members_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        res = grafana_iface.get_team_members(2)
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "http://grafana.example.com/api/teams/2/members",
-            data=None,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
             },
-            method="GET",
+            run_test,
         )
-        self.assertEqual(res, [])
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -534,35 +582,38 @@ class GrafanaTeamsTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url"
     )
     def test_add_team_member_method(self, mock_fetch_url, mock_get_version):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = add_team_member_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            with patch.object(
+                grafana_team.GrafanaTeamInterface, "get_user_id_from_mail"
+            ) as mock_get_user_id_from_mail:
+                mock_get_user_id_from_mail.return_value = 42
+                res = grafana_iface.add_team_member(2, "another@test.com")
+                mock_fetch_url.assert_called_once_with(
+                    module,
+                    "http://grafana.example.com/api/teams/2/members",
+                    data=json.dumps({"userId": 42}),
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": self.authorization,
+                    },
+                    method="POST",
+                )
+                self.assertEqual(res, None)
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
+            },
+            run_test,
         )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = add_team_member_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        with patch.object(
-            grafana_team.GrafanaTeamInterface, "get_user_id_from_mail"
-        ) as mock_get_user_id_from_mail:
-            mock_get_user_id_from_mail.return_value = 42
-            res = grafana_iface.add_team_member(2, "another@test.com")
-            mock_fetch_url.assert_called_once_with(
-                module,
-                "http://grafana.example.com/api/teams/2/members",
-                data=json.dumps({"userId": 42}),
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": self.authorization,
-                },
-                method="POST",
-            )
-            self.assertEqual(res, None)
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -571,35 +622,38 @@ class GrafanaTeamsTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_team.fetch_url"
     )
     def test_delete_team_member_method(self, mock_fetch_url, mock_get_version):
+        def run_test():
+            module = grafana_team.setup_module_object()
+            mock_fetch_url.return_value = delete_team_member_resp()
+            mock_get_version.return_value = get_version_resp()
+
+            grafana_iface = grafana_team.GrafanaTeamInterface(module)
+            with patch.object(
+                grafana_team.GrafanaTeamInterface, "get_user_id_from_mail"
+            ) as mock_get_user_id_from_mail:
+                mock_get_user_id_from_mail.return_value = 42
+                res = grafana_iface.delete_team_member(2, "another@test.com")
+                mock_fetch_url.assert_called_once_with(
+                    module,
+                    "http://grafana.example.com/api/teams/2/members/42",
+                    data=None,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": self.authorization,
+                    },
+                    method="DELETE",
+                )
+                self.assertEqual(res, None)
+
         patch_module_args_compat(
             {
                 "state": "present",
                 "name": "MyTestTeam",
                 "email": "email@test.com",
                 "url": "http://grafana.example.com",
-            }
+            },
+            run_test,
         )
-        module = grafana_team.setup_module_object()
-        mock_fetch_url.return_value = delete_team_member_resp()
-        mock_get_version.return_value = get_version_resp()
-
-        grafana_iface = grafana_team.GrafanaTeamInterface(module)
-        with patch.object(
-            grafana_team.GrafanaTeamInterface, "get_user_id_from_mail"
-        ) as mock_get_user_id_from_mail:
-            mock_get_user_id_from_mail.return_value = 42
-            res = grafana_iface.delete_team_member(2, "another@test.com")
-            mock_fetch_url.assert_called_once_with(
-                module,
-                "http://grafana.example.com/api/teams/2/members/42",
-                data=None,
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": self.authorization,
-                },
-                method="DELETE",
-            )
-            self.assertEqual(res, None)
 
     def test_diff_members_function(self):
         list1 = ["foo@example.com", "bar@example.com"]
