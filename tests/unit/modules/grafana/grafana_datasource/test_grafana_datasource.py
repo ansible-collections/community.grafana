@@ -19,15 +19,16 @@ def set_module_args(args):
     basic._ANSIBLE_ARGS = to_bytes(args)
 
 
-def patch_module_args_compat(args: dict):
-    """Handle patching of module args with compatibility for Ansible 2.19 and later."""
+def patch_module_args_compat(args: dict, run_test_fn):
+    """Patches module arguments in a version-compatible way and executes the test logic."""
     if version.parse(ansible_version) > version.parse("2.18"):
         from ansible.module_utils.testing import patch_module_args
 
         with patch_module_args(args):
-            return
+            run_test_fn()
     else:
         set_module_args(args)
+        run_test_fn()
 
 
 def exit_json(*args, **kwargs):
@@ -84,6 +85,12 @@ class GrafanaDatasource(TestCase):
             "user": "",
             "withCredentials": False,
         }
+
+        def run_test():
+            module = grafana_datasource.setup_module_object()
+            payload = grafana_datasource.get_datasource_payload(module.params)
+            self.assertEqual(payload, expected_payload)
+
         patch_module_args_compat(
             {
                 "url": "https://grafana.example.com",
@@ -95,11 +102,9 @@ class GrafanaDatasource(TestCase):
                 "ds_url": "https://openshift-monitoring.company.com",
                 "access": "proxy",
                 "tls_skip_verify": "true",
-            }
+            },
+            run_test,
         )
-        module = grafana_datasource.setup_module_object()
-        payload = grafana_datasource.get_datasource_payload(module.params)
-        self.assertEqual(payload, expected_payload)
 
     def test_payload_prometheus_with_basic_auth(self):
         expected_payload = {
@@ -122,6 +127,12 @@ class GrafanaDatasource(TestCase):
             "user": "",
             "withCredentials": False,
         }
+
+        def run_test():
+            module = grafana_datasource.setup_module_object()
+            payload = grafana_datasource.get_datasource_payload(module.params)
+            self.assertEqual(payload, expected_payload)
+
         patch_module_args_compat(
             {
                 "url": "https://grafana.example.com",
@@ -135,11 +146,9 @@ class GrafanaDatasource(TestCase):
                 "basic_auth_user": "admin",
                 "basic_auth_password": "admin",
                 "tls_skip_verify": "true",
-            }
+            },
+            run_test,
         )
-        module = grafana_datasource.setup_module_object()
-        payload = grafana_datasource.get_datasource_payload(module.params)
-        self.assertEqual(payload, expected_payload)
 
     def test_payload_influxdb(self):
         expected_payload = {
@@ -161,6 +170,12 @@ class GrafanaDatasource(TestCase):
             "user": "",
             "withCredentials": False,
         }
+
+        def run_test():
+            module = grafana_datasource.setup_module_object()
+            payload = grafana_datasource.get_datasource_payload(module.params)
+            self.assertEqual(payload, expected_payload)
+
         patch_module_args_compat(
             {
                 "url": "https://grafana.example.com",
@@ -173,11 +188,9 @@ class GrafanaDatasource(TestCase):
                 "database": "telegraf",
                 "time_interval": ">10s",
                 "tls_ca_cert": "/etc/ssl/certs/ca.pem",
-            }
+            },
+            run_test,
         )
-        module = grafana_datasource.setup_module_object()
-        payload = grafana_datasource.get_datasource_payload(module.params)
-        self.assertEqual(payload, expected_payload)
 
     def test_payload_elastic(self):
         expected_payload = {
@@ -207,6 +220,12 @@ class GrafanaDatasource(TestCase):
             "user": "",
             "withCredentials": False,
         }
+
+        def run_test():
+            module = grafana_datasource.setup_module_object()
+            payload = grafana_datasource.get_datasource_payload(module.params)
+            self.assertEqual(payload, expected_payload)
+
         patch_module_args_compat(
             {
                 "url": "https://grafana.example.com",
@@ -225,8 +244,6 @@ class GrafanaDatasource(TestCase):
                 "es_version": 56,
                 "max_concurrent_shard_requests": 42,
                 "tls_ca_cert": "/etc/ssl/certs/ca.pem",
-            }
+            },
+            run_test,
         )
-        module = grafana_datasource.setup_module_object()
-        payload = grafana_datasource.get_datasource_payload(module.params)
-        self.assertEqual(payload, expected_payload)
