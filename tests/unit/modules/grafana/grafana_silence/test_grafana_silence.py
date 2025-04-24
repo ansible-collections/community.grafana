@@ -74,6 +74,11 @@ def get_version_resp():
     return {"major": 10, "minor": 0, "rev": 0}
 
 
+def get_datasource_resp():
+    server_response = json.dumps({"uid": "AB981B38A76F"})
+    return (MockedReponse(server_response), {"status": 200})
+
+
 class GrafanaSilenceTest(TestCase):
     def setUp(self):
         self.authorization = basic_auth_header("admin", "changeme")
@@ -164,6 +169,96 @@ class GrafanaSilenceTest(TestCase):
         )
         self.assertEqual(result, {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"})
 
+    # create a new silence with alertmanager datasource defined
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
+    )
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_silence"
+    )
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
+    )
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
+    )
+    def test_create_silence_new_silence_with_datasource(
+        self,
+        mock_fetch_url,
+        mock_get_version,
+        mock_get_silence,
+        mock_datasource_by_name,
+    ):
+        set_module_args(
+            {
+                "url": "https://grafana.example.com",
+                "url_username": "admin",
+                "url_password": "changeme",
+                "comment": "a testcomment",
+                "created_by": "me",
+                "starts_at": "2029-07-29T08:45:45.000Z",
+                "ends_at": "2029-07-29T08:55:45.000Z",
+                "alertmanager_datasource": "testds",
+                "matchers": [
+                    {
+                        "isEqual": True,
+                        "isRegex": True,
+                        "name": "environment",
+                        "value": "test",
+                    }
+                ],
+                "state": "present",
+            }
+        )
+        module = grafana_silence.setup_module_object()
+        mock_get_version.return_value = get_version_resp()
+        mock_datasource_by_name.return_value = get_datasource_resp()
+        mock_fetch_url.return_value = silence_created_resp()
+        mock_get_silence.return_value = silence_get_resp()
+
+        grafana_iface = grafana_silence.GrafanaSilenceInterface(module)
+        result = grafana_iface.create_silence(
+            "a testcomment",
+            "me",
+            "2029-07-29T08:45:45.000Z",
+            "2029-07-29T08:55:45.000Z",
+            [
+                {
+                    "isEqual": True,
+                    "isRegex": True,
+                    "name": "environment",
+                    "value": "test",
+                }
+            ],
+        )
+        mock_fetch_url.assert_called_with(
+            module,
+            "https://grafana.example.com/api/alertmanager/AB981B38A76F/api/v2/silences",
+            data=json.dumps(
+                {
+                    "comment": "a testcomment",
+                    "createdBy": "me",
+                    "startsAt": "2029-07-29T08:45:45.000Z",
+                    "endsAt": "2029-07-29T08:55:45.000Z",
+                    "matchers": [
+                        {
+                            "isEqual": True,
+                            "isRegex": True,
+                            "name": "environment",
+                            "value": "test",
+                        }
+                    ],
+                },
+                sort_keys=True,
+            ),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": self.authorization,
+            },
+            method="POST",
+        )
+        self.assertEquals(result, {"silenceID": "470b7116-8f06-4bb6-9e6c-6258aa92218e"})
+
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
     )
@@ -201,6 +296,59 @@ class GrafanaSilenceTest(TestCase):
         mock_fetch_url.assert_called_with(
             module,
             "https://grafana.example.com/api/alertmanager/grafana/api/v2/silence/470b7116-8f06-4bb6-9e6c-6258aa92218e",
+            data=None,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": self.authorization,
+            },
+            method="DELETE",
+        )
+        self.assertEquals(result, {"message": "silence deleted"})
+
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.datasource_by_name"
+    )
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.GrafanaSilenceInterface.get_version"
+    )
+    @patch(
+        "ansible_collections.community.grafana.plugins.modules.grafana_silence.fetch_url"
+    )
+    def test_delete_silence_with_datasource(
+        self, mock_fetch_url, mock_get_version, mock_datasource_by_name
+    ):
+        set_module_args(
+            {
+                "url": "https://grafana.example.com",
+                "url_username": "admin",
+                "url_password": "changeme",
+                "comment": "a testcomment",
+                "created_by": "me",
+                "ends_at": "2029-07-29T08:55:45.000Z",
+                "alertmanager_datasource": "testds",
+                "matchers": [
+                    {
+                        "isEqual": True,
+                        "isRegex": True,
+                        "name": "environment",
+                        "value": "test",
+                    }
+                ],
+                "starts_at": "2029-07-29T08:45:45.000Z",
+                "state": "present",
+            }
+        )
+        module = grafana_silence.setup_module_object()
+        mock_fetch_url.return_value = silence_deleted_resp()
+        mock_get_version.return_value = get_version_resp()
+        mock_datasource_by_name.return_value = get_datasource_resp()
+
+        grafana_iface = grafana_silence.GrafanaSilenceInterface(module)
+        silence_id = "470b7116-8f06-4bb6-9e6c-6258aa92218e"
+        result = grafana_iface.delete_silence(silence_id)
+        mock_fetch_url.assert_called_with(
+            module,
+            "https://grafana.example.com/api/alertmanager/AB981B38A76F/api/v2/silence/470b7116-8f06-4bb6-9e6c-6258aa92218e",
             data=None,
             headers={
                 "Content-Type": "application/json",
