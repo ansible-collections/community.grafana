@@ -1,24 +1,25 @@
-name: Check Grafana Releases
+name: Check and Update Grafana Releases
 
 on:
   schedule:
-    - cron:  '0 1 * * 0'
+    - cron: '0 1 * * 0'
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
-  check_grafana_releases:
+  check_and_update_releases:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
 
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v2
-
-      - name: Install ansible
+      - name: Install requirements
         run: pip install -r hacking/requirements.txt
 
       - name: Get the latest major releases of Grafana and update repo
@@ -27,11 +28,10 @@ jobs:
           sed -i "s/grafana_version:.*/grafana_version: $RELEASES_LIST/" .github/workflows/ansible-test.yml README.md
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v7
         with:
-            token: ${{ secrets.RREY_PAT }}
-            commit-message: Update tested Grafana versions
-            title: Bump Grafana versions
-            branch: auto-bump-grafana
-            reviewers: rrey
-            base: main
+          token: ${{ secrets.RREY_PAT }}
+          commit-message: "ci(deps): bump grafana versions"
+          title: "ci(deps): bump grafana versions"
+          branch: auto-bump-grafana
+          base: main
