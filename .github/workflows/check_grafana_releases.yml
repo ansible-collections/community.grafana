@@ -30,7 +30,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.RREY_PAT }}
+          token: ${{ secrets.PAT_NEMENTAL }}
           commit-message: "ci(deps): bump grafana versions"
           title: "ci(deps): bump grafana versions"
           branch: auto-bump-grafana
