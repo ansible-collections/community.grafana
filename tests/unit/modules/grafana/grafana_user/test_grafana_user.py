@@ -29,7 +29,10 @@ def set_module_args(args):
 
 def patch_module_args_compat(args: dict, run_test_fn):
     """Patches module arguments in a version-compatible way and executes the test logic."""
-    if version.parse(ansible_version) > version.parse("2.18"):
+    if (
+        version.parse(ansible_version).base_version
+        >= version.parse("2.19").base_version
+    ):
         from ansible.module_utils.testing import patch_module_args
 
         with patch_module_args(args):
