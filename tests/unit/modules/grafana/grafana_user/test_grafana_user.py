@@ -3,9 +3,9 @@ from __future__ import absolute_import, division, print_function
 from unittest import TestCase
 from unittest.mock import call, patch
 from ansible_collections.community.grafana.plugins.modules import grafana_user
-from ansible.module_utils._text import to_bytes
 from ansible.module_utils import basic
 from ansible.module_utils.urls import basic_auth_header
+from contextlib import contextmanager
 import json
 
 __metaclass__ = type
@@ -44,10 +44,21 @@ class AnsibleFailJson(Exception):
     pass
 
 
+@contextmanager
 def set_module_args(args):
-    """prepare arguments so that they will be picked up during module creation"""
-    args = json.dumps({"ANSIBLE_MODULE_ARGS": args})
-    basic._ANSIBLE_ARGS = to_bytes(args)
+    """Context manager that sets module arguments for AnsibleModule"""
+
+    try:
+        from ansible.module_utils.testing import patch_module_args
+    except ImportError:
+        from ansible.module_utils._text import to_bytes
+
+        serialized_args = to_bytes(json.dumps({"ANSIBLE_MODULE_ARGS": args}))
+        with patch.object(basic, "_ANSIBLE_ARGS", serialized_args):
+            yield
+    else:
+        with patch_module_args(args):
+            yield
 
 
 def user_deleted_resp():
@@ -95,7 +106,7 @@ class GrafanaUserTest(TestCase):
         "ansible_collections.community.grafana.plugins.modules.grafana_user.fetch_url"
     )
     def test_create_user_existing_user(self, mock_fetch_url):
-        set_module_args(
+        with set_module_args(
             {
                 "url": "https://grafana.example.com",
                 "url_username": "admin",
@@ -106,38 +117,38 @@ class GrafanaUserTest(TestCase):
                 "password": "oups",
                 "state": "present",
             }
-        )
-        module = grafana_user.setup_module_object()
-        mock_fetch_url.return_value = user_already_exists_resp()
+        ):
+            module = grafana_user.setup_module_object()
+            mock_fetch_url.return_value = user_already_exists_resp()
 
-        grafana_iface = grafana_user.GrafanaUserInterface(module)
-        with self.assertRaises(AnsibleFailJson):
-            grafana_iface.create_user("Joker", "joker@gotham.com", "joker", "oups")
-            mock_fetch_url.assert_called_once_with(
-                module,
-                "https://grafana.example.com/api/admin/users",
-                data=json.dumps(
-                    {
-                        "name": "Joker",
-                        "email": "joker@gotham.com",
-                        "login": "joker",
-                        "password": "oups",
+            grafana_iface = grafana_user.GrafanaUserInterface(module)
+            with self.assertRaises(AnsibleFailJson):
+                grafana_iface.create_user("Joker", "joker@gotham.com", "joker", "oups")
+                mock_fetch_url.assert_called_once_with(
+                    module,
+                    "https://grafana.example.com/api/admin/users",
+                    data=json.dumps(
+                        {
+                            "name": "Joker",
+                            "email": "joker@gotham.com",
+                            "login": "joker",
+                            "password": "oups",
+                        },
+                        sort_keys=True,
+                    ),
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": self.authorization,
                     },
-                    sort_keys=True,
-                ),
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": self.authorization,
-                },
-                method="POST",
-            )
+                    method="POST",
+                )
 
     # create a new user
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_user.fetch_url"
     )
     def test_create_user_new_user(self, mock_fetch_url):
-        set_module_args(
+        with set_module_args(
             {
                 "url": "https://grafana.example.com",
                 "url_username": "admin",
@@ -148,72 +159,74 @@ class GrafanaUserTest(TestCase):
                 "password": "oups",
                 "state": "present",
             }
-        )
-        module = grafana_user.setup_module_object()
+        ):
+            module = grafana_user.setup_module_object()
 
-        mock_fetch_url.return_value = user_created_resp()
+            mock_fetch_url.return_value = user_created_resp()
 
-        expected_fetch_url_calls = [
-            # first call to create user
-            call(
-                module,
-                "https://grafana.example.com/api/admin/users",
-                data=json.dumps(
-                    {
-                        "name": "Robin",
-                        "email": "robin@gotham.com",
-                        "login": "robin",
-                        "password": "oups",
+            expected_fetch_url_calls = [
+                # first call to create user
+                call(
+                    module,
+                    "https://grafana.example.com/api/admin/users",
+                    data=json.dumps(
+                        {
+                            "name": "Robin",
+                            "email": "robin@gotham.com",
+                            "login": "robin",
+                            "password": "oups",
+                        },
+                        sort_keys=True,
+                    ),
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": self.authorization,
                     },
-                    sort_keys=True,
+                    method="POST",
                 ),
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": self.authorization,
+                # second call to return created user
+                call(
+                    module,
+                    "https://grafana.example.com/api/users/lookup?loginOrEmail=robin",
+                    data=None,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": self.authorization,
+                    },
+                    method="GET",
+                ),
+            ]
+
+            grafana_iface = grafana_user.GrafanaUserInterface(module)
+            result = grafana_iface.create_user(
+                "Robin", "robin@gotham.com", "robin", "oups"
+            )
+
+            mock_fetch_url.assert_has_calls(expected_fetch_url_calls, any_order=False)
+
+            self.assertEqual(
+                result,
+                {
+                    "id": 2,
+                    "email": "robin@gotham.com",
+                    "name": "Robin",
+                    "login": "adrobinmin",
+                    "theme": "light",
+                    "orgId": 1,
+                    "isGrafanaAdmin": False,
+                    "isDisabled": False,
+                    "isExternal": False,
+                    "authLabels": None,
+                    "updatedAt": "2019-09-25T14:44:37+01:00",
+                    "createdAt": "2019-09-25T14:44:37+01:00",
                 },
-                method="POST",
-            ),
-            # second call to return created user
-            call(
-                module,
-                "https://grafana.example.com/api/users/lookup?loginOrEmail=robin",
-                data=None,
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": self.authorization,
-                },
-                method="GET",
-            ),
-        ]
-
-        grafana_iface = grafana_user.GrafanaUserInterface(module)
-        result = grafana_iface.create_user("Robin", "robin@gotham.com", "robin", "oups")
-
-        mock_fetch_url.assert_has_calls(expected_fetch_url_calls, any_order=False)
-
-        self.assertEqual(
-            result,
-            {
-                "id": 2,
-                "email": "robin@gotham.com",
-                "name": "Robin",
-                "login": "adrobinmin",
-                "theme": "light",
-                "orgId": 1,
-                "isGrafanaAdmin": False,
-                "isDisabled": False,
-                "isExternal": False,
-                "authLabels": None,
-                "updatedAt": "2019-09-25T14:44:37+01:00",
-                "createdAt": "2019-09-25T14:44:37+01:00",
-            },
-        )
+            )
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_user.fetch_url"
     )
     def test_delete_user(self, mock_fetch_url):
-        set_module_args(
+        with set_module_args(
             {
                 "url": "https://grafana.example.com",
                 "url_username": "admin",
@@ -221,21 +234,21 @@ class GrafanaUserTest(TestCase):
                 "login": "batman",
                 "state": "absent",
             }
-        )
-        module = grafana_user.setup_module_object()
-        mock_fetch_url.return_value = user_deleted_resp()
+        ):
+            module = grafana_user.setup_module_object()
+            mock_fetch_url.return_value = user_deleted_resp()
 
-        grafana_iface = grafana_user.GrafanaUserInterface(module)
-        user_id = 42
-        result = grafana_iface.delete_user(user_id)
-        mock_fetch_url.assert_called_once_with(
-            module,
-            "https://grafana.example.com/api/admin/users/42",
-            data=None,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": self.authorization,
-            },
-            method="DELETE",
-        )
-        self.assertEqual(result, {"message": "User deleted"})
+            grafana_iface = grafana_user.GrafanaUserInterface(module)
+            user_id = 42
+            result = grafana_iface.delete_user(user_id)
+            mock_fetch_url.assert_called_once_with(
+                module,
+                "https://grafana.example.com/api/admin/users/42",
+                data=None,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": self.authorization,
+                },
+                method="DELETE",
+            )
+            self.assertEqual(result, {"message": "User deleted"})
