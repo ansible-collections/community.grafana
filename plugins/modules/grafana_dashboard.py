@@ -363,21 +363,15 @@ def grafana_create_dashboard(module, data):
     headers = grafana_headers(module, data)
 
     grafana_version = get_grafana_version(module, data["url"], headers)
+
     if grafana_version < 5:
-        if data.get("slug"):
-            uid = data["slug"]
-        elif "meta" in payload and "slug" in payload["meta"]:
-            uid = payload["meta"]["slug"]
-        else:
-            raise GrafanaMalformedJson("No slug found in json. Needed with grafana < 5")
+        uid = data.get("slug") or payload.get("meta", {}).get("slug")
+        if not uid:
+            raise GrafanaMalformedJson("No slug found in JSON. Needed with Grafana < 5")
     else:
+        uid = data.get("uid") or payload.get("dashboard", {}).get("uid")
         if data.get("uid"):
-            uid = data["uid"]
             payload["dashboard"]["uid"] = data["uid"]
-        elif "uid" in payload["dashboard"]:
-            uid = payload["dashboard"]["uid"]
-        else:
-            uid = None
 
     result = {}
 
