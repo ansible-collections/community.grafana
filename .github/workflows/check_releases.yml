@@ -1,0 +1,46 @@
+name: Check and Update Releases
+
+on:
+  schedule:
+    - cron: '0 1 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check_and_update_releases:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [grafana, ansible]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+
+      - name: Install requirements
+        run: pip install -r hacking/requirements.txt
+
+      - name: Get the latest major releases and update repo
+        run: |
+          RELEASES_LIST="$(python3 hacking/find_versions.py ${{ matrix.target }})"
+
+          if [[ "${{ matrix.target }}" == "grafana" ]]; then
+            sed -i "s/grafana_version:.*/grafana_version: $RELEASES_LIST/" .github/workflows/ansible-test.yml README.md
+          elif [[ "${{ matrix.target }}" == "ansible" ]]; then
+            sed -i "s/ansible_version:.*/ansible_version: $RELEASES_LIST/" .github/workflows/ansible-test.yml README.md
+          fi
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.PAT_NEMENTAL }}
+          commit-message: "ci(deps): bump ${{ matrix.target }} versions"
+          title: "ci(deps): bump ${{ matrix.target }} versions"
+          branch: auto-bump-${{ matrix.target }}
+          base: main
