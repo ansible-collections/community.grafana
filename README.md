@@ -1,6 +1,8 @@
 # Grafana Collection for Ansible
 
-![](https://github.com/ansible-collections/grafana/workflows/CI/badge.svg?branch=master)
+[![Lint](https://github.com/ansible-collections/community.grafana/actions/workflows/lint.yml/badge.svg)](https://github.com/ansible-collections/community.grafana/actions/workflows/lint.yml)
+[![CI](https://github.com/ansible-collections/community.grafana/actions/workflows/ansible-test.yml/badge.svg)](https://github.com/ansible-collections/community.grafana/actions/workflows/ansible-test.yml)
+[![Check and Update Releases](https://github.com/ansible-collections/community.grafana/actions/workflows/check_releases.yml/badge.svg)](https://github.com/ansible-collections/community.grafana/actions/workflows/check_releases.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.grafana)](https://codecov.io/gh/ansible-collections/community.grafana)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
@@ -27,32 +29,34 @@ For more information about communication, see the [Ansible communication guide](
 
 Click on the name of a plugin or module to view that content's documentation:
 
-  - **Connection Plugins**:
-  - **Filter Plugins**:
-  - **Inventory Source**:
-  - **Callback Plugins**:
-    - [grafana_annotations](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_annotations_callback.html)
-  - **Lookup Plugins**:
-    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_lookup.html)
-  - **Modules**:
-    - [grafana_dashboard](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html)
-    - [grafana_datasource](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html)
-    - [grafana_folder](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html)
-    - [grafana_notification_channel](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_notification_channel_module.html)
-    - [grafana_contact_point](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_contact_point_module.html)
-    - [grafana_organization](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_module.html)
-    - [grafana_organization_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_user_module.html)
-    - [grafana_plugin](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_plugin_module.html)
-    - [grafana_team](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
-    - [grafana_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)
-    - [grafana_silence](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_silence_module.html)
+* **Connection Plugins**:
+* **Filter Plugins**:
+* **Inventory Source**:
+* **Callback Plugins**:
+  * [grafana_annotations](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_annotations_callback.html)
+* **Lookup Plugins**:
+  * [grafana_dashboard](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_lookup.html)
+* **Modules**:
+  * [grafana_dashboard](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html)
+  * [grafana_datasource](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_datasource_module.html)
+  * [grafana_folder](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_folder_module.html)
+  * [grafana_notification_channel](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_notification_channel_module.html)
+  * [grafana_contact_point](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_contact_point_module.html)
+  * [grafana_organization](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_module.html)
+  * [grafana_organization_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_user_module.html)
+  * [grafana_plugin](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_plugin_module.html)
+  * [grafana_team](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_team_module.html)
+  * [grafana_user](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_user_module.html)
+  * [grafana_silence](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_silence_module.html)
 
-## Supported Grafana versions
+## Supported Versions
 
-We aim at keeping the last 3 Major versions of Grafana tested.
-This collection is currently testing the modules against following versions of Grafana:
-```
+We aim to keep the last 3 major versions of both **Grafana** and **Ansible** tested.
+This collection is currently testing the modules against the following versions:
+
+```yaml
 grafana_version: ["11.6.0", "10.4.17", "9.5.20"]
+ansible_version: ["devel", "stable-2.18", "stable-2.17"]
 ```
 
 ## Installation and Usage
@@ -101,8 +105,7 @@ For documentation on how to use individual modules and other content included in
 
 ### Using module group defaults
 
-In your playbooks, you can set [module defaults](https://github.com/ansible/ansible/blob/v2.12.3/docs/docsite/rst/user_guide/playbooks_module_defaults.rst#module-defaults-groups) for the `community.grafana.grafana` group to avoid repeating the same parameters (e.g., `grafana_url`, `grafana_user`, `grafana_password`) in your tasks: 
-
+In your playbooks, you can set [module defaults](https://github.com/ansible/ansible/blob/v2.12.3/docs/docsite/rst/user_guide/playbooks_module_defaults.rst#module-defaults-groups) for the `community.grafana.grafana` group to avoid repeating the same parameters (e.g., `grafana_url`, `grafana_user`, `grafana_password`) in your tasks:
 
 ```yaml
 ---
@@ -126,7 +129,7 @@ In your playbooks, you can set [module defaults](https://github.com/ansible/ansi
         database: "telegraf"
         time_interval: ">10s"
         tls_ca_cert: "/etc/ssl/certs/ca.pem"
-    
+
     - name: Create or update a Grafana user
       community.grafana.grafana_user:
         name: "Bruce Wayne"
@@ -160,6 +163,7 @@ The current process for creating a tag is manual.
 ## Changelogs
 
 Abstract from Ansible requirements for Collections:
+
 ```
 * Every change that does not only affect docs or tests must have a changelog fragment.
   * Exception: fixing/extending a feature that already has a changelog fragment and has not yet been released. Such PRs must always link to the original PR(s) they update.
@@ -177,10 +181,12 @@ Since everything adding to the minor/patch changelogs are backports, the same ch
 See [antsibull-changelog documentation](https://github.com/ansible-community/antsibull-changelog/blob/main/docs/changelogs.rst#changelog-fragment-categories) for fragments format.
 
 Generate a new changelog:
+
 1. Update the collection version in `galaxy.yml` if required.
 2. Generate the changelog:
-```
-$ antsibull-changelog release
+
+```shell
+antsibull-changelog release
 ```
 
 ## License
@@ -192,6 +198,7 @@ See LICENCE to see the full text.
 ## Contributing
 
 Any contribution is welcome and we only ask contributors to:
+
 * Provide *at least* integration tests for any contribution.
 * The Pull Request *MUST* contain a changelog fragment. See [Ansible documentation](https://docs.ansible.com/ansible/latest/community/development_process.html#creating-a-changelog-fragment) about fragments.
 * Create an issue for any significant contribution that would change a large portion of the code base.
