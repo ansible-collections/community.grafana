@@ -61,8 +61,13 @@ options:
   ends_at:
     description:
       - ISO 8601 Timestamp with milliseconds  e.g. "2029-07-29T08:45:45.000Z" when the silence will end.
+      - Mutually exclusive with C(duration).
     type: str
-    required: true
+  duration:
+    description:
+      - Duration for the silence in ISO 8601 duration format e.g. "PT10M" for 10 minutes.
+      - Mutually exclusive with C(ends_at).
+    type: str
   matchers:
     description:
       - List of matchers to select which alerts are affected by the silence.
@@ -75,6 +80,10 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
+  id:
+    description:
+      - The id of the silence.
+    type: str
   skip_version_check:
     description:
       - Skip Grafana version check and try to reach api endpoint anyway.
@@ -89,14 +98,14 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 ---
-- name: Create a silence
+- name: Create a silence with duration
   community.grafana.grafana_silence:
     grafana_url: "https://grafana.example.com"
     grafana_api_key: "{{ some_api_token_value }}"
-    comment: "a testcomment"
+    comment: "a test comment"
     created_by: "me"
     starts_at: "2029-07-29T08:45:45.000Z"
-    ends_at: "2029-07-29T08:55:45.000Z"
+    duration: "PT10M"
     matchers:
       - isEqual: true
         isRegex: true
@@ -104,11 +113,26 @@ EXAMPLES = """
         value: test
     state: present
 
-- name: Delete a silence
+- name: Delete silence with duration without specifying id
   community.grafana.grafana_silence:
     grafana_url: "https://grafana.example.com"
     grafana_api_key: "{{ some_api_token_value }}"
-    comment: "a testcomment"
+    comment: "a test comment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    duration: "PT10M"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    state: absent
+
+- name: Delete silence without specifying id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a test comment"
     created_by: "me"
     starts_at: "2029-07-29T08:45:45.000Z"
     ends_at: "2029-07-29T08:55:45.000Z"
@@ -117,6 +141,29 @@ EXAMPLES = """
         isRegex: true
         name: environment
         value: test
+    state: absent
+
+- name: Create a silence with specified id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    comment: "a test comment"
+    created_by: "me"
+    starts_at: "2029-07-29T08:45:45.000Z"
+    ends_at: "2029-07-29T08:55:45.000Z"
+    matchers:
+      - isEqual: true
+        isRegex: true
+        name: environment
+        value: test
+    id: "custom-silence-id"
+    state: present
+
+- name: Delete a silence by id
+  community.grafana.grafana_silence:
+    grafana_url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    id: "custom-silence-id"
     state: absent
 """
 
@@ -178,6 +225,7 @@ silence:
 """
 
 import json
+from datetime import datetime, timedelta
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
@@ -279,15 +327,8 @@ class GrafanaSilenceInterface(object):
             return {"major": int(major), "minor": int(minor), "rev": int(rev)}
         raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
-    def create_silence(self, comment, created_by, starts_at, ends_at, matchers):
+    def create_silence(self, silence):
         url = "/api/alertmanager/grafana/api/v2/silences"
-        silence = dict(
-            comment=comment,
-            createdBy=created_by,
-            endsAt=ends_at,
-            matchers=matchers,
-            startsAt=starts_at,
-        )
         response = self._send_request(
             url, data=silence, headers=self.headers, method="POST"
         )
@@ -296,33 +337,25 @@ class GrafanaSilenceInterface(object):
             response.pop("id", None)
         return response
 
-    def get_silence(self, comment, created_by, starts_at, ends_at, matchers):
-        url = "/api/alertmanager/grafana/api/v2/silences"
+    def get_silence(self, silence):
+        if silence["silenceID"]:
+            url = "/api/alertmanager/grafana/api/v2/silence/%s" % silence["silenceID"]
+            response = self._send_request(url, headers=self.headers, method="GET")
+            return response
+        else:
+            url = "/api/alertmanager/grafana/api/v2/silences"
+            response = self._send_request(url, headers=self.headers, method="GET")
 
-        responses = self._send_request(url, headers=self.headers, method="GET")
-
-        for response in responses:
-            if (
-                response["comment"] == comment
-                and response["createdBy"] == created_by
-                and response["startsAt"] == starts_at
-                and response["endsAt"] == ends_at
-                and response["matchers"] == matchers
-            ):
-                return response
-        return None
-
-    def get_silence_by_id(self, silence_id):
-        url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
-            SilenceId=silence_id
-        )
-        response = self._send_request(url, headers=self.headers, method="GET")
-        return response
-
-    def get_silences(self):
-        url = "/api/alertmanager/grafana/api/v2/silences"
-        response = self._send_request(url, headers=self.headers, method="GET")
-        return response
+            for resp in response:
+                if (
+                    resp["comment"] == silence["comment"]
+                    and resp["createdBy"] == silence["createdBy"]
+                    and resp["startsAt"] == silence["startsAt"]
+                    and resp["endsAt"] == silence["endsAt"]
+                    and resp["matchers"] == silence["matchers"]
+                ):
+                    return resp
+            return None
 
     def delete_silence(self, silence_id):
         url = "/api/alertmanager/grafana/api/v2/silence/{SilenceId}".format(
@@ -337,7 +370,10 @@ def setup_module_object():
         argument_spec=argument_spec,
         supports_check_mode=False,
         required_together=base.grafana_required_together(),
-        mutually_exclusive=base.grafana_mutually_exclusive(),
+        mutually_exclusive=base.grafana_mutually_exclusive()
+        + [
+            ["ends_at", "duration"],
+        ],
     )
     return module
 
@@ -346,7 +382,9 @@ argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     comment=dict(type="str", required=True),
     created_by=dict(type="str", required=True),
-    ends_at=dict(type="str", required=True),
+    duration=dict(type="str"),
+    ends_at=dict(type="str"),
+    id=dict(type="str"),
     matchers=dict(type="list", elements="dict", required=True),
     org_id=dict(default=1, type="int"),
     org_name=dict(type="str"),
@@ -356,29 +394,58 @@ argument_spec.update(
 )
 
 
+def parse_iso8601_duration(duration):
+    # Remove the leading 'P' and split days ('D'), hours ('H'), minutes ('M')
+    duration = duration[1:]  # Remove 'P'
+    days, time = duration.split("T") if "T" in duration else (None, duration)
+
+    days = int(days[:-1]) if days and "D" in days else 0
+    hours = int(time.split("H")[0][:-1]) if "H" in time else 0
+    minutes = int(time.split("M")[0][-1:]) if "M" in time else 0
+
+    return timedelta(days=days, hours=hours, minutes=minutes)
+
+
 def main():
     module = setup_module_object()
-    comment = module.params["comment"]
-    created_by = module.params["created_by"]
-    ends_at = module.params["ends_at"]
-    matchers = module.params["matchers"]
-    starts_at = module.params["starts_at"]
-    state = module.params["state"]
-
+    grafana_iface = GrafanaSilenceInterface(module)
     changed = False
     failed = False
-    grafana_iface = GrafanaSilenceInterface(module)
 
-    silence = grafana_iface.get_silence(
-        comment, created_by, starts_at, ends_at, matchers
-    )
+    silence_payload = {
+        "comment": module.params.get("comment"),
+        "createdBy": module.params.get("created_by"),
+        "matchers": module.params.get("matchers"),
+        "startsAt": module.params.get("starts_at"),
+        "silenceID": module.params.get("silence_id"),
+    }
+
+    state = module.params.get("state")
+
+    if module.params.get("ends_at"):
+        silence_payload["endsAt"] = module.params.get("ends_at")
+    elif module.params.get("duration"):
+        starts_at = module.params.get("starts_at")
+        duration = module.params.get("duration")
+
+        # Parse starts_at into datetime object
+        starts_at_dt = datetime.strptime(starts_at, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+        # Parse ISO 8601 duration into timedelta
+        duration_timedelta = parse_iso8601_duration(duration)
+
+        # Calculate ends_at
+        ends_at_dt = starts_at_dt + duration_timedelta
+
+        # Format ends_at as ISO 8601
+        silence_payload["endsAt"] = ends_at_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+    silence = grafana_iface.get_silence(silence_payload)
 
     if state == "present":
         if not silence:
-            silence = grafana_iface.create_silence(
-                comment, created_by, starts_at, ends_at, matchers
-            )
-            silence = grafana_iface.get_silence_by_id(silence["silenceID"])
+            silence = grafana_iface.create_silence(silence_payload)
+            silence = grafana_iface.get_silence(silence_payload)
             changed = True
         else:
             module.exit_json(
