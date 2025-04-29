@@ -39,7 +39,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.PAT_NEMENTAL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "ci(deps): bump ${{ matrix.target }} versions"
           title: "ci(deps): bump ${{ matrix.target }} versions"
           branch: auto-bump-${{ matrix.target }}
