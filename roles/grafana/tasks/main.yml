@@ -328,6 +328,7 @@
         dashboard_id: "{{ dashboard.dashboard_id | default(omit) }}"
         dashboard_revision: "{{ dashboard.dashboard_revision | default(omit) }}"
         folder: "{{ dashboard.folder | default(omit) }}"
+        parent_folder: "{{ dashboard.parent_folder | default(omit) }}"
         org_id: "{{ dashboard.org_id | default(omit) }}"
         org_name: "{{ dashboard.org_name | default(omit) }}"
         overwrite: "{{ dashboard.overwrite | default(omit) }}"
