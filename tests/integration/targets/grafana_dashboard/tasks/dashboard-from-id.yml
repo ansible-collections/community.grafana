@@ -70,7 +70,7 @@
       - dfi_result4.uid == 'dfi'
       - dfi_result4.msg == 'Dashboard Node Exporter Full unchanged.'
 
-# - ansible.builtin.include_tasks:
-#     file: delete-dashboard.yml
-#   vars:
-#     uid_to_delete: '{{ dfi_result4.uid }}'
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml
+  vars:
+    uid_to_delete: '{{ dfi_result4.uid }}'
