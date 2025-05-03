@@ -52,7 +52,8 @@ options:
   uid:
     version_added: "1.0.0"
     description:
-      - uid of the dashboard to export when C(state) is C(export) or C(absent).
+      - Used to identify the dashboard when C(state) is C(export) or C(absent).
+      - When C(state) is C(present), this can be used to set the UID during dashboard creation.
     type: str
   path:
     description:
