@@ -1,8 +1,7 @@
 ---
-- name: Create Dashboard from file | check mode | folder does not exist
+- name: Create Dashboard Folder Destination | check mode | folder does not exist
   community.grafana.grafana_dashboard:
     state: present
-    commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
     folder: inexistent
@@ -15,10 +14,9 @@
       - dfff_result1.changed == false
       - "dfff_result1.msg == 'error : Dashboard folder \\'inexistent\\' does not exist.'"
 
-- name: Create Dashboard from file | run mode | folder does not exist
+- name: Create Dashboard Folder Destination | run mode | folder does not exist
   community.grafana.grafana_dashboard:
     state: present
-    commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
     folder: inexistent
@@ -31,68 +29,64 @@
       - dfff_result2.changed == false
       - "dfff_result2.msg == 'error : Dashboard folder \\'inexistent\\' does not exist.'"
 
-- name: Create a dashboard in a folder
-  block:
-    - name: Create the original folder
-      community.grafana.grafana_folder:
-        title: parent_folder
-        state: present
-        url: "{{ grafana_url }}"
-        url_username: "{{ grafana_username }}"
-        url_password: "{{ grafana_password }}"
-      register: parent_folder
+- name: Create Dashboard Folder Destination | run mode | create parent folder
+  community.grafana.grafana_folder:
+    title: Parent
+    uid: parent_folder
+    state: present
+  check_mode: false
+  register: dfff_result_folder1
 
-    - name: Create the dashboard in the folder
-      community.grafana.grafana_dashboard:
-        grafana_url: "{{ grafana_url }}"
-        grafana_user: "{{ grafana_username }}"
-        grafana_password: "{{ grafana_password }}"
-        state: present
-        commit_message: Updated by ansible
-        path: /tmp/dashboard.json
-        overwrite: true
-        folder: parent_folder
-      check_mode: false
-      register: diff_result3
-      ignore_errors: true
-    - ansible.builtin.assert:
-        that:
-          - diff_result3.failed == false
-          - diff_result3.changed == true
+- name: Create Dashboard Folder Destination | run mode | create in parent folder
+  community.grafana.grafana_dashboard:
+    state: present
+    path: /tmp/dashboard.json
+    overwrite: true
+    folder: "{{ dfff_result_folder1.folder.uid }}"
+  check_mode: false
+  register: dfff_result3
+- ansible.builtin.assert:
+    that:
+      - dfff_result3.failed == false
+      - dfff_result3.changed == true
+      - dfff_result3.msg == 'Dashboard test created'
 
-- name: Create a dashboard in a subfolder
-  block:
-    - name: Create the subfolder
-      community.grafana.grafana_folder:
-        title: sub_folder
-        parent_uid: "{{ parent_folder.folder.uid }}"
-        state: present
-        url: "{{ grafana_url }}"
-        url_username: "{{ grafana_username }}"
-        url_password: "{{ grafana_password }}"
-      register: sub_folder
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml
+  vars:
+    uid_to_delete: '{{ dfff_result3.uid }}'
 
-    - name: Create the dashboard in the subfolder
-      community.grafana.grafana_dashboard:
-        grafana_url: "{{ grafana_url }}"
-        grafana_user: "{{ grafana_username }}"
-        grafana_password: "{{ grafana_password }}"
-        state: present
-        commit_message: Updated by ansible
-        path: /tmp/dashboard.json
-        overwrite: true
-        folder: sub_folder
-        parent_uid: "{{ parent_folder.folder.uid }}"
-      check_mode: false
-      register: diff_result4
-      ignore_errors: true
-    - ansible.builtin.assert:
-        that:
-          - diff_result4.failed == false
-          - diff_result4.changed == true
-  rescue:
-    - name: Skip if we are running an older version of Grafana
-      ansible.builtin.assert:
-        that:
-          - sub_folder.msg | default ('') == 'Subfolder API is available starting Grafana v11'
-        fail_msg: "Failed to create dashboard in subfolder, for a separate reason than using an older Grafana. See above."
+- name: Create Dashboard Folder Destination | run mode | create subfolder
+  community.grafana.grafana_folder:
+    title: Subfolder
+    uid: sub_folder
+    parent_uid: "{{ dfff_result_folder1.folder.uid }}"
+    state: present
+  check_mode: false
+  register: dfff_result_folder2
+
+- name: Create Dashboard Folder Destination | run mode | create in subfolder
+  community.grafana.grafana_dashboard:
+    state: present
+    path: /tmp/dashboard.json
+    overwrite: true
+    folder: "{{ dfff_result_folder2.folder.uid }}"
+    parent_folder: "{{ dfff_result_folder1.folder.uid }}"
+  check_mode: false
+  register: dfff_result4
+- ansible.builtin.assert:
+    that:
+      - dfff_result4.failed == false
+      - dfff_result4.changed == true
+      - dfff_result4.msg == 'Dashboard test created'
+
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml
+  vars:
+    uid_to_delete: '{{ dfff_result4.uid }}'
+
+- name: Create Dashboard Folder Destination | run mode | delete folders recursive
+  check_mode: false
+  community.grafana.grafana_folder:
+    name: "{{ dfff_result_folder1.folder.title }}"
+    state: absent
