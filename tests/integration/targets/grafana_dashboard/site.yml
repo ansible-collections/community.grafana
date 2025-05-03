@@ -4,10 +4,11 @@
   vars_files:
     - defaults/main.yml
   module_defaults:
-    community.grafana.grafana_dashboard:
+    community.grafana.grafana_dashboard: &grafana_module_defaults
       grafana_url: "{{ grafana_url }}"
       grafana_user: "{{ grafana_username }}"
       grafana_password: "{{ grafana_password }}"
+    community.grafana.grafana_folder: *grafana_module_defaults
   tasks:
     - ansible.builtin.include_role:
         name: ../../grafana_dashboard
