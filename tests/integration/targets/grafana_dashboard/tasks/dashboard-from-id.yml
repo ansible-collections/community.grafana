@@ -3,9 +3,10 @@
   community.grafana.grafana_dashboard:
     state: present
     commit_message: Updated by ansible
-    dashboard_id: "6098"
+    dashboard_id: "1860"
     dashboard_revision: "1"
     overwrite: true
+    uid: "dfi"
   check_mode: true
   register: dfi_result1
 - ansible.builtin.assert:
@@ -13,60 +14,63 @@
       - dfi_result1.failed == false
       - dfi_result1.changed == true
       - dfi_result1.uid is not defined
-      - dfi_result1.msg == 'Dashboard Zabbix Host Status will be created'
+      - dfi_result1.msg == 'Dashboard Node Exporter Full will be created'
 
 - name: Create Dashboard from ID | run mode | dashboard does not exist
   community.grafana.grafana_dashboard:
     state: present
     commit_message: Updated by ansible
-    dashboard_id: "6098"
+    dashboard_id: "1860"
     dashboard_revision: "1"
     overwrite: true
+    uid: "dfi"
   check_mode: false
   register: dfi_result2
 - ansible.builtin.assert:
     that:
       - dfi_result2.failed == false
       - dfi_result2.changed == true
-      - dfi_result2.uid is defined
-      - dfi_result2.uid is string
-      - dfi_result2.msg == 'Dashboard Zabbix Host Status created'
+      - dfi_result2.uid is truthy
+      - dfi_result2.uid == 'dfi'
+      - dfi_result2.msg == 'Dashboard Node Exporter Full created'
 
 - name: Create Dashboard from ID | check mode | dashboard exists
   community.grafana.grafana_dashboard:
     state: present
     commit_message: Updated by ansible
-    dashboard_id: "6098"
+    dashboard_id: "1860"
     dashboard_revision: "1"
     overwrite: true
+    uid: "dfi"
   check_mode: true
   register: dfi_result3
 - ansible.builtin.assert:
     that:
       - dfi_result3.failed == false
       - dfi_result3.changed == false
-      - dfi_result3.uid is defined
-      - dfi_result3.uid is string
-      - dfi_result3.msg == 'Dashboard Zabbix Host Status unchanged.'
+      - dfi_result3.uid is truthy
+      - dfi_result3.uid == 'dfi'
+      - dfi_result3.msg == 'Dashboard Node Exporter Full unchanged.'
 
 - name: Create Dashboard from ID | run mode | dashboard exists
   community.grafana.grafana_dashboard:
     state: present
     commit_message: Updated by ansible
-    dashboard_id: "6098"
+    dashboard_id: "1860"
     dashboard_revision: "1"
     overwrite: true
+    uid: "dfi"
   check_mode: false
   register: dfi_result4
 - ansible.builtin.assert:
     that:
       - dfi_result4.failed == false
       - dfi_result4.changed == false
-      - dfi_result4.uid is defined
-      - dfi_result4.uid is string
-      - dfi_result4.msg == 'Dashboard Zabbix Host Status unchanged.'
+      - dfi_result4.uid is truthy
+      - dfi_result4.uid == 'dfi'
+      - dfi_result4.msg == 'Dashboard Node Exporter Full unchanged.'
 
-- ansible.builtin.include_tasks:
-    file: delete-dashboard.yml
-  vars:
-    uid_to_delete: '{{ dfi_result4.uid }}'
+# - ansible.builtin.include_tasks:
+#     file: delete-dashboard.yml
+#   vars:
+#     uid_to_delete: '{{ dfi_result4.uid }}'
