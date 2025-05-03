@@ -356,6 +356,7 @@ releases:
       bugfixes:
       - Remove field `apiVersion` from return of current `grafana_datasource` for
         working diff
+      - grafana_dashboard - add uid to payload
       - 'test: replace more deprecated `TestCase.assertEquals` to support Python 3.12'
       minor_changes:
       - Add argument `tls_servername` for `grafana_datasource`
@@ -367,4 +368,8 @@ releases:
     - 396-datasource-diff-apiversion.yml
     - 397-improve-datasource-tests.yml
     - 406-python3.12.yml
+    - 416-dashboard-uid.yml
+    - 419-fix-ansible-tests.yml
+    - 421-grafana-workflow.yml
+    - 425-check-releases-add-ansible.yml
     release_date: '2025-04-23'
