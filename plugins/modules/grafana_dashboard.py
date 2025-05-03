@@ -263,7 +263,7 @@ def grafana_folder_exists(module, grafana_url, folder_name, parent_folder, heade
         folders = json.loads(r.read())
 
         for folder in folders:
-            if folder["title"] == folder_name:
+            if folder_name in (folder["title"], folder["uid"]):
                 return True, folder["id"]
     except Exception as e:
         raise GrafanaAPIException(e)
