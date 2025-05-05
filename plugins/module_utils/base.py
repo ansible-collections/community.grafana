@@ -18,6 +18,7 @@
 
 from __future__ import absolute_import, division, print_function
 from ansible.module_utils.urls import url_argument_spec
+from ansible.module_utils.six import string_types
 
 __metaclass__ = type
 
@@ -52,3 +53,8 @@ def grafana_required_together():
 
 def grafana_mutually_exclusive():
     return [["url_username", "grafana_api_key"]]
+
+def dict_str(value):
+    if isinstance(value, (dict, string_types)):
+        return value
+    raise TypeError
