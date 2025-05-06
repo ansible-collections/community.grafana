@@ -4,6 +4,23 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+v2.2.0
+======
+
+Minor Changes
+-------------
+
+- Add argument `tls_servername` for `grafana_datasource`
+- Support `alertmanager` as type for `grafana_datasource`
+- grafana_dashboard - allow creating dashboards in subfolders
+
+Bugfixes
+--------
+
+- Remove field `apiVersion` from return of current `grafana_datasource` for working diff
+- grafana_dashboard - add uid to payload
+- test: replace more deprecated `TestCase.assertEquals` to support Python 3.12
+
 v2.1.0
 ======
 

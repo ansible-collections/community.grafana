@@ -87,6 +87,7 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | org_id | no |
 | org_name | no |
 | overwrite | no |
+| parent_folder | no |
 | path | no |
 | slug | no |
 | state | no |

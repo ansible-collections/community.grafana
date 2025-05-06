@@ -1,8 +1,7 @@
 ---
-- name: Create Dashboard from file | check mode | folder does not exist
+- name: Create Dashboard Folder Destination | check mode | folder does not exist
   community.grafana.grafana_dashboard:
     state: present
-    commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
     folder: inexistent
@@ -15,10 +14,9 @@
       - dfff_result1.changed == false
       - "dfff_result1.msg == 'error : Dashboard folder \\'inexistent\\' does not exist.'"
 
-- name: Create Dashboard from file | run mode | folder does not exist
+- name: Create Dashboard Folder Destination | run mode | folder does not exist
   community.grafana.grafana_dashboard:
     state: present
-    commit_message: Updated by ansible
     path: /tmp/dashboard.json
     overwrite: true
     folder: inexistent
@@ -30,3 +28,77 @@
       - dfff_result2.failed == true
       - dfff_result2.changed == false
       - "dfff_result2.msg == 'error : Dashboard folder \\'inexistent\\' does not exist.'"
+
+- name: Create Dashboard Folder Destination | run mode | create parent folder
+  community.grafana.grafana_folder:
+    title: Parent
+    uid: parent_folder
+    state: present
+  check_mode: false
+  register: dfff_result_folder1
+
+- name: Create Dashboard Folder Destination | run mode | create in parent folder
+  community.grafana.grafana_dashboard:
+    state: present
+    path: /tmp/dashboard.json
+    overwrite: true
+    folder: "{{ dfff_result_folder1.folder.uid }}"
+  check_mode: false
+  register: dfff_result3
+- ansible.builtin.assert:
+    that:
+      - dfff_result3.failed == false
+      - dfff_result3.changed == true
+      - dfff_result3.msg == 'Dashboard test created'
+
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml
+  vars:
+    uid_to_delete: '{{ dfff_result3.uid }}'
+
+- name: Create Dashboard Folder Destination | run mode | check if v11 subfolder available
+  register: dfff_result_check_api
+  ignore_errors: true
+  check_mode: false
+  community.grafana.grafana_folder:
+    title: apitest
+    parent_uid: myparent
+    state: absent
+
+- name: Block for subfolder creation if api available
+  when: "dfff_result_check_api.msg | default('') != 'Subfolder API is available starting Grafana v11'"
+  block:
+    - name: Create Dashboard Folder Destination | run mode | create subfolder
+      community.grafana.grafana_folder:
+        title: Subfolder
+        uid: sub_folder
+        parent_uid: "{{ dfff_result_folder1.folder.uid }}"
+        state: present
+      check_mode: false
+      register: dfff_result_folder2
+
+    - name: Create Dashboard Folder Destination | run mode | create in subfolder
+      community.grafana.grafana_dashboard:
+        state: present
+        path: /tmp/dashboard.json
+        overwrite: true
+        folder: "{{ dfff_result_folder2.folder.uid }}"
+        parent_folder: "{{ dfff_result_folder1.folder.uid }}"
+      check_mode: false
+      register: dfff_result4
+    - ansible.builtin.assert:
+        that:
+          - dfff_result4.failed == false
+          - dfff_result4.changed == true
+          - dfff_result4.msg == 'Dashboard test created'
+
+    - ansible.builtin.include_tasks:
+        file: delete-dashboard.yml
+      vars:
+        uid_to_delete: '{{ dfff_result4.uid }}'
+
+- name: Create Dashboard Folder Destination | run mode | delete folders recursive
+  check_mode: false
+  community.grafana.grafana_folder:
+    name: "{{ dfff_result_folder1.folder.title }}"
+    state: absent
