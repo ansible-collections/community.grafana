@@ -796,14 +796,14 @@ class GrafanaInterface(object):
         self._send_request(url, data=data, headers=self.headers, method="POST")
 
     def plugin_exists(self, plugin_id):
-      url = "/api/plugins?type=datasource"
-      plugins = self._send_request(url, headers=self.headers, method="GET")
-      
-      for plugin in plugins:
-        if plugin["id"] == plugin_id:
-          return plugin["enabled"]
-      
-      return False
+        url = "/api/plugins?type=datasource"
+        plugins = self._send_request(url, headers=self.headers, method="GET")
+
+        for plugin in plugins:
+            if plugin["id"] == plugin_id:
+                return plugin["enabled"]
+
+        return False
 
 
 def setup_module_object():
@@ -949,21 +949,21 @@ def main():
     if state == "present":
         payload = get_datasource_payload(module.params, grafana_iface.org_id)
         if ds is None:
-          ds_type = module.params["ds_type"]
-          enabled = grafana_iface.plugin_exists(ds_type)
-          if not enabled:
-            module.fail_json(
-                failed=True, msg="Datasource type unknown: %s" % ds_type
-            )
-          else:
-            grafana_iface.create_datasource(payload)
-            ds = grafana_iface.datasource_by_name(name)
-            if ds.get("isDefault") != module.params["is_default"]:
-                grafana_iface.update_datasource(ds.get("id"), payload)
+            ds_type = module.params["ds_type"]
+            enabled = grafana_iface.plugin_exists(ds_type)
+            if not enabled:
+                module.fail_json(
+                    failed=True, msg="Datasource type unknown: %s" % ds_type
+                )
+            else:
+                grafana_iface.create_datasource(payload)
                 ds = grafana_iface.datasource_by_name(name)
-            module.exit_json(
-                changed=True, datasource=ds, msg="Datasource %s created" % name
-            )
+                if ds.get("isDefault") != module.params["is_default"]:
+                    grafana_iface.update_datasource(ds.get("id"), payload)
+                    ds = grafana_iface.datasource_by_name(name)
+                module.exit_json(
+                    changed=True, datasource=ds, msg="Datasource %s created" % name
+                )
         else:
             diff = compare_datasources(payload.copy(), ds.copy(), enforce_secure_data)
             if diff.get("before") == diff.get("after"):
