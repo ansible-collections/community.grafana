@@ -12,6 +12,7 @@ Minor Changes
 
 - Add argument `tls_servername` for `grafana_datasource`
 - Support `alertmanager` as type for `grafana_datasource`
+- grafana_dashboard - allow creating dashboards in subfolders
 
 Bugfixes
 --------
