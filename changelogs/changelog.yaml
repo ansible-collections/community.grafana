@@ -361,6 +361,7 @@ releases:
       minor_changes:
       - Add argument `tls_servername` for `grafana_datasource`
       - Support `alertmanager` as type for `grafana_datasource`
+      - grafana_dashboard - allow creating dashboards in subfolders
     fragments:
     - 0-readme.yml
     - 287-alertmanager-datasource.yml
@@ -368,6 +369,7 @@ releases:
     - 396-datasource-diff-apiversion.yml
     - 397-improve-datasource-tests.yml
     - 406-python3.12.yml
+    - 411-dashboard-subfolders.yml
     - 416-dashboard-uid.yml
     - 419-fix-ansible-tests.yml
     - 421-grafana-workflow.yml
