@@ -351,3 +351,27 @@ releases:
     - 392-dashboard-lookup-apikey.yml
     - patch-1.yaml
     release_date: '2024-08-08'
+  2.2.0:
+    changes:
+      bugfixes:
+      - Remove field `apiVersion` from return of current `grafana_datasource` for
+        working diff
+      - grafana_dashboard - add uid to payload
+      - 'test: replace more deprecated `TestCase.assertEquals` to support Python 3.12'
+      minor_changes:
+      - Add argument `tls_servername` for `grafana_datasource`
+      - Support `alertmanager` as type for `grafana_datasource`
+      - grafana_dashboard - allow creating dashboards in subfolders
+    fragments:
+    - 0-readme.yml
+    - 287-alertmanager-datasource.yml
+    - 395-datasource-tls-servername.yml
+    - 396-datasource-diff-apiversion.yml
+    - 397-improve-datasource-tests.yml
+    - 406-python3.12.yml
+    - 411-dashboard-subfolders.yml
+    - 416-dashboard-uid.yml
+    - 419-fix-ansible-tests.yml
+    - 421-grafana-workflow.yml
+    - 425-check-releases-add-ansible.yml
+    release_date: '2025-04-23'
