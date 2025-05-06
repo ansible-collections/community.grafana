@@ -54,6 +54,7 @@ def grafana_required_together():
 def grafana_mutually_exclusive():
     return [["url_username", "grafana_api_key"]]
 
+
 def dict_str(value):
     if isinstance(value, (dict, string_types)):
         return value

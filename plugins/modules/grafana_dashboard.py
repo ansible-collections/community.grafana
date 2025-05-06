@@ -89,7 +89,7 @@ options:
     description:
       - Grafana dashboard content.
       - Mutually exclusive with C(path) and C(dashboard_id).
-    version_added: "2.1.0"
+    version_added: "2.3.0"
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
