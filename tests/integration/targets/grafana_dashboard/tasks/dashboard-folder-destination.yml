@@ -37,7 +37,7 @@
   check_mode: false
   register: dfff_result_folder1
 
-- name: Create Dashboard Folder Destination | run mode | create in parent folder
+- name: Create Dashboard Folder Destination | run mode | create in parent folder | dashboard does not exist
   community.grafana.grafana_dashboard:
     state: present
     path: /tmp/dashboard.json
@@ -50,6 +50,20 @@
       - dfff_result3.failed == false
       - dfff_result3.changed == true
       - dfff_result3.msg == 'Dashboard test created'
+
+- name: Create Dashboard Folder Destination | run mode | create in parent folder | dashboard exists
+  community.grafana.grafana_dashboard:
+    state: present
+    path: /tmp/dashboard.json
+    overwrite: true
+    folder: "{{ dfff_result_folder1.folder.uid }}"
+  check_mode: false
+  register: dfff_result4
+- ansible.builtin.assert:
+    that:
+      - dfff_result4.failed == false
+      - dfff_result4.changed == false
+      - dfff_result4.msg == 'Dashboard test unchanged.'
 
 - ansible.builtin.include_tasks:
     file: delete-dashboard.yml
@@ -77,7 +91,7 @@
       check_mode: false
       register: dfff_result_folder2
 
-    - name: Create Dashboard Folder Destination | run mode | create in subfolder
+    - name: Create Dashboard Folder Destination | run mode | create in subfolder | dashboard does not exist
       community.grafana.grafana_dashboard:
         state: present
         path: /tmp/dashboard.json
@@ -85,12 +99,27 @@
         folder: "{{ dfff_result_folder2.folder.uid }}"
         parent_folder: "{{ dfff_result_folder1.folder.uid }}"
       check_mode: false
-      register: dfff_result4
+      register: dfff_result5
     - ansible.builtin.assert:
         that:
-          - dfff_result4.failed == false
-          - dfff_result4.changed == true
-          - dfff_result4.msg == 'Dashboard test created'
+          - dfff_result5.failed == false
+          - dfff_result5.changed == true
+          - dfff_result5.msg == 'Dashboard test created'
+
+    - name: Create Dashboard Folder Destination | run mode | create in subfolder | dashboard exists
+      community.grafana.grafana_dashboard:
+        state: present
+        path: /tmp/dashboard.json
+        overwrite: true
+        folder: "{{ dfff_result_folder2.folder.uid }}"
+        parent_folder: "{{ dfff_result_folder1.folder.uid }}"
+      check_mode: false
+      register: dfff_result6
+    - ansible.builtin.assert:
+        that:
+          - dfff_result6.failed == false
+          - dfff_result6.changed == false
+          - dfff_result6.msg == 'Dashboard test unchanged.'
 
     - ansible.builtin.include_tasks:
         file: delete-dashboard.yml
