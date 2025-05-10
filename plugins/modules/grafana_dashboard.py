@@ -329,15 +329,17 @@ def is_grafana_dashboard_changed(payload, dashboard):
     if "version" in dashboard["dashboard"]:
         del dashboard["dashboard"]["version"]
 
+    # if folderId is not provided in dashboard,
+    # try getting the folderId from the dashboard metadata,
+    # otherwise set the default folderId
+    if "folderId" not in dashboard:
+        dashboard["folderId"] = dashboard["meta"].get("folderId", 0)
+
     # remove meta key if exists for compare
     if "meta" in dashboard:
         del dashboard["meta"]
     if "meta" in payload:
         del payload["meta"]
-
-    # if folderId is not provided in dashboard, set default folderId
-    if "folderId" not in dashboard:
-        dashboard["folderId"] = 0
 
     # Ignore dashboard ids since real identifier is uuid
     if "id" in dashboard["dashboard"]:
