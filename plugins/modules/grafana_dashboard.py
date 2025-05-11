@@ -62,6 +62,12 @@ options:
       - Used to identify the dashboard when C(state) is C(export) or C(absent).
       - When C(state) is C(present), this can be used to set the UID during dashboard creation.
     type: str
+  name:
+    description:
+      - A new title to rename the imported Grafana dashboard to.
+    type: str
+    aliases: [ title ]
+    version_added: "2.3.0"
   path:
     description:
       - The path to the json file containing the Grafana dashboard to import or export.
@@ -393,6 +399,10 @@ def grafana_create_dashboard(module, data):
         if data.get("uid"):
             payload["dashboard"]["uid"] = data["uid"]
 
+    if data.get("name"):
+        # rename dashboard if user has provided a custom name
+        payload["dashboard"]["title"] = data["name"]
+
     result = {}
 
     # test if the folder exists
@@ -634,6 +644,7 @@ def main():
         folder=dict(type="str", default="General"),
         parent_folder=dict(type="str"),
         uid=dict(type="str"),
+        name=dict(type="str", aliases=["title"]),
         slug=dict(type="str"),
         path=dict(aliases=["dashboard_url"], type="str"),
         dashboard_id=dict(type="str"),
