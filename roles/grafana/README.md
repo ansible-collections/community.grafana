@@ -84,6 +84,7 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | dashboard_id | no |
 | dashboard_revision | no |
 | folder | no |
+| inputs | no |
 | org_id | no |
 | org_name | no |
 | overwrite | no |
