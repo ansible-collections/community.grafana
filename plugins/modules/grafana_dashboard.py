@@ -156,6 +156,7 @@ uid:
 """
 
 import json
+import yaml
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -380,13 +381,15 @@ def grafana_create_dashboard(module, data):
                 with open(data["path"], "r", encoding="utf-8") as json_file:
                     payload = json.load(json_file)
             except Exception as e:
-                raise GrafanaAPIException("Can't load json file %s" % to_native(e))
+                raise GrafanaAPIException("Can't load json file %s" % to_native(e)) from e
         else:
-            content = data["content"]
-            if type(content) == dict:
-                payload = content
-            else:
-                payload = json.loads(content)
+            try:
+                payload = json.loads(data["content"])
+            except json.JSONDecodeError as e:
+                try:
+                    payload = yaml.safe_load(data["content"])
+                except yaml.YAMLError:
+                    module.fail_json(msg=f"Invalid content data: {str(e)}")
 
     # Check that the dashboard JSON is nested under the 'dashboard' key
     if "dashboard" not in payload:
