@@ -301,8 +301,7 @@ class GrafanaFolderInterface(object):
         )
         version = response.get("version")
         if version is not None:
-            major, minor, rev = version.split(".")
-            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+            return base.parse_grafana_version(version)
         raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
     def create_folder(self, title, uid=None, parent_uid=None):

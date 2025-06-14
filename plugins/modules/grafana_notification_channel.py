@@ -436,6 +436,7 @@ from ansible.module_utils._text import to_text
 from ansible_collections.community.grafana.plugins.module_utils.base import (
     grafana_argument_spec,
     clean_url,
+    parse_grafana_version,
 )
 from ansible.module_utils.urls import basic_auth_header
 
@@ -653,8 +654,7 @@ class GrafanaNotificationChannelInterface(object):
         if info["status"] == 200:
             version = json.loads(to_text(r.read())).get("version")
             if version is not None:
-                major, minor, rev = version.split(".")
-                return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+                return parse_grafana_version(version)
         else:
             raise GrafanaAPIException("Failed to retrieve version: %s" % info)
 
