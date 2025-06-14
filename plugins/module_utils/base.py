@@ -52,3 +52,16 @@ def grafana_required_together():
 
 def grafana_mutually_exclusive():
     return [["url_username", "grafana_api_key"]]
+
+
+def parse_grafana_version(version):
+    version, sep, build_meta = version.partition("+")
+    version, sep, pre_release = version.partition("-")
+    major, minor, rev = version.split(".")
+    return {
+        "major": int(major),
+        "minor": int(minor),
+        "rev": int(rev),
+        "pre_release": pre_release,
+        "build_meta": build_meta,
+    }
