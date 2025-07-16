@@ -69,6 +69,21 @@ options:
     type: bool
     default: false
     version_added: "1.2.0"
+  org_id:
+    description:
+    - Grafana organization ID in which the team should be created.
+    - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+      belongs to one organization.
+    - Mutually exclusive with C(org_name).
+    default: 1
+    type: int
+  org_name:
+    description:
+    - Grafana organization name in which the team should be created.
+    - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+      belongs to one organization.
+    - Mutually exclusive with C(org_id).
+    type: str
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -185,18 +200,13 @@ class GrafanaError(Exception):
 class GrafanaTeamInterface(object):
     def __init__(self, module):
         self._module = module
+        self.grafana_url = base.clean_url(module.params.get("url"))
+
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        if module.params.get("grafana_api_key", None):
-            self.headers["Authorization"] = (
-                "Bearer %s" % module.params["grafana_api_key"]
-            )
-        else:
-            self.headers["Authorization"] = basic_auth_header(
-                module.params["url_username"], module.params["url_password"]
-            )
+        self.grafana_headers()
         # }}}
-        self.grafana_url = base.clean_url(module.params.get("url"))
+
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()
@@ -206,6 +216,53 @@ class GrafanaTeamInterface(object):
                 self._module.fail_json(
                     failed=True, msg="Teams API is available starting Grafana v5"
                 )
+
+    def grafana_switch_organisation(self, org_id):
+        r, info = fetch_url(
+            self._module,
+            "%s/api/user/using/%s" % (self.grafana_url, org_id),
+            headers=self.headers,
+            method="POST",
+        )
+
+        if info["status"] != 200:
+            self._module.fail_json(
+                failed=True,
+                msg="Unable to switch to organization %s : %s" % (org_id, info),
+            )
+
+    def organization_by_name(self, org_name):
+        url = "/api/user/orgs"
+        organizations = self._send_request(url, headers=self.headers, method="GET")
+        try:
+            orga = next((org for org in organizations if org["name"] == org_name))
+            if orga:
+                return orga["orgId"]
+        except StopIteration:
+            pass
+
+        self._module.fail_json(
+            failed=True, msg="Current user isn't member of organization: %s" % org_name
+        )
+
+    def grafana_headers(self):
+        if (
+            "grafana_api_key" in self._module.params
+            and self._module.params["grafana_api_key"]
+        ):
+            self.headers["Authorization"] = (
+                "Bearer %s" % self._module.params["grafana_api_key"]
+            )
+        else:
+            self.headers["Authorization"] = basic_auth_header(
+                self._module.params["url_username"], self._module.params["url_password"]
+            )
+            self.org_id = (
+                self.organization_by_name(self._module.params["org_name"])
+                if self._module.params["org_name"]
+                else self._module.params["org_id"]
+            )
+            self.grafana_switch_organisation(self.org_id)
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -307,8 +364,12 @@ def setup_module_object():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=base.grafana_required_together(),
-        mutually_exclusive=base.grafana_mutually_exclusive(),
+        required_together=base.grafana_required_together()
+        + [["url_username", "url_password", "org_id"]],
+        mutually_exclusive=base.grafana_mutually_exclusive()
+        + [
+            ["org_id", "org_name"],
+        ],
     )
     return module
 
@@ -316,6 +377,8 @@ def setup_module_object():
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     name=dict(type="str", required=True),
+    org_id=dict(default=1, type="int"),
+    org_name=dict(type="str"),
     email=dict(type="str", required=True),
     members=dict(type="list", elements="str", required=False),
     enforce_members=dict(type="bool", default=False),
