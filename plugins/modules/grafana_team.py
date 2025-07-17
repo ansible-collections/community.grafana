@@ -262,8 +262,7 @@ class GrafanaTeamInterface(object):
         except StopIteration:
             self._module.fail_json(
                 failed=True,
-                msg="The current user is not a member of the organization: %s"
-                % org_name,
+                msg="Current user isn't member of organization: %s" % org_name,
             )
 
     def grafana_headers(self):
