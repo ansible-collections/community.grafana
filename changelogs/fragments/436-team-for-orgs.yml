@@ -1,3 +1,4 @@
+---
 minor_changes:
-  - Enable option ``org_id`` for grafana_team
-  - Enable option ``org_name`` for grafana_team
+  - grafana_team - integrate parameter ``org_id``
+  - grafana_team - integrate parameter ``org_name``
