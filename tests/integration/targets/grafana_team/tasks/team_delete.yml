@@ -1,0 +1,30 @@
+---
+- name: Check a team can be deleted
+  community.grafana.grafana_team:
+    name: grafana working group
+    org_id: "{{ team_create_org_result.org.id if team_include.org_id | default(false) else omit }}"
+    org_name: "{{ team_create_org_result.org.name if team_include.org_name | default(false) else omit }}"
+    email: foo.bar@example.com
+    state: absent
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.message == 'Team deleted'
+  when: not ansible_check_mode
+
+- name: Check idempotency on team deletion
+  community.grafana.grafana_team:
+    name: grafana working group
+    org_id: "{{ team_create_org_result.org.id if team_include.org_id | default(false) else omit }}"
+    org_name: "{{ team_create_org_result.org.name if team_include.org_name | default(false) else omit }}"
+    email: foo.bar@example.com
+    state: absent
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.message == 'No team found'
+  when: not ansible_check_mode
