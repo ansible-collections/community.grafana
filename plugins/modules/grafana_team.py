@@ -71,18 +71,18 @@ options:
     version_added: "1.2.0"
   org_id:
     description:
-    - Grafana organization ID in which the team should be created.
-    - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
-      belongs to one organization.
-    - Mutually exclusive with C(org_name).
+      - Grafana organization ID in which the team should be created.
+      - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only 
+        belongs to one organization.
+      - Mutually exclusive with C(org_name).
     default: 1
     type: int
   org_name:
     description:
-    - Grafana organization name in which the team should be created.
-    - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
-      belongs to one organization.
-    - Mutually exclusive with C(org_id).
+      - Grafana organization name in which the team should be created.
+      - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+        belongs to one organization.
+      - Mutually exclusive with C(org_id).
     type: str
 extends_documentation_fragment:
 - community.grafana.basic_auth
@@ -93,42 +93,62 @@ EXAMPLES = """
 ---
 - name: Create a team
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: present
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    state: present
 
 - name: Create a team with members
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members:
-          - john.doe@example.com
-          - jane.doe@example.com
-      state: present
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    members:
+      - john.doe@example.com
+      - jane.doe@example.com
+    state: present
 
 - name: Create a team with members and enforce the list of members
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members:
-          - john.doe@example.com
-          - jane.doe@example.com
-      enforce_members: true
-      state: present
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    members:
+      - john.doe@example.com
+      - jane.doe@example.com
+    enforce_members: true
+    state: present
 
 - name: Delete a team
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: absent
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    state: absent
+
+- name: Create a team in a specific organization by name
+  community.grafana.grafana_team:
+    url: "https://grafana.example.com"
+    url_username: "admin"
+    url_password: "admin"
+    name: "foo_team"
+    email: "foo@example.com"
+    org_name: "Main Org."
+    state: present
+
+- name: Create a team in a specific organization by ID
+  community.grafana.grafana_team:
+    url: "https://grafana.example.com"
+    url_username: "admin"
+    url_password: "admin"
+    name: "bar_team"
+    email: "bar@example.com"
+    org_id: 3
+    state: present
 """
 
 RETURN = """
