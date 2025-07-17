@@ -611,7 +611,7 @@ class GrafanaTeamsTest(TestCase):
                 },
                 method="GET",
             )
-            self.assertEqual(res, ["user1@email.com", "user2@email.com"])
+            self.assertEqual(res, ["user1", "user2"])
 
     @patch(
         "ansible_collections.community.grafana.plugins.modules.grafana_team.GrafanaTeamInterface.get_version"
@@ -673,7 +673,7 @@ class GrafanaTeamsTest(TestCase):
                 grafana_team.GrafanaTeamInterface, "get_user_id_from_mail"
             ) as mock_get_user_id_from_mail:
                 mock_get_user_id_from_mail.return_value = 42
-                res = grafana_iface.add_team_member(2, "another@test.com")
+                res = grafana_iface.add_team_member(2, 42)
                 self.assertEqual(mock_fetch_url.call_count, 2)
                 mock_fetch_url.assert_called_with(
                     module,
@@ -711,7 +711,7 @@ class GrafanaTeamsTest(TestCase):
                 grafana_team.GrafanaTeamInterface, "get_user_id_from_mail"
             ) as mock_get_user_id_from_mail:
                 mock_get_user_id_from_mail.return_value = 42
-                res = grafana_iface.delete_team_member(2, "another@test.com")
+                res = grafana_iface.delete_team_member(2, 42)
                 self.assertEqual(mock_fetch_url.call_count, 2)
                 mock_fetch_url.assert_called_with(
                     module,

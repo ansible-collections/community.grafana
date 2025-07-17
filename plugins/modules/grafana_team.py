@@ -44,7 +44,7 @@ options:
     type: str
   members:
     description:
-      - List of team members (emails).
+      - List of team members (logins).
       - The list can be enforced with C(enforce_members) parameter.
     type: list
     elements: str
@@ -106,8 +106,8 @@ EXAMPLES = """
     name: "grafana_working_group"
     email: "foo.bar@example.com"
     members:
-      - john.doe@example.com
-      - jane.doe@example.com
+      - john.doe
+      - jane.doe
     state: present
 
 - name: Create a team with members and enforce the list of members
@@ -117,8 +117,8 @@ EXAMPLES = """
     name: "grafana_working_group"
     email: "foo.bar@example.com"
     members:
-      - john.doe@example.com
-      - jane.doe@example.com
+      - john.doe
+      - jane.doe
     enforce_members: true
     state: present
 
@@ -357,16 +357,15 @@ class GrafanaTeamInterface(object):
     def get_team_members(self, team_id):
         url = "/api/teams/{team_id}/members".format(team_id=team_id)
         response = self._send_request(url, headers=self.headers, method="GET")
-        members = [item.get("email") for item in response]
+        members = [item.get("login") for item in response]
         return members
 
-    def add_team_member(self, team_id, email):
+    def add_team_member(self, team_id, user_id):
         url = "/api/teams/{team_id}/members".format(team_id=team_id)
-        data = {"userId": self.get_user_id_from_mail(email)}
+        data = {"userId": user_id}
         self._send_request(url, data=data, headers=self.headers, method="POST")
 
-    def delete_team_member(self, team_id, email):
-        user_id = self.get_user_id_from_mail(email)
+    def delete_team_member(self, team_id, user_id):
         url = "/api/teams/{team_id}/members/{user_id}".format(
             team_id=team_id, user_id=user_id
         )
@@ -415,6 +414,13 @@ def main():
     enforce_members = module.params["enforce_members"]
 
     grafana_iface = GrafanaTeamInterface(module)
+
+    # COMPAT: translate member emails to logins if needed
+    if members and len(members) != 0:
+        members = [
+            grafana_iface.get_user_id_from_mail(item) if "@" in item else item
+            for item in members
+        ]
 
     changed = False
     if state == "present":
