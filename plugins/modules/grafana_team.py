@@ -72,7 +72,7 @@ options:
   org_id:
     description:
       - Grafana organization ID in which the team should be created.
-      - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only 
+      - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
         belongs to one organization.
       - Mutually exclusive with C(org_name).
     default: 1
