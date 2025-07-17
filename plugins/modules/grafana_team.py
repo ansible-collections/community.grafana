@@ -254,16 +254,17 @@ class GrafanaTeamInterface(object):
     def organization_by_name(self, org_name):
         url = "/api/user/orgs"
         organizations = self._send_request(url, headers=self.headers, method="GET")
-        try:
-            orga = next((org for org in organizations if org["name"] == org_name))
-            if orga:
-                return orga["orgId"]
-        except StopIteration:
-            pass
 
-        self._module.fail_json(
-            failed=True, msg="Current user isn't member of organization: %s" % org_name
-        )
+        try:
+            return next(
+                org["orgId"] for org in organizations if org["name"] == org_name
+            )
+        except StopIteration:
+            self._module.fail_json(
+                failed=True,
+                msg="The current user is not a member of the organization: %s"
+                % org_name,
+            )
 
     def grafana_headers(self):
         if (
