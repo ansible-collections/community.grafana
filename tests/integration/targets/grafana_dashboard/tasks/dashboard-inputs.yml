@@ -1,0 +1,84 @@
+---
+- name: Create Dashboard with inputs | check mode | dashboard does not exist
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "405"
+    dashboard_revision: "8"
+    inputs:
+      DS_PROMETHEUS: Prometheus
+    overwrite: true
+    uid: "dfi"
+  check_mode: true
+  register: dfi_result1
+- ansible.builtin.assert:
+    that:
+      - dfi_result1.failed == false
+      - dfi_result1.changed == true
+      - dfi_result1.uid is not defined
+      - dfi_result1.msg == 'Dashboard Node Exporter Server Metrics will be created'
+
+- name: Create Dashboard with inputs | run mode | dashboard does not exist
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "405"
+    dashboard_revision: "8"
+    inputs:
+      DS_PROMETHEUS: Prometheus
+    overwrite: true
+    uid: "dfi"
+  check_mode: false
+  register: dfi_result2
+- ansible.builtin.assert:
+    that:
+      - dfi_result2.failed == false
+      - dfi_result2.changed == true
+      - dfi_result2.uid is truthy
+      - dfi_result2.uid == 'dfi'
+      - dfi_result2.msg == 'Dashboard Node Exporter Server Metrics created'
+
+- name: Create Dashboard with inputs | check mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "405"
+    dashboard_revision: "8"
+    inputs:
+      DS_PROMETHEUS: Prometheus
+    overwrite: true
+    uid: "dfi"
+  check_mode: true
+  register: dfi_result3
+- ansible.builtin.assert:
+    that:
+      - dfi_result3.failed == false
+      - dfi_result3.changed == false
+      - dfi_result3.uid is truthy
+      - dfi_result3.uid == 'dfi'
+      - dfi_result3.msg == 'Dashboard Node Exporter Server Metrics unchanged.'
+
+- name: Create Dashboard with inputs | run mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "405"
+    dashboard_revision: "8"
+    inputs:
+      DS_PROMETHEUS: Prometheus
+    overwrite: true
+    uid: "dfi"
+  check_mode: false
+  register: dfi_result4
+- ansible.builtin.assert:
+    that:
+      - dfi_result4.failed == false
+      - dfi_result4.changed == false
+      - dfi_result4.uid is truthy
+      - dfi_result4.uid == 'dfi'
+      - dfi_result4.msg == 'Dashboard Node Exporter Server Metrics unchanged.'
+
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml
+  vars:
+    uid_to_delete: "{{ dfi_result4.uid }}"
