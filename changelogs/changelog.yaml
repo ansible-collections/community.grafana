@@ -375,3 +375,16 @@ releases:
     - 421-grafana-workflow.yml
     - 425-check-releases-add-ansible.yml
     release_date: '2025-04-23'
+  2.3.0:
+    changes:
+      bugfixes:
+      - Fix parsing of grafana version for pre-releases and security releases
+      - grafana_dashboard - fix change detection for dashboards in folders
+      minor_changes:
+      - grafana_team - integrate parameter ``org_id``
+      - grafana_team - integrate parameter ``org_name``
+    fragments:
+    - 428-dashboard-change-detection.yml
+    - 433-version-parsing.yml
+    - 436-team-for-orgs.yml
+    release_date: '2025-07-21'

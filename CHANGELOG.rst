@@ -4,6 +4,21 @@ Grafana Collection Release Notes
 
 .. contents:: Topics
 
+v2.3.0
+======
+
+Minor Changes
+-------------
+
+- grafana_team - integrate parameter ``org_id``
+- grafana_team - integrate parameter ``org_name``
+
+Bugfixes
+--------
+
+- Fix parsing of grafana version for pre-releases and security releases
+- grafana_dashboard - fix change detection for dashboards in folders
+
 v2.2.0
 ======
 
