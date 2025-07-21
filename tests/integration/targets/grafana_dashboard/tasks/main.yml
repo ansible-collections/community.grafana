@@ -7,6 +7,10 @@
   ansible.builtin.include_tasks:
     file: dashboard-from-id.yml
 
+- name: Create dashboard with inputs
+  ansible.builtin.include_tasks:
+    file: dashboard-inputs.yml
+
 - name: Create dashboard from file and export
   ansible.builtin.include_tasks:
     file: dashboard-from-file-export.yml
