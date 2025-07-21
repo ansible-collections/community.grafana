@@ -336,6 +336,7 @@
         slug: "{{ dashboard.slug | default(omit) }}"
         state: "{{ dashboard.state | default(omit) }}"
         uid: "{{ dashboard.uid | default(omit) }}"
+        name: "{{ dashboard.name | default(omit) }}"
       loop: "{{ grafana_dashboards }}"
       loop_control: {loop_var: dashboard}
       tags: [dashboard, molecule-idempotence-notest]
