@@ -157,6 +157,7 @@ from ansible.module_utils._text import to_text
 from ansible_collections.community.grafana.plugins.module_utils.base import (
     grafana_argument_spec,
     clean_url,
+    parse_grafana_version,
 )
 
 __metaclass__ = type
@@ -224,14 +225,14 @@ def grafana_headers(module, data):
 
 
 def get_grafana_version(module, grafana_url, headers):
-    grafana_version = None
+    grafana_version = {}
     r, info = fetch_url(
         module, "%s/api/frontend/settings" % grafana_url, headers=headers, method="GET"
     )
     if info["status"] == 200:
         try:
             settings = json.loads(to_text(r.read()))
-            grafana_version = settings["buildInfo"]["version"].split(".")[0]
+            grafana_version = parse_grafana_version(settings["buildInfo"]["version"])
         except UnicodeError:
             raise GrafanaAPIException("Unable to decode version string to Unicode")
         except Exception as e:
@@ -239,7 +240,7 @@ def get_grafana_version(module, grafana_url, headers):
     else:
         raise GrafanaAPIException("Unable to get grafana version: %s" % info)
 
-    return int(grafana_version)
+    return grafana_version.get("major")
 
 
 def grafana_folder_exists(module, grafana_url, folder_name, parent_folder, headers):
@@ -329,15 +330,17 @@ def is_grafana_dashboard_changed(payload, dashboard):
     if "version" in dashboard["dashboard"]:
         del dashboard["dashboard"]["version"]
 
+    # if folderId is not provided in dashboard,
+    # try getting the folderId from the dashboard metadata,
+    # otherwise set the default folderId
+    if "folderId" not in dashboard:
+        dashboard["folderId"] = dashboard["meta"].get("folderId", 0)
+
     # remove meta key if exists for compare
     if "meta" in dashboard:
         del dashboard["meta"]
     if "meta" in payload:
         del payload["meta"]
-
-    # if folderId is not provided in dashboard, set default folderId
-    if "folderId" not in dashboard:
-        dashboard["folderId"] = 0
 
     # Ignore dashboard ids since real identifier is uuid
     if "id" in dashboard["dashboard"]:

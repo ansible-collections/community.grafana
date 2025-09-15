@@ -69,6 +69,21 @@ options:
     type: bool
     default: false
     version_added: "1.2.0"
+  org_id:
+    description:
+      - Grafana organization ID in which the team should be created.
+      - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+        belongs to one organization.
+      - Mutually exclusive with C(org_name).
+    default: 1
+    type: int
+  org_name:
+    description:
+      - Grafana organization name in which the team should be created.
+      - Not used when C(grafana_api_key) is set, because the C(grafana_api_key) only
+        belongs to one organization.
+      - Mutually exclusive with C(org_id).
+    type: str
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -78,42 +93,62 @@ EXAMPLES = """
 ---
 - name: Create a team
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: present
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    state: present
 
 - name: Create a team with members
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members:
-          - john.doe@example.com
-          - jane.doe@example.com
-      state: present
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    members:
+      - john.doe@example.com
+      - jane.doe@example.com
+    state: present
 
 - name: Create a team with members and enforce the list of members
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      members:
-          - john.doe@example.com
-          - jane.doe@example.com
-      enforce_members: true
-      state: present
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    members:
+      - john.doe@example.com
+      - jane.doe@example.com
+    enforce_members: true
+    state: present
 
 - name: Delete a team
   community.grafana.grafana_team:
-      url: "https://grafana.example.com"
-      grafana_api_key: "{{ some_api_token_value }}"
-      name: "grafana_working_group"
-      email: "foo.bar@example.com"
-      state: absent
+    url: "https://grafana.example.com"
+    grafana_api_key: "{{ some_api_token_value }}"
+    name: "grafana_working_group"
+    email: "foo.bar@example.com"
+    state: absent
+
+- name: Create a team in a specific organization by name
+  community.grafana.grafana_team:
+    url: "https://grafana.example.com"
+    url_username: "admin"
+    url_password: "admin"
+    name: "foo_team"
+    email: "foo@example.com"
+    org_name: "Main Org."
+    state: present
+
+- name: Create a team in a specific organization by ID
+  community.grafana.grafana_team:
+    url: "https://grafana.example.com"
+    url_username: "admin"
+    url_password: "admin"
+    name: "bar_team"
+    email: "bar@example.com"
+    org_id: 3
+    state: present
 """
 
 RETURN = """
@@ -185,18 +220,13 @@ class GrafanaError(Exception):
 class GrafanaTeamInterface(object):
     def __init__(self, module):
         self._module = module
+        self.grafana_url = base.clean_url(module.params.get("url"))
+
         # {{{ Authentication header
         self.headers = {"Content-Type": "application/json"}
-        if module.params.get("grafana_api_key", None):
-            self.headers["Authorization"] = (
-                "Bearer %s" % module.params["grafana_api_key"]
-            )
-        else:
-            self.headers["Authorization"] = basic_auth_header(
-                module.params["url_username"], module.params["url_password"]
-            )
+        self.grafana_headers()
         # }}}
-        self.grafana_url = base.clean_url(module.params.get("url"))
+
         if module.params.get("skip_version_check") is False:
             try:
                 grafana_version = self.get_version()
@@ -206,6 +236,53 @@ class GrafanaTeamInterface(object):
                 self._module.fail_json(
                     failed=True, msg="Teams API is available starting Grafana v5"
                 )
+
+    def grafana_switch_organisation(self, org_id):
+        r, info = fetch_url(
+            self._module,
+            "%s/api/user/using/%s" % (self.grafana_url, org_id),
+            headers=self.headers,
+            method="POST",
+        )
+
+        if info["status"] != 200:
+            self._module.fail_json(
+                failed=True,
+                msg="Unable to switch to organization %s : %s" % (org_id, info),
+            )
+
+    def organization_by_name(self, org_name):
+        url = "/api/user/orgs"
+        organizations = self._send_request(url, headers=self.headers, method="GET")
+
+        try:
+            return next(
+                org["orgId"] for org in organizations if org["name"] == org_name
+            )
+        except StopIteration:
+            self._module.fail_json(
+                failed=True,
+                msg="Current user isn't member of organization: %s" % org_name,
+            )
+
+    def grafana_headers(self):
+        if (
+            "grafana_api_key" in self._module.params
+            and self._module.params["grafana_api_key"]
+        ):
+            self.headers["Authorization"] = (
+                "Bearer %s" % self._module.params["grafana_api_key"]
+            )
+        else:
+            self.headers["Authorization"] = basic_auth_header(
+                self._module.params["url_username"], self._module.params["url_password"]
+            )
+            self.org_id = (
+                self.organization_by_name(self._module.params["org_name"])
+                if self._module.params["org_name"]
+                else self._module.params["org_id"]
+            )
+            self.grafana_switch_organisation(self.org_id)
 
     def _send_request(self, url, data=None, headers=None, method="GET"):
         if data is not None:
@@ -242,8 +319,7 @@ class GrafanaTeamInterface(object):
         )
         version = response.get("version")
         if version is not None:
-            major, minor, rev = version.split(".")
-            return {"major": int(major), "minor": int(minor), "rev": int(rev)}
+            return base.parse_grafana_version(version)
         raise GrafanaError("Failed to retrieve version from '%s'" % url)
 
     def create_team(self, name, email):
@@ -307,8 +383,12 @@ def setup_module_object():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=False,
-        required_together=base.grafana_required_together(),
-        mutually_exclusive=base.grafana_mutually_exclusive(),
+        required_together=base.grafana_required_together()
+        + [["url_username", "url_password", "org_id"]],
+        mutually_exclusive=base.grafana_mutually_exclusive()
+        + [
+            ["org_id", "org_name"],
+        ],
     )
     return module
 
@@ -316,6 +396,8 @@ def setup_module_object():
 argument_spec = base.grafana_argument_spec()
 argument_spec.update(
     name=dict(type="str", required=True),
+    org_id=dict(default=1, type="int"),
+    org_name=dict(type="str"),
     email=dict(type="str", required=True),
     members=dict(type="list", elements="str", required=False),
     enforce_members=dict(type="bool", default=False),

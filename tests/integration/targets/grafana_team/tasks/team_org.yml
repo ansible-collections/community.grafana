@@ -1,0 +1,120 @@
+---
+- name: Create a Team with members
+  community.grafana.grafana_team:
+    name: grafana working group
+    org_id: "{{ team_create_org_result.org.id if team_include.org_id | default(false) else omit }}"
+    org_name: "{{ team_create_org_result.org.name if team_include.org_name | default(false) else omit }}"
+    email: foo.bar@example.com
+    members:
+      - john+doe@example.com
+      - jane.doe@example.com
+    state: present
+  register: result
+
+- ansible.builtin.set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com'])
+      }}"
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.orgId == team_create_org_result.org.id
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
+
+- name: Ensure a Team exists with member not enforced
+  community.grafana.grafana_team:
+    name: grafana working group
+    org_id: "{{ team_create_org_result.org.id if team_include.org_id | default(false) else omit }}"
+    org_name: "{{ team_create_org_result.org.name if team_include.org_name | default(false) else omit }}"
+    email: foo.bar@example.com
+    members:
+      - john+doe@example.com
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.team.name == 'grafana working group'
+      - result.team.orgId == team_create_org_result.org.id
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
+
+- ansible.builtin.set_fact:
+    enforced_members: "{{ auto_member | ternary(['admin@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'john+doe@example.com'], ['john+doe@example.com']) }}"
+
+- name: Ensure a Team exists with member enforced
+  community.grafana.grafana_team:
+    name: grafana working group
+    org_id: "{{ team_create_org_result.org.id if team_include.org_id | default(false) else omit }}"
+    org_name: "{{ team_create_org_result.org.name if team_include.org_name | default(false) else omit }}"
+    email: foo.bar@example.com
+    members: "{{ enforced_members }}"
+    enforce_members: true
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.orgId == team_create_org_result.org.id
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+
+- name: Ensure a Team exists with members omitted
+  community.grafana.grafana_team:
+    name: grafana working group
+    org_id: "{{ team_create_org_result.org.id if team_include.org_id | default(false) else omit }}"
+    org_name: "{{ team_create_org_result.org.name if team_include.org_name | default(false) else omit }}"
+    email: foo.bar@example.com
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.team.name == 'grafana working group'
+      - result.team.orgId == team_create_org_result.org.id
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
+
+- name: Add new member to existing Team
+  community.grafana.grafana_team:
+    name: grafana working group
+    org_id: "{{ team_create_org_result.org.id if team_include.org_id | default(false) else omit }}"
+    org_name: "{{ team_create_org_result.org.name if team_include.org_name | default(false) else omit }}"
+    email: foo.bar@example.com
+    members:
+      - john+doe@example.com
+      - jane.doe@example.com
+    state: present
+  register: result
+
+- ansible.builtin.set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost', 'jane.doe@example.com', 'john+doe@example.com'], ['jane.doe@example.com', 'john+doe@example.com'])
+      }}"
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.orgId == team_create_org_result.org.id
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
+
+- name: Delete team
+  ansible.builtin.import_tasks:
+    file: team_delete.yml
