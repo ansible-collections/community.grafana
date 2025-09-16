@@ -1,0 +1,44 @@
+---
+- name: Create a Team
+  community.grafana.grafana_team:
+    name: grafana working group
+    email: foo.bar@example.com
+    state: present
+    skip_version_check: true
+  register: result
+
+- ansible.builtin.set_fact:
+    # From Grafana 9.0.0, the API user automatically becomes a member of the team
+    auto_member: "{{ result.team.memberCount == 1 }}"
+
+- ansible.builtin.set_fact:
+    expected_members: "{{ auto_member | ternary(['********@localhost'], []) }}"
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
+
+- name: Check idempotency on team creation
+  community.grafana.grafana_team:
+    name: grafana working group
+    email: foo.bar@example.com
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.team.name == 'grafana working group'
+      - result.team.email == 'foo.bar@example.com'
+      - result.team.memberCount == (expected_members|length)
+      - result.team.members == expected_members
+  when: not ansible_check_mode
+
+- name: Delete team
+  ansible.builtin.import_tasks:
+    file: team_delete.yml

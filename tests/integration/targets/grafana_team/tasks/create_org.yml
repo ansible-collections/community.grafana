@@ -1,0 +1,13 @@
+---
+- name: Create a Grafana organization
+  community.grafana.grafana_organization:
+    name: "Other Org."
+    state: present
+  register: team_create_org_result
+
+- ansible.builtin.assert:
+    that:
+      - team_create_org_result.changed == true
+      - team_create_org_result.failed == false
+      - team_create_org_result.org.name == 'Other Org.'
+  when: not ansible_check_mode
