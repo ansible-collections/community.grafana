@@ -50,11 +50,12 @@ options:
     - tempo
     - quickwit-quickwit-datasource
     - alertmanager
+    - grafana-sentry-datasource
     type: str
   ds_url:
     description:
     - The URL of the datasource.
-    - Required when C(state=present).
+    - Required when C(state=present), except when using sentry_url.
     type: str
   access:
     description:
@@ -351,6 +352,11 @@ options:
     - Password for Zabbix API
     required: false
     type: str
+  sentry_url:
+    description:
+    - Base URL for Sentry API. Required when using sentry datasource.
+    required: false
+    type: str
   additional_json_data:
     description:
     - Defined data is used for datasource jsonData
@@ -480,6 +486,19 @@ EXAMPLES = """
     basic_auth_user: "thruk-user"
     basic_auth_password: "******"
 
+- name: grafana - update sentry datasource
+  community.grafana.grafana_datasource:
+    name: sentry
+    grafana_url: "https://grafana.company.com"
+    grafana_user: "admin"
+    grafana_password: "xxxxxx"
+    ds_type: grafana-sentry-datasource
+    sentry_url: https://sentry.io/
+    additional_json_data:
+      orgSlug: your-org
+    additional_secure_json_data:
+      authToken: supersecret
+
 # handle secure data - workflow example
 # this will create/update the datasource but dont update the secure data on updates
 # so you can assert if all tasks are changed=False
@@ -567,6 +586,7 @@ def compare_datasources(new, current, compareSecureData=True):
         "readOnly",
         "typeLogoUrl",
         "version",
+        "sentry_url",
     ]:
         current.pop(field, None)
 
@@ -726,6 +746,12 @@ def get_datasource_payload(data, org_id=None):
             secure_json_data["accessKey"] = data.get("aws_access_key")
             secure_json_data["secretKey"] = data.get("aws_secret_key")
 
+    if data["ds_type"] == "grafana-sentry-datasource":
+        json_data["url"] = data["sentry_url"]
+        payload["url"] = ""
+        if "authToken" not in secure_json_data:
+            raise KeyError("The key 'authToken' is required under additional_secure_json_data for Sentry datasources")
+
     payload["jsonData"] = json_data
     payload["secureJsonData"] = secure_json_data
     return payload
@@ -839,6 +865,7 @@ def setup_module_object():
                 "tempo",
                 "quickwit-quickwit-datasource",
                 "alertmanager",
+                "grafana-sentry-datasource",
             ]
         ),
         ds_url=dict(type="str"),
@@ -925,6 +952,7 @@ def setup_module_object():
         azure_tenant=dict(type="str"),
         azure_client=dict(type="str"),
         azure_secret=dict(type="str", no_log=True),
+        sentry_url=dict(type="str"),
         zabbix_user=dict(type="str"),
         zabbix_password=dict(type="str", no_log=True),
         additional_json_data=dict(type="dict", default={}, required=False),
@@ -945,7 +973,7 @@ def setup_module_object():
             ["org_id", "org_name"],
         ],
         required_if=[
-            ["state", "present", ["ds_type", "ds_url"]],
+            ["state", "present", ["ds_type"]],
             ["ds_type", "opentsdb", ["tsdb_version", "tsdb_resolution"]],
             ["ds_type", "influxdb", ["database"]],
             [
@@ -960,6 +988,7 @@ def setup_module_object():
             ["es_version", "60", ["max_concurrent_shard_requests"]],
             ["es_version", "70", ["max_concurrent_shard_requests"]],
         ],
+        required_one_of=[["ds_url", "sentry_url"]],
     )
     return module
 
