@@ -1,0 +1,2 @@
+minor_changes:
+  - Add support for Sentry datasource type (https://grafana.com/grafana/plugins/grafana-sentry-datasource/)

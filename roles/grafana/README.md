@@ -55,6 +55,7 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | org_id | no |
 | org_name | no |
 | password | no |
+| sentry_url | no |
 | sslmode | no |
 | state | no |
 | time_field | no |

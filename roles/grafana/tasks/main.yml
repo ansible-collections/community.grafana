@@ -254,6 +254,7 @@
         org_id: "{{ datasource.org_id | default(omit) }}"
         org_name: "{{ datasource.org_name | default(omit) }}"
         password: "{{ datasource.password | default(omit) }}"
+        sentry_url: "{{ datasource.sentry_user | default(omit) }}"
         sslmode: "{{ datasource.sslmode | default(omit) }}"
         state: "{{ datasource.state | default(omit) }}"
         time_field: "{{ datasource.time_field | default(omit) }}"
