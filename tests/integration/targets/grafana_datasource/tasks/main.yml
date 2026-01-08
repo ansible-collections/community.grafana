@@ -14,3 +14,4 @@
     - redis
     - azure
     - uid
+    - sentry
