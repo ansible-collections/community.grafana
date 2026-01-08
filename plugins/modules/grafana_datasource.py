@@ -565,7 +565,6 @@ from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
 
-
 ES_VERSION_MAPPING = {
     "7.7+": "7.7.0",
     "7.10+": "7.10.0",
@@ -750,7 +749,9 @@ def get_datasource_payload(data, org_id=None):
         json_data["url"] = data["sentry_url"]
         payload["url"] = ""
         if "authToken" not in secure_json_data:
-            raise KeyError("The key 'authToken' is required under additional_secure_json_data for Sentry datasources")
+            raise KeyError(
+                "The key 'authToken' is required under additional_secure_json_data for Sentry datasources"
+            )
 
     payload["jsonData"] = json_data
     payload["secureJsonData"] = secure_json_data
@@ -974,6 +975,7 @@ def setup_module_object():
         ],
         required_if=[
             ["state", "present", ["ds_type"]],
+            ["state", "present", ["ds_url", "sentry_url"], True],
             ["ds_type", "opentsdb", ["tsdb_version", "tsdb_resolution"]],
             ["ds_type", "influxdb", ["database"]],
             [
@@ -988,7 +990,6 @@ def setup_module_object():
             ["es_version", "60", ["max_concurrent_shard_requests"]],
             ["es_version", "70", ["max_concurrent_shard_requests"]],
         ],
-        required_one_of=[["ds_url", "sentry_url"]],
     )
     return module
 
