@@ -12,8 +12,13 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
+<<<<<<< HEAD
         python_version: ["3.13"]
         ansible_version: ["devel", "milestone", "stable-2.21", "stable-2.20", "stable-2.19"]
+=======
+        python_version: ["3.14"]
+        ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
+>>>>>>> 4829972 (ci(ansible-test): bump python version to 3.14)
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
