@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        python_version: ["3.12"]
+        python_version: ["3.14"]
         ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
     steps:
       - name: Perform testing
@@ -29,7 +29,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        python_version: ["3.12"]
+        python_version: ["3.14"]
         ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
     steps:
       - name: Perform testing
@@ -47,7 +47,7 @@ jobs:
       matrix:
         grafana_version: ["12.3.2", "11.6.10", "10.4.19"]
         ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
-        python_version: ["3.12"]
+        python_version: ["3.14"]
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
@@ -69,7 +69,7 @@ jobs:
       matrix:
         grafana_version: ["12.3.2", "11.6.10", "10.4.19"]
         ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
-        python_version: ["3.12"]
+        python_version: ["3.14"]
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
