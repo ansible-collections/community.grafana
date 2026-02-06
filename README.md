@@ -56,7 +56,7 @@ required by the Ansible Community Package inclusion requirements.
 This collection is currently testing the modules against the following versions:
 
 ```yaml
-grafana_version: ["12.0.2", "11.6.3", "10.4.19"]
+grafana_version: ["12.3.2", "11.6.10", "10.4.19"]
 ansible_version: ["devel", "milestone", "stable-2.21", "stable-2.20", "stable-2.19"]
 ```
 
