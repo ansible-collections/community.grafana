@@ -54,8 +54,8 @@ We aim to keep the last 3 major versions of both **Grafana** and **Ansible** tes
 This collection is currently testing the modules against the following versions:
 
 ```yaml
-grafana_version: ["12.0.2", "11.6.3", "10.4.19"]
-ansible_version: ["v2.19.0b7", "stable-2.18", "stable-2.17"]
+grafana_version: ["12.3.2", "11.6.10", "10.4.19"]
+ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
 ```
 
 ## Installation and Usage

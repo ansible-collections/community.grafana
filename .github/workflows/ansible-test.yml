@@ -1,4 +1,5 @@
 name: CI
+
 on:
   push:
     branches:
@@ -12,8 +13,8 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        python_version: ["3.12"]
-        ansible_version: ["v2.19.0b7", "stable-2.18", "stable-2.17"]
+        python_version: ["3.13"]
+        ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
@@ -29,8 +30,8 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        python_version: ["3.12"]
-        ansible_version: ["v2.19.0b7", "stable-2.18", "stable-2.17"]
+        python_version: ["3.13"]
+        ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
@@ -45,9 +46,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        grafana_version: ["12.0.2", "11.6.3", "10.4.19"]
-        ansible_version: ["v2.19.0b7", "stable-2.18", "stable-2.17"]
-        python_version: ["3.12"]
+        grafana_version: ["12.3.2", "11.6.10", "10.4.19"]
+        ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
+        python_version: ["3.13"]
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
@@ -67,19 +68,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        grafana_version: ["12.0.2", "11.6.3", "10.4.19"]
-        ansible_version: ["v2.19.0b7", "stable-2.18", "stable-2.17"]
-        python_version: ["3.12"]
+        grafana_version: ["12.3.2", "11.6.10", "10.4.19"]
+        ansible_version: ["v2.20.2rc1", "stable-2.20", "stable-2.19"]
+        python_version: ["3.13"]
     services:
       grafana:
         image: grafana/grafana:${{ matrix.grafana_version }}
         ports: ["3000:3000"]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python_version }}
 
