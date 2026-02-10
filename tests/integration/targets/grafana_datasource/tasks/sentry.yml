@@ -1,0 +1,98 @@
+---
+- name: Create sentry datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-sentry
+    org_id: "1"
+    ds_type: grafana-sentry-datasource
+    sentry_url: https://sentry.io
+    additional_json_data:
+      orgSlug: my-organization
+    additional_secure_json_data:
+      authToken: "foo"
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - not result.datasource.isDefault
+      - result.datasource.jsonData.url == 'https://sentry.io'
+      - result.datasource.name == 'datasource-sentry'
+      - result.datasource.orgId == 1
+      - ('password' not in result.datasource) or (result.datasource.password == '')
+      - result.datasource.type == 'grafana-sentry-datasource'
+      - result.datasource.url == ''
+      - result.datasource.user == ''
+      - not result.datasource.withCredentials
+      - result.msg == 'Datasource datasource-sentry created'
+
+- name: Create sentry datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-sentry
+    org_id: "1"
+    ds_type: grafana-sentry-datasource
+    sentry_url: https://sentry.io
+    additional_json_data:
+      orgSlug: my-organization
+    additional_secure_json_data:
+      authToken: "foo"
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+
+- name: Update Sentry datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-sentry
+    org_id: "1"
+    ds_type: grafana-sentry-datasource
+    sentry_url: https://sentry.io
+    additional_json_data:
+      orgSlug: my-organization-updated
+    additional_secure_json_data:
+      authToken: "foo"
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - not result.datasource.isDefault
+      - result.datasource.jsonData.url == 'https://sentry.io'
+      - result.datasource.jsonData.orgSlug == 'my-organization-updated'
+      - result.datasource.name == 'datasource-sentry'
+      - result.datasource.orgId == 1
+      - ('password' not in result.datasource) or (result.datasource.password == '')
+      - result.datasource.type == 'grafana-sentry-datasource'
+      - result.datasource.url == ''
+      - result.datasource.user == ''
+      - not result.datasource.withCredentials
+      - result.msg == 'Datasource datasource-sentry updated'
+
+- name: Delete sentry datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-sentry
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+
+- name: Delete sentry datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-sentry
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
