@@ -85,6 +85,12 @@ options:
     default: '1'
     version_added: "1.0.0"
     type: str
+  inputs:
+    description:
+      - Set replacement values for dashboard input variables
+      - The dictionary key is the input name and the value is the input value
+    version_added: "2.4.0"
+    type: dict
   commit_message:
     description:
       - Set a commit message for the version history.
@@ -128,6 +134,15 @@ EXAMPLES = """
     folder: myteam
     dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
 
+- name: Import Grafana dashboard Node Exporter Full and set value for an input
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_api_key: "{{ grafana_api_key }}"
+    dashboard_id: 1860
+    dashboard_revision: 40
+    inputs:
+      DS_PROMETHEUS: DatasourceName
+
 - name: Export dashboard
   community.grafana.grafana_dashboard:
     grafana_url: http://grafana.company.com
@@ -148,6 +163,7 @@ uid:
   sample: 000000063
 """
 
+import copy
 import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -342,6 +358,27 @@ def is_grafana_dashboard_changed(payload, dashboard):
     if "meta" in payload:
         del payload["meta"]
 
+    # remove elements which are stripped by the import api
+    for key in ["__inputs", "__elements", "__requires"]:
+        if key in dashboard["dashboard"]:
+            del dashboard["dashboard"][key]
+        if key in payload["dashboard"]:
+            del payload["dashboard"][key]
+
+    if "inputs" in payload:
+        # ignore inputs for compare
+        dashboard["inputs"] = payload["inputs"]
+
+        # replace inputs in payload with actual values
+        payload_string = json.dumps(payload)
+        for input_var in payload["inputs"]:
+            if "name" not in input_var or "value" not in input_var:
+                continue
+            payload_string = payload_string.replace(
+                "${" + input_var["name"] + "}", input_var["value"]
+            )
+        payload = json.loads(payload_string)
+
     # Ignore dashboard ids since real identifier is uuid
     if "id" in dashboard["dashboard"]:
         del dashboard["dashboard"]["id"]
@@ -394,6 +431,24 @@ def grafana_create_dashboard(module, data):
         if data.get("uid"):
             payload["dashboard"]["uid"] = data["uid"]
 
+    # set dashboard inputs
+    api_endpoint = "db"
+    if data["inputs"] is not None:
+        inputs = []
+        for input_var in copy.deepcopy(payload["dashboard"].get("__inputs", [])):
+            if input_var.get("name") is None:
+                continue
+            if input_var["name"] in data["inputs"]:
+                # user has overriden input value
+                input_var["value"] = data["inputs"].get(input_var["name"])
+                inputs.append(input_var)
+            elif "value" in input_var:
+                # use default value for input
+                inputs.append(input_var)
+        if len(inputs) >= 1:
+            api_endpoint = "import"
+            payload["inputs"] = inputs
+
     result = {}
 
     # test if the folder exists
@@ -429,7 +484,10 @@ def grafana_create_dashboard(module, data):
         )
 
     if dashboard_exists is True:
-        grafana_dashboard_changed = is_grafana_dashboard_changed(payload, dashboard)
+        # pass a copy of payload so that the original isn't modified by this function
+        grafana_dashboard_changed = is_grafana_dashboard_changed(
+            copy.deepcopy(payload), dashboard
+        )
 
         if grafana_dashboard_changed:
             if module.check_mode:
@@ -447,7 +505,7 @@ def grafana_create_dashboard(module, data):
 
             r, info = fetch_url(
                 module,
-                "%s/api/dashboards/db" % data["url"],
+                "%s/api/dashboards/%s" % (data["url"], api_endpoint),
                 data=json.dumps(payload),
                 headers=headers,
                 method="POST",
@@ -487,7 +545,7 @@ def grafana_create_dashboard(module, data):
 
         r, info = fetch_url(
             module,
-            "%s/api/dashboards/db" % data["url"],
+            "%s/api/dashboards/%s" % (data["url"], api_endpoint),
             data=json.dumps(payload),
             headers=headers,
             method="POST",
@@ -641,6 +699,7 @@ def main():
         dashboard_revision=dict(type="str", default="1"),
         overwrite=dict(type="bool", default=False),
         commit_message=dict(type="str"),
+        inputs=dict(type="dict"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
