@@ -1,0 +1,2 @@
+minor_changes:
+  - grafana_datasource - add support for Sentry datasource type
