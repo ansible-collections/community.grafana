@@ -1,0 +1,3 @@
+---
+removed_features:
+  - grafana_notification_channel - removed module
