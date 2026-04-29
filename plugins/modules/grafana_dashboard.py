@@ -69,6 +69,12 @@ options:
       - Required if C(state) is C(export) or C(present).
     aliases: [ dashboard_url ]
     type: str
+  api_version:
+    description:
+      - API version to use when interacting with Grafana.
+    choices: [ v1, v2 ]
+    default: v1
+    type: str
   overwrite:
     description:
       - Override existing dashboard when state is present.
@@ -137,6 +143,17 @@ EXAMPLES = """
     state: export
     uid: "000000653"
     path: "/path/to/dashboards/000000653.json"
+
+- name: Export dashboard in v2 format
+  community.grafana.grafana_dashboard:
+    grafana_url: http://grafana.company.com
+    grafana_user: "admin"
+    grafana_password: "{{ grafana_password }}"
+    org_id: 1
+    state: export
+    uid: "000000653"
+    path: "/path/to/dashboards/000000653.json"
+    api_version: v2
 """
 
 RETURN = """
@@ -272,13 +289,15 @@ def grafana_folder_exists(module, grafana_url, folder_name, parent_folder, heade
     return False, 0
 
 
-def grafana_dashboard_exists(module, grafana_url, uid, headers):
+def grafana_dashboard_exists(module, grafana_url, uid, headers, api_version="v1", namespace="default"):
     dashboard_exists = False
     dashboard = {}
 
     grafana_version = get_grafana_version(module, grafana_url, headers)
     if grafana_version >= 5:
         uri = "%s/api/dashboards/uid/%s" % (grafana_url, uid)
+        if api_version == "v2":
+            uri = "%s/apis/dashboard.grafana.app/v2/namespaces/%s/dashboards/%s" % (grafana_url, namespace, uid)
     else:
         uri = "%s/api/dashboards/db/%s" % (grafana_url, uid)
 
@@ -287,7 +306,10 @@ def grafana_dashboard_exists(module, grafana_url, uid, headers):
     if info["status"] == 200:
         dashboard_exists = True
         try:
-            dashboard = json.loads(r.read())
+            if header["Content-Type"].startswith("application/yaml"):
+                dashboard = yaml.safe_load(r.read())
+            else:
+                dashboard = json.loads(r.read())
         except Exception as e:
             raise GrafanaAPIException(e)
     elif info["status"] == 404:
@@ -592,9 +614,13 @@ def grafana_export_dashboard(module, data):
         else:
             raise GrafanaExportException("No uid specified")
 
+    if data["path"].endswith(".yaml") is True:
+        headers["Accept"] = "application/yaml"
+
+
     # test if dashboard already exists
     dashboard_exists, dashboard = grafana_dashboard_exists(
-        module, data["url"], uid, headers=headers
+        module, data["url"], uid, headers=headers, api_version=data["api_version"]
     )
 
     if dashboard_exists is True:
@@ -607,7 +633,10 @@ def grafana_export_dashboard(module, data):
             )
         try:
             with open(data["path"], "w", encoding="utf-8") as f:
-                f.write(json.dumps(dashboard, indent=2))
+                if data["path"].endswith(".yaml"):
+                    f.write(yaml.dump(dashboard, default_flow_style=False))
+                else:
+                    f.write(json.dumps(dashboard, indent=2))
         except Exception as e:
             raise GrafanaExportException("Can't write json file : %s" % to_native(e))
         result = {
@@ -641,6 +670,7 @@ def main():
         dashboard_revision=dict(type="str", default="1"),
         overwrite=dict(type="bool", default=False),
         commit_message=dict(type="str"),
+        api_version=dict(type="str", choices=["v1", "v2"], default="v1"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
