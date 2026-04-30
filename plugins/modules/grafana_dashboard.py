@@ -77,7 +77,8 @@ options:
     type: str
   api_version:
     description:
-      - API version to use when interacting with Grafana.
+      - API version to use when interacting with Grafana if the server is v13 or higher.
+        The v2 API supports tabs, dynamic panels and other features not available in the v1 API.
     choices: [ v1, v2 ]
     default: v1
     type: str
