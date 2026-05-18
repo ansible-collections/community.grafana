@@ -50,6 +50,8 @@ options:
     - tempo
     - quickwit-quickwit-datasource
     - alertmanager
+    - victoriametrics-metrics-datasource
+    - victoriametrics-logs-datasource
     type: str
   ds_url:
     description:
@@ -185,7 +187,7 @@ options:
     default: '@timestamp'
   time_interval:
     description:
-    - Minimum group by interval for C(influxdb), C(elasticsearch) or C(prometheus) datasources.
+    - Minimum group by interval for C(influxdb), C(elasticsearch), C(prometheus) or C(victoriametrics-metrics-datasource) datasources.
     - for example C(>10s).
     type: str
   interval:
@@ -480,6 +482,26 @@ EXAMPLES = """
     basic_auth_user: "thruk-user"
     basic_auth_password: "******"
 
+- name: grafana - create victoriametrics datasource
+  community.grafana.grafana_datasource:
+    name: victoriametrics
+    grafana_url: "https://grafana.company.com"
+    grafana_user: "admin"
+    grafana_password: "xxxxxx"
+    ds_type: victoriametrics-metrics-datasource
+    ds_url: "http://victoriametrics:8428"
+    access: proxy
+
+- name: grafana - create victorialogs datasource
+  community.grafana.grafana_datasource:
+    name: victorialogs
+    grafana_url: "https://grafana.company.com"
+    grafana_user: "admin"
+    grafana_password: "xxxxxx"
+    ds_type: victoriametrics-logs-datasource
+    ds_url: "http://victorialogs:9428"
+    access: proxy
+
 # handle secure data - workflow example
 # this will create/update the datasource but dont update the secure data on updates
 # so you can assert if all tasks are changed=False
@@ -681,7 +703,12 @@ def get_datasource_payload(data, org_id=None):
             es_version = ES_VERSION_MAPPING.get(data["es_version"])
         json_data["esVersion"] = es_version
 
-    if data["ds_type"] in ["elasticsearch", "influxdb", "prometheus"]:
+    if data["ds_type"] in [
+        "elasticsearch",
+        "influxdb",
+        "prometheus",
+        "victoriametrics-metrics-datasource",
+    ]:
         if data.get("time_interval"):
             json_data["timeInterval"] = data["time_interval"]
 
@@ -839,6 +866,8 @@ def setup_module_object():
                 "tempo",
                 "quickwit-quickwit-datasource",
                 "alertmanager",
+                "victoriametrics-metrics-datasource",
+                "victoriametrics-logs-datasource",
             ]
         ),
         ds_url=dict(type="str"),

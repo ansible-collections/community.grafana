@@ -1,0 +1,87 @@
+---
+- name: Create victorialogs datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victorialogs
+    org_id: "1"
+    ds_type: victoriametrics-logs-datasource
+    ds_url: http://victorialogs:9428
+    access: proxy
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - not result.datasource.isDefault
+      - result.datasource.name == 'datasource-victorialogs'
+      - result.datasource.orgId == 1
+      - ('password' not in result.datasource) or (result.datasource.password == '')
+      - result.datasource.type == 'victoriametrics-logs-datasource'
+      - result.datasource.url == 'http://victorialogs:9428'
+      - result.datasource.user == ''
+      - not result.datasource.withCredentials
+      - result.msg == 'Datasource datasource-victorialogs created'
+
+- name: Create victorialogs datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victorialogs
+    org_id: "1"
+    ds_type: victoriametrics-logs-datasource
+    ds_url: http://victorialogs:9428
+    access: proxy
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+
+- name: Update victorialogs datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victorialogs
+    org_id: "1"
+    ds_type: victoriametrics-logs-datasource
+    ds_url: http://victorialogs:9428
+    access: proxy
+    with_credentials: true
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - not result.datasource.isDefault
+      - result.datasource.name == 'datasource-victorialogs'
+      - result.datasource.orgId == 1
+      - ('password' not in result.datasource) or (result.datasource.password == '')
+      - result.datasource.type == 'victoriametrics-logs-datasource'
+      - result.datasource.url == 'http://victorialogs:9428'
+      - result.datasource.user == ''
+      - result.datasource.withCredentials
+      - result.msg == 'Datasource datasource-victorialogs updated'
+
+- name: Delete victorialogs datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victorialogs
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+
+- name: Delete victorialogs datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victorialogs
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
