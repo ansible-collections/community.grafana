@@ -37,38 +37,32 @@ class AnsibleReleases(GitHubReleases):
     def get_latest_versions(self):
         releases = self.fetch_releases()
         stable_releases = {}
-        prerelease_candidates = []
 
         for release in releases:
             tag_name = release.get("tag_name", "")
             if not tag_name.startswith("v"):
                 continue
 
-            version_tuple = self.normalize_version(tag_name)
-
             if release.get("prerelease") or any(
                 x in tag_name for x in ["alpha", "beta", "rc", "b"]
             ):
-                prerelease_candidates.append((version_tuple, tag_name))
                 continue
 
-            major_minor = f"stable-{version_tuple[0]}.{version_tuple[1]}"
+            version_tuple = self.normalize_version(tag_name)
+            major_minor = (version_tuple[0], version_tuple[1])
             if (
                 major_minor not in stable_releases
                 or stable_releases[major_minor] < version_tuple
             ):
                 stable_releases[major_minor] = version_tuple
 
-        sorted_stables = sorted(stable_releases.keys(), reverse=True)
+        latest_3 = sorted(stable_releases.keys(), reverse=True)[:3]
+        stable_versions = [f"stable-{major}.{minor}" for major, minor in latest_3]
 
-        versions = []
-        if prerelease_candidates:
-            prerelease_candidates.sort(reverse=True)
-            versions.append(prerelease_candidates[0][1])
-
-        versions.extend(sorted_stables)
-
-        return versions[:3]
+        # devel and milestone are required in addition to the actively
+        # supported stable branches to comply with the Ansible Community
+        # Package inclusion requirements.
+        return ["devel", "milestone"] + stable_versions
 
 
 class GrafanaReleases(GitHubReleases):
