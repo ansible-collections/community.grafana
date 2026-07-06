@@ -1,0 +1,4 @@
+---
+trivial:
+  - drop eol ansible versions and update to current versions
+  - find-version.py script includes devel and milestone alongside 3 latest version
