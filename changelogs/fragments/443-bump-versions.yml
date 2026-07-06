@@ -1,0 +1,4 @@
+---
+trivial:
+  - bump tested Grafana versions and CI action versions
+  - switch lint from black to ruff
