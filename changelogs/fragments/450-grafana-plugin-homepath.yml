@@ -1,0 +1,8 @@
+---
+
+minor_changes:
+  - Add parameter `grafana_homepath` to `grafana_plugin`
+
+bugfixes:
+  - Fall back to `/usr/share/grafana` as working directory when installing
+    plugins and no homepath was given

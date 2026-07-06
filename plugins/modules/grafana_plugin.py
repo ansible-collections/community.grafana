@@ -39,6 +39,11 @@ options:
     - Full URL to the plugin zip file instead of downloading the file from U(https://grafana.com/api/plugins).
     - Requires grafana 4.6.x or later.
     type: str
+  grafana_homepath:
+    description:
+    - Path to Grafana install/home path.
+    - 'If omitted, the home path will be set to C(/usr/share/grafana).'
+    type: str
   state:
     description:
     - Whether the plugin should be installed.
@@ -126,10 +131,30 @@ def grafana_cli_bin(params):
             grafana_cli = "{0} {1} {2}".format(
                 grafana_cli, "--repo", params["grafana_repo"]
             )
+        if "grafana_homepath" in params and params["grafana_homepath"]:
+            grafana_cli = "{0} {1} {2}".format(
+                grafana_cli, "--homepath", params["grafana_homepath"]
+            )
         if "validate_certs" in params and params["validate_certs"] is False:
             grafana_cli = "{0} {1}".format(grafana_cli, "--insecure")
 
         return "{0} {1}".format(grafana_cli, "plugins")
+
+
+def get_grafana_cwd(params):
+    """
+    Get the current working directory in which the grafana-cli binary should
+    be executed. The default directory would be /usr/share/grafana. When
+    homepath is given via ansible module params, the working directory falls
+    back to /. If the working directory or homepath is not pointing to the
+    grafana installation directory, the installation of plugins can fail.
+
+    :param params: ansible module params. Used to fill grafana-cli global params.
+    """
+
+    if "grafana_homepath" in params and params["grafana_homepath"]:
+        return "/"
+    return "/usr/share/grafana"
 
 
 def get_grafana_plugin_version(module, params):
@@ -177,6 +202,7 @@ def grafana_plugin(module, params):
     :param params: ansible module params.
     """
     grafana_cli = grafana_cli_bin(params)
+    grafana_cwd = get_grafana_cwd(params)
 
     if params["state"] == "present":
         grafana_plugin_version = get_grafana_plugin_version(module, params)
@@ -223,7 +249,7 @@ def grafana_plugin(module, params):
     else:
         cmd = "{0} uninstall {1}".format(grafana_cli, params["name"])
 
-    rc, stdout, stderr = module.run_command(cmd, umask=0o0022)
+    rc, stdout, stderr = module.run_command(cmd, cwd=grafana_cwd, umask=0o0022)
     if rc == 0:
         stdout_lines = stdout.split("\n")
         for line in stdout_lines:
@@ -272,6 +298,7 @@ def main():
             grafana_plugins_dir=dict(type="str"),
             grafana_repo=dict(type="str"),
             grafana_plugin_url=dict(type="str"),
+            grafana_homepath=dict(type="str"),
             validate_certs=dict(type="bool", default=False),
             state=dict(choices=["present", "absent"], default="present"),
         ),
