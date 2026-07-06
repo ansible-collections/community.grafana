@@ -50,12 +50,14 @@ Click on the name of a plugin or module to view that content's documentation:
 
 ## Supported Versions
 
-We aim to keep the last 3 major versions of both **Grafana** and **Ansible** tested.
+We aim to keep the last 3 major versions of **Grafana** tested, along with the actively
+supported **ansible-core** stable versions plus its `devel` and `milestone` branches, as
+required by the Ansible Community Package inclusion requirements.
 This collection is currently testing the modules against the following versions:
 
 ```yaml
 grafana_version: ["12.0.2", "11.6.3", "10.4.19"]
-ansible_version: ["v2.19.0b7", "stable-2.18", "stable-2.17"]
+ansible_version: ["devel", "milestone", "stable-2.21", "stable-2.20", "stable-2.19"]
 ```
 
 ## Installation and Usage
