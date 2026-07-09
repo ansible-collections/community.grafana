@@ -66,7 +66,8 @@ options:
     description:
       - The path to the json file containing the Grafana dashboard to import or export.
       - A http URL is also accepted (since 2.10).
-      - Required if C(state) is C(export) or C(present).
+      - Required if C(state) is C(export).
+      - Mutually exclusive with C(content) and C(dashboard_id).
     aliases: [ dashboard_url ]
     type: str
   overwrite:
@@ -77,6 +78,7 @@ options:
   dashboard_id:
     description:
       - Public Grafana.com dashboard id to import
+      - Mutually exclusive with C(content) and C(path).
     version_added: "1.0.0"
     type: str
   dashboard_revision:
@@ -90,6 +92,11 @@ options:
       - Set a commit message for the version history.
       - Only used when C(state) is C(present).
     type: str
+  content:
+    description:
+      - Grafana dashboard content.
+      - Mutually exclusive with C(path) and C(dashboard_id).
+    version_added: "2.3.0"
 extends_documentation_fragment:
 - community.grafana.basic_auth
 - community.grafana.api_key
@@ -149,6 +156,7 @@ uid:
 """
 
 import json
+import yaml
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -158,6 +166,7 @@ from ansible_collections.community.grafana.plugins.module_utils.base import (
     grafana_argument_spec,
     clean_url,
     parse_grafana_version,
+    dict_str,
 )
 
 __metaclass__ = type
@@ -370,11 +379,20 @@ def grafana_create_dashboard(module, data):
             )
         payload = json.loads(r.read())
     else:
-        try:
-            with open(data["path"], "r", encoding="utf-8") as json_file:
-                payload = json.load(json_file)
-        except Exception as e:
-            raise GrafanaAPIException("Can't load json file %s" % to_native(e))
+        if data["path"]:
+            try:
+                with open(data["path"], "r", encoding="utf-8") as json_file:
+                    payload = json.load(json_file)
+            except Exception as e:
+                raise GrafanaAPIException("Can't load json file %s" % to_native(e)) from e
+        else:
+            try:
+                payload = json.loads(data["content"])
+            except json.JSONDecodeError as e:
+                try:
+                    payload = yaml.safe_load(data["content"])
+                except yaml.YAMLError:
+                    module.fail_json(msg=f"Invalid content data: {str(e)}")
 
     # Check that the dashboard JSON is nested under the 'dashboard' key
     if "dashboard" not in payload:
@@ -641,6 +659,7 @@ def main():
         dashboard_revision=dict(type="str", default="1"),
         overwrite=dict(type="bool", default=False),
         commit_message=dict(type="str"),
+        content=dict(type=dict_str),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -652,7 +671,7 @@ def main():
         mutually_exclusive=[
             ["url_username", "grafana_api_key"],
             ["uid", "slug"],
-            ["path", "dashboard_id"],
+            ["path", "dashboard_id", "content"],
             ["org_id", "org_name"],
         ],
     )

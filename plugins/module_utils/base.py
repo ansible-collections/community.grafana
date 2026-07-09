@@ -18,6 +18,7 @@
 
 from __future__ import absolute_import, division, print_function
 from ansible.module_utils.urls import url_argument_spec
+from ansible.module_utils.six import string_types
 
 __metaclass__ = type
 
@@ -65,3 +66,9 @@ def parse_grafana_version(version):
         "pre_release": pre_release,
         "build_meta": build_meta,
     }
+
+
+def dict_str(value):
+    if isinstance(value, (dict, string_types)):
+        return value
+    raise TypeError
