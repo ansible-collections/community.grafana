@@ -32,24 +32,6 @@ options:
     description:
     - The type of the datasource.
     - Required when C(state=present).
-    choices:
-    - graphite
-    - prometheus
-    - elasticsearch
-    - influxdb
-    - opentsdb
-    - mysql
-    - postgres
-    - cloudwatch
-    - alexanderzobnin-zabbix-datasource
-    - grafana-azure-monitor-datasource
-    - sni-thruk-datasource
-    - camptocamp-prometheus-alertmanager-datasource
-    - loki
-    - redis-datasource
-    - tempo
-    - quickwit-quickwit-datasource
-    - alertmanager
     type: str
   ds_url:
     description:
@@ -813,6 +795,16 @@ class GrafanaInterface(object):
         url = "/api/datasources"
         self._send_request(url, data=data, headers=self.headers, method="POST")
 
+    def plugin_exists(self, plugin_id):
+        url = "/api/plugins?type=datasource"
+        plugins = self._send_request(url, headers=self.headers, method="GET")
+
+        for plugin in plugins:
+            if plugin["id"] == plugin_id:
+                return plugin["enabled"]
+
+        return False
+
 
 def setup_module_object():
     argument_spec = base.grafana_argument_spec()
@@ -820,27 +812,7 @@ def setup_module_object():
     argument_spec.update(
         name=dict(required=True, type="str"),
         uid=dict(type="str"),
-        ds_type=dict(
-            choices=[
-                "graphite",
-                "prometheus",
-                "elasticsearch",
-                "influxdb",
-                "opentsdb",
-                "mysql",
-                "postgres",
-                "cloudwatch",
-                "alexanderzobnin-zabbix-datasource",
-                "grafana-azure-monitor-datasource",
-                "camptocamp-prometheus-alertmanager-datasource",
-                "sni-thruk-datasource",
-                "redis-datasource",
-                "loki",
-                "tempo",
-                "quickwit-quickwit-datasource",
-                "alertmanager",
-            ]
-        ),
+        ds_type=dict(type="str"),
         ds_url=dict(type="str"),
         access=dict(default="proxy", choices=["proxy", "direct"]),
         database=dict(type="str", default=""),
@@ -977,13 +949,16 @@ def main():
     if state == "present":
         payload = get_datasource_payload(module.params, grafana_iface.org_id)
         if ds is None:
+            ds_type = module.params["ds_type"]
+            if not grafana_iface.plugin_exists(ds_type):
+                module.log(msg=f"Datasource type unknown: {ds_type}")
             grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)
             if ds.get("isDefault") != module.params["is_default"]:
                 grafana_iface.update_datasource(ds.get("id"), payload)
                 ds = grafana_iface.datasource_by_name(name)
             module.exit_json(
-                changed=True, datasource=ds, msg="Datasource %s created" % name
+                changed=True, datasource=ds, msg=f"Datasource {name} created"
             )
         else:
             diff = compare_datasources(payload.copy(), ds.copy(), enforce_secure_data)
