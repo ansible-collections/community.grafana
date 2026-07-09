@@ -1,0 +1,91 @@
+---
+- name: Create victoriametrics datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victoriametrics
+    org_id: "1"
+    ds_type: victoriametrics-metrics-datasource
+    ds_url: http://victoriametrics:8428
+    access: proxy
+    time_interval: "15s"
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - not result.datasource.isDefault
+      - result.datasource.jsonData.timeInterval == '15s'
+      - result.datasource.name == 'datasource-victoriametrics'
+      - result.datasource.orgId == 1
+      - ('password' not in result.datasource) or (result.datasource.password == '')
+      - result.datasource.type == 'victoriametrics-metrics-datasource'
+      - result.datasource.url == 'http://victoriametrics:8428'
+      - result.datasource.user == ''
+      - not result.datasource.withCredentials
+      - result.msg == 'Datasource datasource-victoriametrics created'
+
+- name: Create victoriametrics datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victoriametrics
+    org_id: "1"
+    ds_type: victoriametrics-metrics-datasource
+    ds_url: http://victoriametrics:8428
+    access: proxy
+    time_interval: "15s"
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
+
+- name: Update victoriametrics datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victoriametrics
+    org_id: "1"
+    ds_type: victoriametrics-metrics-datasource
+    ds_url: http://victoriametrics:8428
+    access: proxy
+    time_interval: "30s"
+
+- ansible.builtin.debug:
+    var: result
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+      - not result.datasource.isDefault
+      - result.datasource.jsonData.timeInterval == '30s'
+      - result.datasource.name == 'datasource-victoriametrics'
+      - result.datasource.orgId == 1
+      - ('password' not in result.datasource) or (result.datasource.password == '')
+      - result.datasource.type == 'victoriametrics-metrics-datasource'
+      - result.datasource.url == 'http://victoriametrics:8428'
+      - result.datasource.user == ''
+      - not result.datasource.withCredentials
+      - result.msg == 'Datasource datasource-victoriametrics updated'
+
+- name: Delete victoriametrics datasource
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victoriametrics
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - result.changed
+
+- name: Delete victoriametrics datasource (idempotency)
+  register: result
+  community.grafana.grafana_datasource:
+    name: datasource-victoriametrics
+    state: absent
+
+- ansible.builtin.assert:
+    that:
+      - not result.changed
