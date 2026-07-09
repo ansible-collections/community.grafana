@@ -92,6 +92,7 @@ Configure Grafana organizations, dashboards, folders, datasources, teams and use
 | slug | no |
 | state | no |
 | uid | no |
+| name | no |
 | [**grafana_organization_users**](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_organization_user_module.html) |
 | login | yes |
 | org_id | no |

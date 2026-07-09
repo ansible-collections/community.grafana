@@ -1,0 +1,160 @@
+---
+- name: Create dashboard from ID with custom name | check mode | dashboard does not exist
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "7587"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+    name: "Different Name"
+  check_mode: true
+  register: dfi_result1
+- ansible.builtin.assert:
+    that:
+      - dfi_result1.failed == false
+      - dfi_result1.changed == true
+      - dfi_result1.uid is not defined
+      - dfi_result1.msg == 'Dashboard Different Name will be created'
+
+- name: Create dashboard from ID with custom name | run mode | dashboard does not exist
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "7587"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+    name: "Different Name"
+  check_mode: false
+  register: dfi_result2
+- ansible.builtin.assert:
+    that:
+      - dfi_result2.failed == false
+      - dfi_result2.changed == true
+      - dfi_result2.uid is truthy
+      - dfi_result2.uid == 'dfi'
+      - dfi_result2.msg == 'Dashboard Different Name created'
+
+- name: Create dashboard from ID with custom name | check mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "7587"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+    name: "Different Name"
+  check_mode: true
+  register: dfi_result3
+- ansible.builtin.assert:
+    that:
+      - dfi_result3.failed == false
+      - dfi_result3.changed == false
+      - dfi_result3.uid is truthy
+      - dfi_result3.uid == 'dfi'
+      - dfi_result3.msg == 'Dashboard Different Name unchanged.'
+
+- name: Create dashboard from ID with custom name | run mode | dashboard exists
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "7587"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+    name: "Different Name"
+  check_mode: false
+  register: dfi_result4
+- ansible.builtin.assert:
+    that:
+      - dfi_result4.failed == false
+      - dfi_result4.changed == false
+      - dfi_result4.uid is truthy
+      - dfi_result4.uid == 'dfi'
+      - dfi_result4.msg == 'Dashboard Different Name unchanged.'
+
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml
+  vars:
+    uid_to_delete: "{{ dfi_result4.uid }}"
+
+- name: Create dashboard from ID with default name | run mode | dashboard does not exist
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "9578"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+  check_mode: false
+  register: dfi_result5
+- ansible.builtin.assert:
+    that:
+      - dfi_result5.failed == false
+      - dfi_result5.changed == true
+      - dfi_result5.uid is truthy
+      - dfi_result5.uid == 'dfi'
+      - dfi_result5.msg == 'Dashboard Alertmanager created'
+
+- name: Rename existing dashboard | check mode | dashboard has original name
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "9578"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+    name: "Renamed"
+  check_mode: true
+  register: dfi_result6
+- ansible.builtin.assert:
+    that:
+      - dfi_result6.failed == false
+      - dfi_result6.changed == true
+      - dfi_result6.uid is truthy
+      - dfi_result6.uid == 'dfi'
+      - dfi_result6.msg == 'Dashboard Renamed will be updated'
+
+- name: Rename existing dashboard | run mode | dashboard has original name
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "9578"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+    name: "Renamed"
+  check_mode: false
+  register: dfi_result7
+- ansible.builtin.assert:
+    that:
+      - dfi_result7.failed == false
+      - dfi_result7.changed == true
+      - dfi_result7.uid is truthy
+      - dfi_result7.uid == 'dfi'
+      - dfi_result7.msg == 'Dashboard Renamed updated'
+
+- name: Rename existing dashboard | run mode | dashboard has been renamed
+  community.grafana.grafana_dashboard:
+    state: present
+    commit_message: Updated by ansible
+    dashboard_id: "9578"
+    dashboard_revision: "1"
+    overwrite: true
+    uid: "dfi"
+    name: "Renamed"
+  check_mode: false
+  register: dfi_result8
+- ansible.builtin.assert:
+    that:
+      - dfi_result8.failed == false
+      - dfi_result8.changed == false
+      - dfi_result8.uid is truthy
+      - dfi_result8.uid == 'dfi'
+      - dfi_result8.msg == 'Dashboard Renamed unchanged.'
+
+- ansible.builtin.include_tasks:
+    file: delete-dashboard.yml
+  vars:
+    uid_to_delete: "{{ dfi_result8.uid }}"
