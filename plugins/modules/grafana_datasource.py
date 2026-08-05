@@ -540,12 +540,11 @@ datasource:
 """
 
 import json
+from urllib.parse import quote
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
-
 
 ES_VERSION_MAPPING = {
     "7.7+": "7.7.0",
