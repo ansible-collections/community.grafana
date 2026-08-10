@@ -202,7 +202,7 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
 from ansible_collections.community.grafana.plugins.module_utils import base
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 
 __metaclass__ = type
 

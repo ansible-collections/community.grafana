@@ -51,7 +51,7 @@ def set_module_args(args):
     try:
         from ansible.module_utils.testing import patch_module_args
     except ImportError:
-        from ansible.module_utils._text import to_bytes
+        from ansible.module_utils.common.text.converters import to_bytes
 
         serialized_args = to_bytes(json.dumps({"ANSIBLE_MODULE_ARGS": args}))
         with patch.object(basic, "_ANSIBLE_ARGS", serialized_args):

@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Replace the deprecated `ansible.module_utils._text` imports with
+    `ansible.module_utils.common.text.converters`. The old import path was
+    deprecated in ansible-core 2.20 and will be removed in 2.24.
