@@ -805,8 +805,8 @@ class GrafanaInterface(object):
         url = "/api/datasources/name/%s" % quote(name, safe="")
         self._send_request(url, headers=self.headers, method="DELETE")
 
-    def update_datasource(self, ds_id, data):
-        url = "/api/datasources/%d" % ds_id
+    def update_datasource(self, ds_uid, data):
+        url = "/api/datasources/uid/%s" % ds_uid
         self._send_request(url, data=data, headers=self.headers, method="PUT")
 
     def create_datasource(self, data):
@@ -980,7 +980,7 @@ def main():
             grafana_iface.create_datasource(payload)
             ds = grafana_iface.datasource_by_name(name)
             if ds.get("isDefault") != module.params["is_default"]:
-                grafana_iface.update_datasource(ds.get("id"), payload)
+                grafana_iface.update_datasource(ds.get("uid"), payload)
                 ds = grafana_iface.datasource_by_name(name)
             module.exit_json(
                 changed=True, datasource=ds, msg="Datasource %s created" % name
@@ -991,7 +991,7 @@ def main():
                 module.exit_json(
                     changed=False, datasource=ds, msg="Datasource %s unchanged" % name
                 )
-            grafana_iface.update_datasource(ds.get("id"), payload)
+            grafana_iface.update_datasource(ds.get("uid"), payload)
             ds = grafana_iface.datasource_by_name(name)
             if diff.get("before") == diff.get("after"):
                 module.exit_json(
