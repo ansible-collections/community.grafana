@@ -246,7 +246,7 @@ def get_grafana_version(module, grafana_url, headers):
 def grafana_folder_exists(module, grafana_url, folder_name, parent_folder, headers):
     # the 'General' folder is a special case, it's ID is always '0'
     if folder_name == "General":
-        return True, 0
+        return True, 0, None
 
     try:
         url = "%s/api/folders" % grafana_url
@@ -265,11 +265,12 @@ def grafana_folder_exists(module, grafana_url, folder_name, parent_folder, heade
 
         for folder in folders:
             if folder_name in (folder["title"], folder["uid"]):
-                return True, folder["id"]
+                return True, folder["id"], folder["uid"]
+
     except Exception as e:
         raise GrafanaAPIException(e)
 
-    return False, 0
+    return False, 0, None
 
 
 def grafana_dashboard_exists(module, grafana_url, uid, headers):
@@ -327,29 +328,34 @@ def is_grafana_dashboard_changed(payload, dashboard):
     # you don't need to set the version, but '0' is incremented to '1' by Grafana's API
     if "version" in payload["dashboard"]:
         del payload["dashboard"]["version"]
+
     if "version" in dashboard["dashboard"]:
         del dashboard["dashboard"]["version"]
 
-    # if folderId is not provided in dashboard,
-    # try getting the folderId from the dashboard metadata,
-    # otherwise set the default folderId
-    if "folderId" not in dashboard:
-        dashboard["folderId"] = dashboard["meta"].get("folderId", 0)
+    # Normalize folder information for comparison
+    if "folderUid" not in dashboard:
+        dashboard["folderUid"] = dashboard.get("meta", {}).get("folderUid", "")
+
+    if "folderUid" not in payload:
+        payload["folderUid"] = ""
 
     # remove meta key if exists for compare
     if "meta" in dashboard:
         del dashboard["meta"]
+
     if "meta" in payload:
         del payload["meta"]
 
     # Ignore dashboard ids since real identifier is uuid
     if "id" in dashboard["dashboard"]:
         del dashboard["dashboard"]["id"]
+
     if "id" in payload["dashboard"]:
         del payload["dashboard"]["id"]
 
     if payload == dashboard:
         return False
+
     return True
 
 
@@ -404,15 +410,21 @@ def grafana_create_dashboard(module, data):
         )
 
     if grafana_version >= 5:
-        folder_exists, folder_id = grafana_folder_exists(
-            module, data["url"], data["folder"], data["parent_folder"], headers
+        folder_exists, folder_id, folder_uid = grafana_folder_exists(
+            module,
+            data["url"],
+            data["folder"],
+            data["parent_folder"],
+            headers,
         )
+
         if folder_exists is False:
             raise GrafanaAPIException(
                 "Dashboard folder '%s' does not exist." % data["folder"]
             )
 
-        payload["folderId"] = folder_id
+        if folder_uid:
+            payload["folderUid"] = folder_uid
 
     # test if dashboard already exists
     if uid:

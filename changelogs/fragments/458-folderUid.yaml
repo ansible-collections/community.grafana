@@ -1,0 +1,4 @@
+---
+
+bugfixes:
+  - use `folderUid` instead of folder's `title`
