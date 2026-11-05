@@ -1086,10 +1086,12 @@ class GrafanaContactPointInterface(object):
         if info["status"] == 202:
             contact_point = self.grafana_check_contact_point_match(data)
 
+            before = dict(self.contact_point)
             if contact_point.get("provenance") and data.get("provisioning"):
                 del contact_point["provenance"]
+                before.pop("provenance", None)
 
-            if self.contact_point == contact_point:
+            if before == contact_point:
                 return {
                     "changed": False,
                     "contact_point": contact_point,
