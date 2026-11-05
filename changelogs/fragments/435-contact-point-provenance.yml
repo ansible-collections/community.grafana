@@ -1,0 +1,2 @@
+bugfixes:
+  - grafana_contact_point - ignore ``provenance`` on both sides when checking whether an update changed the contact point, so that a contact point with a provenance is no longer reported as changed on every run (https://github.com/ansible-collections/community.grafana/issues/435, https://github.com/ansible-collections/community.grafana/pull/459).
